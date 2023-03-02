@@ -91,4 +91,3 @@ html_theme_options = {
     "use_download_button": True,
     "home_page_in_toc": False,
 }
-
