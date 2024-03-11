@@ -17,17 +17,17 @@ dependencies:
   - build
   - twine
   # Test
+  - pooch
   - pytest
   - pytest-cov
   - coverage
   # Documentation
   - sphinx==7.2.*
   - sphinx-book-theme==1.1.*
-  - sphinx-gallery==0.15.*
+  - sphinx-copybutton==0.5.*
   - sphinx-design==0.5.*
   - jupyter-sphinx==0.5.*
   - matplotlib
-  - ensaio
   # Style
   - black
   - pathspec

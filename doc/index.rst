@@ -21,13 +21,20 @@
 
         .. image:: ./_static/magali-logo.svg
             :width: 200px
-            :class: sd-m-auto
+            :class: sd-m-auto dark-light
 
 
-**Magali** is Python library for modeling and inversion of magnetic microscopy
-data.
+**Magali** is a Python library for modeling and processing magnetic microscopy
+data. It is able to perform data transformation, automatically identify
+particles in imagery, and perform inversions for magnetic dipole moments.
 
+.. admonition:: **Why this name?**
+   :class: note
 
+   Magali is one of the main characters in a
+   `beloved Brazilian comic strip <https://en.wikipedia.org/wiki/Monica_and_Friends>`__
+   who is always eating watermelons. It also sounds a bit "magnetic" and we
+   thought the logo looked cool.
 
 ----
 
@@ -55,9 +62,9 @@ data.
         :class-title: sd-fs-5
         :class-card: sd-p-3
 
-        Open an Issue on GitHub.
+        Ask on our community channels.
 
-        .. button-link:: https://github.com/compgeolab/magali
+        .. button-link:: https://www.fatiando.org/contact
             :click-parent:
             :color: primary
             :outline:
@@ -96,15 +103,14 @@ data.
 .. admonition:: Magali is in early stages of development
     :class: important
 
-    The functinality we're implementing is the subject of active research.
-    This means that we sometimes break backwards compatibility as we try to
-    improve the software based on user experience, new ideas, better design
-    decisions, etc. Please keep that in mind before you update Magali to a
-    newer version.
+    **Magali is in early stages of development.** We're still figuring out what the
+    best approach, API, and methods will be. Expect breaking changes on new
+    releases as we work towards a more stable future release.
 
-    :octicon:`code-review` **We welcome feedback and ideas!** This is a great
-    time to bring new ideas on how we can improve the project. Submit
-    `issues on GitHub <https://github.com/compgeolab/magali/issues>`__.
+    **We welcome feedback and ideas!** This is a great time to bring new ideas on
+    how we can improve the project.
+    `Join the conversation <https://www.fatiando.org/contact>`__ or submit
+    `issues on GitHub <https://github.com/fatiando/magali/issues>`__.
 
 
 .. toctree::
@@ -138,7 +144,8 @@ data.
     :hidden:
     :caption: Community
 
-    How to contribute <https://github.com/compgeolab/magali/blob/main/CONTRIBUTING.md>
-    Code of Conduct <https://github.com/compgeolab/magali/blob/main/CODE_OF_CONDUCT.md>
-    Source code on GitHub <https://github.com/compgeolab/magali>
-    Computer-Oriented Geoscience Lab <https://www.compgeolab.org>
+    Join the community <https://www.fatiando.org/contact/>
+    How to contribute <https://github.com/fatiando/magali/blob/master/CONTRIBUTING.md>
+    Code of Conduct <https://github.com/fatiando/magali/blob/master/CODE_OF_CONDUCT.md>
+    Source code on GitHub <https://github.com/fatiando/magali>
+    The Fatiando a Terra project <https://www.fatiando.org>

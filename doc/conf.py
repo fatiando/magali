@@ -8,7 +8,7 @@ import magali
 # Project information
 # -----------------------------------------------------------------------------
 project = "magali"
-copyright = f"{datetime.date.today().year}, The {project} developers"  # noqa: A001
+copyright = f"{datetime.date.today().year}, The {project.title()} developers"  # noqa: A001
 if len(magali.__version__.split(".")) > 3:
     version = "dev"
 else:
@@ -64,7 +64,7 @@ add_function_parentheses = False
 # HTML output configuration
 # -----------------------------------------------------------------------------
 html_title = f'{project} <span class="project-version">{version}</span>'
-html_logo = "_static/magali-logo.png"
+html_logo = ""
 html_favicon = "_static/favicon.png"
 html_last_updated_fmt = "%b %d, %Y"
 html_copy_source = True
@@ -78,7 +78,7 @@ html_show_copyright = True
 
 html_theme = "sphinx_book_theme"
 html_theme_options = {
-    "repository_url": "https://github.com/compgeolab/magali",
+    "repository_url": "https://github.com/fatiando/magali",
     "repository_branch": "main",
     "path_to_docs": "doc",
     "launch_buttons": {
