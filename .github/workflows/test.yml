@@ -38,13 +38,18 @@ jobs:
       # run all of them to catch failures in different combinations.
       fail-fast: false
       matrix:
-        os: [ubuntu, macos, windows]
-        python: ["3.7", "3.10"]
+        os:
+          - ubuntu
+          - macos
+          - windows
+        dependencies:
+          - oldest
+          - latest
         include:
-          - python: "3.7"
-            dependencies: oldest
-          - python: "3.10"
-            dependencies: latest
+          - dependencies: oldest
+            python: "3.8"
+          - dependencies: latest
+            python: "3.12"
     env:
       REQUIREMENTS: env/requirements-build.txt env/requirements-test.txt
       # Used to tag codecov submissions
@@ -52,14 +57,6 @@ jobs:
       PYTHON: ${{ matrix.python }}
 
     steps:
-      # Cancel any previous run of the test job
-      # We pin the commit hash corresponding to v0.5.0, and not pinning the tag
-      # because we are giving full access through the github.token.
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@148d9a848c6acaf90a3ec30bc5062f646f8a4163
-        with:
-          access_token: ${{ github.token }}
-
       # Checks-out your repository under $GITHUB_WORKSPACE
       - name: Checkout
         uses: actions/checkout@v2
@@ -85,7 +82,7 @@ jobs:
       - name: Collect requirements
         run: |
           echo "Install Dependente to capture dependencies:"
-          python -m pip install dependente==0.1.0
+          python -m pip install dependente==0.3.0
           echo ""
           echo "Capturing run-time dependencies:"
           if [[ "${{ matrix.dependencies }}" == "oldest" ]]; then
@@ -139,12 +136,12 @@ jobs:
         run: coverage xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
           env_vars: OS,PYTHON
-          # Don't mark the job as failed if the upload fails for some reason.
-          # It does sometimes but shouldn't be the reason for running
-          # everything again unless something else is broken.
+          # Fail the job so we know coverage isn't being updated. Otherwise it
+          # can silently drop and we won't know.
           fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
