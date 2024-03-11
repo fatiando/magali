@@ -1,5 +1,49 @@
-# Specify that we use setuptools and setuptools_scm (to generate the version
-# string). Actual configuration is in setup.cfg.
+[project]
+name = "magali"
+description = "Modelling and inversion of magnetic microscopy data"
+dynamic = ["version"]
+authors = [
+  {name="The Magali Developers", email="fatiandoaterra@protonmail.com"},
+]
+maintainers = [
+  {name = "Leonardo Uieda", email = "leo@uieda.com"},
+]
+readme = "README.md"
+license = {text = "BSD 3-Clause"}
+keywords = ["magnetism", "microscopy", "geophysics", "paleomagnetism"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.19",
+    "xarray>=0.16",
+    "scikit-image>=0.18",
+    "harmonica>=0.6",
+    "verde>=1.7",
+    "choclo==0.0.1",
+]
+
+[project.urls]
+"Documentation" = "https://www.fatiando.org/magali"
+"Changelog" = "https://www.fatiando.org/magali/latest/changes.html"
+"Bug Tracker" = "https://github.com/fatiando/magali/issues"
+"Source Code" = "https://github.com/fatiando/magali"
+
 [build-system]
 requires = ["setuptools>=61", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
