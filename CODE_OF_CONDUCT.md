@@ -1,3 +1,4 @@
-# Code of Conduct
+# Contributor Code of Conduct
 
-See https://www.compgeolab.org/manual/coc.html
+Please refer to our organization-wide
+[Code of Conduct](https://github.com/fatiando/community/blob/main/CODE_OF_CONDUCT.md).
