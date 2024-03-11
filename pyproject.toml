@@ -1,6 +1,6 @@
 [project]
 name = "magali"
-description = "Modelling and inversion of magnetic microscopy data"
+description = "Modeling and inversion of magnetic microscopy data"
 dynamic = ["version"]
 authors = [
   {name="The Magali Developers", email="fatiandoaterra@protonmail.com"},
@@ -31,6 +31,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     "numpy>=1.19",
+    "scipy>=1.8",
     "xarray>=0.16",
     "scikit-image>=0.18",
     "harmonica>=0.6",

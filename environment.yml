@@ -1,19 +1,18 @@
 name: magali
 channels:
   - conda-forge
-  - defaults
 dependencies:
-  - python==3.10
+  - python==3.12
   - pip
   - make
   # Run
   - numpy
+  - scipy
   - xarray
   - scikit-image
   - choclo
   - harmonica
   - verde
-  - pooch
   # Build
   - build
   - twine
@@ -22,13 +21,13 @@ dependencies:
   - pytest-cov
   - coverage
   # Documentation
-  - sphinx==4.5.*
-  - sphinx-book-theme==0.3.*
-  - sphinx-copybutton==0.5.*
-  - jupyter-sphinx==0.3.*
-  - sphinx-design==0.1.*
-  - myst-parser==0.15.*
+  - sphinx==7.2.*
+  - sphinx-book-theme==1.1.*
+  - sphinx-gallery==0.15.*
+  - sphinx-design==0.5.*
+  - jupyter-sphinx==0.5.*
   - matplotlib
+  - ensaio
   # Style
   - black
   - pathspec
@@ -42,3 +41,5 @@ dependencies:
   - flake8-simplify
   - flake8-unused-arguments
   - pep8-naming
+  - pip:
+    - burocrata
