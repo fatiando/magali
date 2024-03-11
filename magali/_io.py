@@ -9,7 +9,7 @@ import verde as vd
 from ._constants import METER_TO_MICROMETER, TESLA_TO_NANOTESLA
 
 
-def read_qdm_harvard():
+def read_qdm_harvard(path):
     """
     Load QDM microscopy data in the Harvard group format.
     """
