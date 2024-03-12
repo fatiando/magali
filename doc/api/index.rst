@@ -7,3 +7,7 @@ List of functions and classes (API)
 
 .. currentmodule:: magali
 
+.. autosummary::
+   :toctree: generated/
+
+   read_qdm_harvard
