@@ -8,7 +8,9 @@ import magali
 # Project information
 # -----------------------------------------------------------------------------
 project = "magali"
-copyright = f"{datetime.date.today().year}, The {project.title()} developers"  # noqa: A001
+copyright = (
+    f"{datetime.date.today().year}, The {project.title()} developers"  # noqa: A001
+)
 if len(magali.__version__.split(".")) > 3:
     version = "dev"
 else:
