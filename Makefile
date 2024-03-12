@@ -28,23 +28,19 @@ test:
 	cp $(TESTDIR)/.coverage* .
 	rm -r $(TESTDIR)
 
-format: isort black
-
-check: black-check isort-check flake8
-
-black:
-	black $(CHECK_STYLE)
-
-black-check:
-	black --check $(CHECK_STYLE)
-
-isort:
+format:
 	isort $(CHECK_STYLE)
+	black $(CHECK_STYLE)
+	burocrata --extension=py $(CHECK_STYLE)
 
-isort-check:
+check: check-format check-style
+
+check-format:
 	isort --check $(CHECK_STYLE)
+	black --check $(CHECK_STYLE)
+	burocrata --check --extension=py $(CHECK_STYLE)
 
-flake8:
+check-style:
 	flake8 $(CHECK_STYLE)
 
 clean:
