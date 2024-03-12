@@ -33,12 +33,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REQUIREMENTS: env/requirements-docs.txt env/requirements-build.txt
-      PYTHON: "3.10"
+      PYTHON: "3.12"
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           # Need to fetch more than the last commit so that setuptools-scm can
           # create the correct version string. If the number of commits since
@@ -54,14 +54,14 @@ jobs:
       #  run: git fetch origin 'refs/tags/*:refs/tags/*'
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
       - name: Collect requirements
         run: |
           echo "Install Dependente to capture dependencies:"
-          python -m pip install dependente==0.1.0
+          python -m pip install dependente==0.3.0
           echo ""
           echo "Capturing run-time dependencies:"
           dependente --source install > requirements-full.txt
@@ -93,7 +93,7 @@ jobs:
         run: pip install --no-deps dist/*.whl
 
       - name: Cache the downloaded datasets
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/.cache/pooch
           # Use a constant key to reuse the datasets across all jobs
@@ -118,7 +118,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Fetch the built docs from the "build" job
       - name: Download HTML documentation artifact
@@ -128,7 +128,7 @@ jobs:
           path: doc/_build/html
 
       - name: Checkout the gh-pages branch in a separate folder
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
           # Checkout to this folder instead of the current one

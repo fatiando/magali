@@ -31,7 +31,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           # Need to fetch more than the last commit so that setuptools_scm can
           # create the correct version string. If the number of commits since
@@ -47,7 +47,7 @@ jobs:
         run: git fetch origin 'refs/tags/*:refs/tags/*'
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           # The GitHub token is preserved by default but this job doesn't need
           # to be able to push to GitHub.
@@ -106,7 +106,7 @@ jobs:
       - name: Publish to Test PyPI
         # Only publish to TestPyPI when a PR is merged (pushed to main)
         if: success() && github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@v1.8.12
+        uses: pypa/gh-action-pypi-publish@v1.8.14
         with:
           repository_url: https://test.pypi.org/legacy/
           # Allow existing releases on test PyPI without errors.
@@ -116,4 +116,4 @@ jobs:
       - name: Publish to PyPI
         # Only publish to PyPI when a release triggers the build
         if: success() && github.event_name == 'release'
-        uses: pypa/gh-action-pypi-publish@v1.8.12
+        uses: pypa/gh-action-pypi-publish@v1.8.14
