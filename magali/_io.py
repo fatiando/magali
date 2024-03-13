@@ -14,7 +14,6 @@ import verde as vd
 
 from ._constants import METER_TO_MICROMETER, TESLA_TO_NANOTESLA
 
-
 def read_qdm_harvard(path):
     """
     Load QDM microscopy data in the Harvard group format.
@@ -26,12 +25,12 @@ def read_qdm_harvard(path):
     Parameters
     ----------
     path : str or pathlib.Path
+        Path to the input Matlab binary file.
 
     Returns
     -------
     data : xarray.Dataset
-        The magnetic field data as a regular grid with coordinates. The
-        coordinates are in µm and magnetic field in nT.
+        The magnetic field data as a regular grid with coordinates. The coordinates are in µm and magnetic field in nT.
     """
     contents = scipy.io.loadmat(path)
     # For some reason, the spacing is returned as an array with a single
