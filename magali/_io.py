@@ -26,6 +26,7 @@ def read_qdm_harvard(path):
     Parameters
     ----------
     path : str or pathlib.Path
+        Path to the input Matlab binary file.
 
     Returns
     -------
