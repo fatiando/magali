@@ -74,7 +74,6 @@ def _set_qdm_data_grid(contents):
     data_names = ["bz"]
     sensor_sample_distance = contents["h"] * METER_TO_MICROMETER
     shape = bz.shape
-
     x = np.arange(shape[1]) * spacing
     y = np.arange(shape[0]) * spacing
     z = np.full(shape, sensor_sample_distance)
