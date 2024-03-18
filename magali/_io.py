@@ -54,11 +54,8 @@ def _set_qdm_data_grid(contents):
     Returns
     -------
     coordinates: tuple of arrays
-        Arrays with coordinates of each point in the grid. Each array must
-        contain values for a dimension in the order: easting, northing,
-        vertical, etc. All arrays must be 2d and need to
-        have the same shape. These coordinates can be generated through
-        verde.grid_coordinates.
+        Tuple of 1D arrays with coordinates of each point in the grid: 
+        x, y, and z (vertical). 
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data
         is None.
