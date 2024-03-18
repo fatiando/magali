@@ -35,12 +35,12 @@ def read_qdm_harvard(path):
         coordinates are in µm and magnetic field in nT.
     """
     contents = scipy.io.loadmat(path)
-    coordinates, data_names, bz = _set_qdm_data_grid(contents)
-    data = _create_grid_qdm_data(coordinates, data_names, bz, path)
+    coordinates, data_names, bz = _extract_data_qdm_harvard(contents)
+    data = _create_qdm_harvard_grid(coordinates, data_names, bz, path)
     return data
 
 
-def _set_qdm_data_grid(contents):
+def _extract_data_qdm_harvard(contents):
     """
     Define variables for generating a grid from QDM microscopy data.
 
@@ -71,11 +71,10 @@ def _set_qdm_data_grid(contents):
     x = np.arange(shape[1]) * spacing
     y = np.arange(shape[0]) * spacing
     z = np.full(shape, sensor_sample_distance)
-
     return (x, y, z), data_names, bz
 
 
-def _create_grid_qdm_data(coordinates, data_names, bz, path):
+def _create_qdm_harvard_grid(coordinates, data_names, bz, path):
     """
     Grid QDM microscopy data in the Harvard group format.
 
