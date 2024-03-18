@@ -53,8 +53,8 @@ def _extract_data_qdm_harvard(contents):
     Returns
     -------
     coordinates: tuple of arrays
-        Tuple of 1D arrays with coordinates of each point in the grid: 
-        x, y, and z (vertical). 
+        Tuple of 1D arrays with coordinates of each point in the grid:
+        x, y, and z (vertical).
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data
         is None.
