@@ -76,11 +76,9 @@ def _extract_data_qdm_harvard(contents):
 
 def _create_qdm_harvard_grid(coordinates, data_names, bz, path):
     """
-    Grid QDM microscopy data in the Harvard group format.
+    Creates QDM microscopy data in the Harvard group format.
 
-    This is the file type used by Roger Fu's group to distribute QDM data. It's
-    a Matlab binary file that has the data and some information about grid
-    spacing.
+    This functions makes the xarray.Dataset and sets appropriate metadata.
 
     Parameters
     ----------
