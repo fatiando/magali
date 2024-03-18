@@ -118,5 +118,4 @@ def _create_grid_qdm_data(coordinates, data_names, bz, path):
     qdm_data.z.attrs = {"long_name": "sensor sample distance", "units": "µm"}
     qdm_data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
     qdm_data.attrs = {"file_name": str(path)}
-
     return qdm_data
