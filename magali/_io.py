@@ -35,7 +35,7 @@ def read_qdm_harvard(path):
         coordinates are in µm and magnetic field in nT.
     """
     contents = scipy.io.loadmat(path)
-    set_qdm_data_grid(contents)
+    coordinates, data_names, bz = set_qdm_data_grid(contents)
     data = vd.make_xarray_grid(
         (x, y, z),
         bz,
@@ -69,6 +69,9 @@ def set_qdm_data_grid(contents):
     
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data is None.
+
+    bz : array
+        The Bz component in nT.
     """
     # For some reason, the spacing is returned as an array with a single
     # value. That messes up operations below so get the only element out.
@@ -81,4 +84,4 @@ def set_qdm_data_grid(contents):
     y = np.arange(shape[0]) * spacing
     z = np.full(shape, sensor_sample_distance)
     
-    return (x, y, z), data_names
+    return (x, y, z), data_names, bz
