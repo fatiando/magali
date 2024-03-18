@@ -35,16 +35,7 @@ def read_qdm_harvard(path):
         coordinates are in µm and magnetic field in nT.
     """
     contents = scipy.io.loadmat(path)
-    # For some reason, the spacing is returned as an array with a single
-    # value. That messes up operations below so get the only element out.
-    spacing = contents["step"].ravel()[0] * METER_TO_MICROMETER
-    bz = contents["Bz"] * TESLA_TO_NANOTESLA
-    data_names = ["bz"]
-    shape = bz.shape
-    sensor_sample_distance = contents["h"] * METER_TO_MICROMETER
-    x = np.arange(shape[1]) * spacing
-    y = np.arange(shape[0]) * spacing
-    z = np.full(shape, sensor_sample_distance)
+    set_qdm_data_grid(contents)
     data = vd.make_xarray_grid(
         (x, y, z),
         bz,
@@ -58,3 +49,36 @@ def read_qdm_harvard(path):
     data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
     data.attrs = {"file_name": str(path)}
     return data
+
+def set_qdm_data_grid(contents):
+    """
+    Define variables for generating a grid from QDM microscopy data.
+
+    Parameters
+    ----------
+    contents: dict
+        A dictionary containing essential parameters including spacing, Bz component, and sensor 
+        sample distances.
+
+    Returns
+    -------
+    coordinates: tuple of arrays
+        Arrays with coordinates of each point in the grid. Each array must contain values for a 
+        dimension in the order: easting, northing, vertical, etc. All arrays must be 2d and need to 
+        have the same shape. These coordinates can be generated through verde.grid_coordinates.
+    
+    data_names : str or list
+        The name(s) of the data variables in the output grid. Ignored if data is None.
+    """
+    # For some reason, the spacing is returned as an array with a single
+    # value. That messes up operations below so get the only element out.
+    spacing = contents["step"].ravel()[0] * METER_TO_MICROMETER
+    bz = contents["Bz"] * TESLA_TO_NANOTESLA
+    data_names = ["bz"]
+    sensor_sample_distance = contents["h"] * METER_TO_MICROMETER
+    shape = bz.shape
+    x = np.arange(shape[1]) * spacing
+    y = np.arange(shape[0]) * spacing
+    z = np.full(shape, sensor_sample_distance)
+    
+    return (x, y, z), data_names
