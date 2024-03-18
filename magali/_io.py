@@ -59,7 +59,6 @@ def _set_qdm_data_grid(contents):
         vertical, etc. All arrays must be 2d and need to
         have the same shape. These coordinates can be generated through
         verde.grid_coordinates.
-
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data
         is None.
