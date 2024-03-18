@@ -40,6 +40,7 @@ def read_qdm_harvard(path):
 
     return data
 
+
 def set_qdm_data_grid(contents):
     """
     Define variables for generating a grid from QDM microscopy data.
@@ -47,16 +48,16 @@ def set_qdm_data_grid(contents):
     Parameters
     ----------
     contents: dict
-        A dictionary containing essential parameters including spacing, Bz component, and sensor 
+        A dictionary containing essential parameters including spacing, Bz component, and sensor
         sample distances.
 
     Returns
     -------
     coordinates: tuple of arrays
-        Arrays with coordinates of each point in the grid. Each array must contain values for a 
-        dimension in the order: easting, northing, vertical, etc. All arrays must be 2d and need to 
+        Arrays with coordinates of each point in the grid. Each array must contain values for a
+        dimension in the order: easting, northing, vertical, etc. All arrays must be 2d and need to
         have the same shape. These coordinates can be generated through verde.grid_coordinates.
-    
+
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data is None.
 
@@ -73,8 +74,9 @@ def set_qdm_data_grid(contents):
     x = np.arange(shape[1]) * spacing
     y = np.arange(shape[0]) * spacing
     z = np.full(shape, sensor_sample_distance)
-    
+
     return (x, y, z), data_names, bz
+
 
 def grid_qdm_data(coordinates, data_names, bz, path):
     """
@@ -87,16 +89,16 @@ def grid_qdm_data(coordinates, data_names, bz, path):
     Parameters
     ----------
     coordinates: tuple of arrays
-        Arrays with coordinates of each point in the grid. Each array must contain values for a 
-        dimension in the order: easting, northing, vertical, etc. All arrays must be 2d and need to 
+        Arrays with coordinates of each point in the grid. Each array must contain values for a
+        dimension in the order: easting, northing, vertical, etc. All arrays must be 2d and need to
         have the same shape. These coordinates can be generated through verde.grid_coordinates.
-    
+
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data is None.
 
     path : str or pathlib.Path
         Path to the input Matlab binary file.
-    
+
     bz : array
         The Bz component in nT.
 
@@ -118,5 +120,5 @@ def grid_qdm_data(coordinates, data_names, bz, path):
     qdm_data.z.attrs = {"long_name": "sensor sample distance", "units": "µm"}
     qdm_data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
     qdm_data.attrs = {"file_name": str(path)}
-    
+
     return qdm_data
