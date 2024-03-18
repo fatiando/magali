@@ -58,7 +58,6 @@ def _set_qdm_data_grid(contents):
     data_names : str or list
         The name(s) of the data variables in the output grid. Ignored if data
         is None.
-
     bz : array
         The Bz component in nT.
     """
