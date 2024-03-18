@@ -35,13 +35,13 @@ def read_qdm_harvard(path):
         coordinates are in µm and magnetic field in nT.
     """
     contents = scipy.io.loadmat(path)
-    coordinates, data_names, bz = set_qdm_data_grid(contents)
-    data = grid_qdm_data(coordinates, data_names, bz, path)
+    coordinates, data_names, bz = _set_qdm_data_grid(contents)
+    data = _create_grid_qdm_data(coordinates, data_names, bz, path)
 
     return data
 
 
-def set_qdm_data_grid(contents):
+def _set_qdm_data_grid(contents):
     """
     Define variables for generating a grid from QDM microscopy data.
 
@@ -71,6 +71,7 @@ def set_qdm_data_grid(contents):
     data_names = ["bz"]
     sensor_sample_distance = contents["h"] * METER_TO_MICROMETER
     shape = bz.shape
+
     x = np.arange(shape[1]) * spacing
     y = np.arange(shape[0]) * spacing
     z = np.full(shape, sensor_sample_distance)
@@ -78,9 +79,9 @@ def set_qdm_data_grid(contents):
     return (x, y, z), data_names, bz
 
 
-def grid_qdm_data(coordinates, data_names, bz, path):
+def _create_grid_qdm_data(coordinates, data_names, bz, path):
     """
-    Load QDM microscopy data in the Harvard group format.
+    Grid QDM microscopy data in the Harvard group format.
 
     This is the file type used by Roger Fu's group to distribute QDM data. It's
     a Matlab binary file that has the data and some information about grid
@@ -89,16 +90,15 @@ def grid_qdm_data(coordinates, data_names, bz, path):
     Parameters
     ----------
     coordinates: tuple of arrays
-        Arrays with coordinates of each point in the grid. Each array must contain values for a
-        dimension in the order: easting, northing, vertical, etc. All arrays must be 2d and need to
-        have the same shape. These coordinates can be generated through verde.grid_coordinates.
-
+        Arrays with coordinates of each point in the grid. Each array must
+        contain values for a dimension in the order: easting, northing,
+        vertical, etc. All arrays must be 2d and need to have the same shape.
+        These coordinates can be generated through verde.grid_coordinates.
     data_names : str or list
-        The name(s) of the data variables in the output grid. Ignored if data is None.
-
+        The name(s) of the data variables in the output grid. Ignored if data is
+        None.
     path : str or pathlib.Path
         Path to the input Matlab binary file.
-
     bz : array
         The Bz component in nT.
 
