@@ -10,7 +10,7 @@ Test the IO functions
 
 import pooch
 
-from .._io import read_qdm_harvard
+from .._input_output import read_qdm_harvard
 
 
 def test_read_qdm_harvard():
