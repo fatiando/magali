@@ -4,5 +4,5 @@
 #
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
-from ._io import read_qdm_harvard
+from ._input_output import read_qdm_harvard
 from ._version import __version__
