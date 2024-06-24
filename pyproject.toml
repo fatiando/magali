@@ -35,7 +35,7 @@ dependencies = [
     "xarray>=2022.6.0",
     "harmonica>=0.6",
     "verde>=1.8.1",
-    "choclo==0.2.0",
+    "choclo>=0.2.0",
 ]
 
 [project.urls]
