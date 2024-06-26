@@ -144,3 +144,37 @@ def random_unitary_vector(dispersion_angle, loc=0, size=100):
 
     r_vector = np.array([x, y, z])
     return r_vector
+
+
+def vector_to_angles(vector):
+    r"""
+    Generate inclination, declination, and amplitude from a 3-component vector
+
+    .. note::
+
+        Inclination is positive downwards and declination is the angle with
+        the y component. The vector has x, y, and z (upward) Cartesian
+        components.
+
+    Parameters
+    ----------
+    vector : 1D or 2D array
+        The x, y, z vector components. Can be a 1D array for a single vector
+        or 2D for multiple. If 2D, then each vector should be a row of the
+        array.
+
+    Returns
+    -------
+    inclination : float or array
+        The inclination values in degrees.
+    declination : float or array
+        The declination values in degrees.
+    amplitude : float or array
+        The vector amplitude values.
+    """
+    vector = np.asarray(vector)
+    x, y, z = vector.T
+    amplitude = np.sqrt(x**2 + y**2 + z**2)
+    inclination = -np.degrees(np.arctan2(z, np.hypot(x, y)))
+    declination = np.degrees(np.arctan2(x, y))
+    return inclination, declination, amplitude
