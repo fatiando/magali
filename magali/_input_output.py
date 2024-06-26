@@ -137,10 +137,11 @@ def random_unitary_vector(dispersion_angle, loc=0, size=100):
     r_vector : :class:'numpy.ndarray'
         A random unitary vector.
     """
-    r = np.sin(dispersion_angle)
-    x = np.random.normal(loc, abs(r / 3), size)
-    y = np.random.normal(loc, abs(r / 3), size)
-    z = np.sqrt(1 - (x**2) - (y**2))
+    alpha = np.deg2rad(np.random.uniform(loc, 360, size))
+    r = np.random.normal(0, dispersion_angle, size)
+    x = np.sin(r) * np.cos(alpha)
+    y = np.sin(r) * np.sin(alpha)
+    z = np.cos(r)
 
     r_vector = np.array([x, y, z])
     return r_vector
