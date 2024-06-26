@@ -179,3 +179,36 @@ def _vector_to_angles(vector):
     inclination = -np.degrees(np.arctan2(z, np.hypot(x, y)))
     declination = np.degrees(np.arctan2(x, y))
     return inclination, declination, intensity
+
+
+def rotate_vector(r_vector, inc, dec):
+    """
+    Creates a random unitary vector from a defined dispersion angle.
+
+    Parameters
+    ----------
+    r_vector : :class:'numpy.ndarray'
+        A random unitary vector.
+    inclination : float or array
+        Inclination of the magnetic vector in degrees.
+    declination : float or array
+        Declination of the magnetic vector in degrees
+        
+    Returns
+    -------
+    rotatated_vector : :class:'numpy.ndarray'
+        The rotated vector.
+    """
+    theta = np.deg2rad(90+inc)
+    phi = np.deg2rad(90-dec)
+
+    x = r_vector[0]
+    y = r_vector[1]
+    z = r_vector[2]
+
+    rotatated_vector = [
+        np.cos(phi)*(x*np.cos(theta)+z*np.sin(theta))-y*np.sin(phi),
+        np.sin(phi)*(x*np.cos(theta)+z*np.sin(theta))+y*np.cos(phi),
+        -x*np.sin(theta)+z*np.cos(theta)
+    ]
+    return np.asanyarray(rotatated_vector)
