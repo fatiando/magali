@@ -114,3 +114,33 @@ def _create_qdm_harvard_grid(coordinates, data_names, bz, path):
     qdm_data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
     qdm_data.attrs = {"file_name": str(path)}
     return qdm_data
+
+
+def random_unitary_vector(dispersion_angle, loc=0, size=100 ):
+    """
+    Creates a random unitary vector from a defined dispersion angle.
+
+    Parameters
+    ----------
+    dispersion_angle: float
+        Dispersion angle that defines a region in a sphere surface.
+    loc:float or array_like of floats
+        Mean (“centre”) of the distribution.
+    size:int or tuple of ints, optional
+        Output shape. If the given shape is, e.g., (m, n, k), then m * n * k 
+        samples are drawn. If size is None (default), a single value is 
+        returned if loc and scale are both scalars. Otherwise, 
+        np.broadcast(loc, scale).size samples are drawn.
+
+    Returns
+    -------
+    r_vector : :class:'numpy.ndarray' 
+        A random unitary vector.
+    """
+    r = np.sin(dispersion_angle)
+    x = np.random.normal(loc,abs(r/3),size)
+    y = np.random.normal(loc,abs(r/3),size)
+    z = np.sqrt(1-(x**2)-(y**2))
+
+    r_vector = np.array([x,y,z])
+    return r_vector
