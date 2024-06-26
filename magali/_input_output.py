@@ -147,7 +147,7 @@ def random_unitary_vector(dispersion_angle, loc=0, size=100):
     return r_vector
 
 
-def vector_to_angles(vector):
+def _vector_to_angles(vector):
     r"""
     Generate inclination, declination, and intensity from a 3-component vector
 

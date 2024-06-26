@@ -4,5 +4,5 @@
 #
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
-from ._input_output import random_unitary_vector, read_qdm_harvard, vector_to_angles
+from ._input_output import random_unitary_vector, read_qdm_harvard
 from ._version import __version__

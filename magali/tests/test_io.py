@@ -29,6 +29,6 @@ def test_random_unitary_vector():
     "Perform a shapiro test, in order to check normal distribution"
     r_vector = random_unitary_vector(np.deg2rad(50))
 
-    assert (sp.stats.shapiro(r_vector[0]).pvalue > 0.05) and (
-        sp.stats.shapiro(r_vector[1]).pvalue > 0.05
+    assert (sp.stats.shapiro(r_vector[0]).pvalue >= 0.05) and (
+        sp.stats.shapiro(r_vector[1]).pvalue >= 0.05
     )
