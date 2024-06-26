@@ -149,7 +149,7 @@ def random_unitary_vector(dispersion_angle, loc=0, size=100):
 
 def vector_to_angles(vector):
     r"""
-    Generate inclination, declination, and amplitude from a 3-component vector
+    Generate inclination, declination, and intensity from a 3-component vector
 
     .. note::
 
@@ -167,15 +167,15 @@ def vector_to_angles(vector):
     Returns
     -------
     inclination : float or array
-        The inclination values in degrees.
+        Inclination of the magnetic vector in degrees.
     declination : float or array
-        The declination values in degrees.
-    amplitude : float or array
-        The vector amplitude values.
+        Declination of the magnetic vector in degrees
+    intensity : float or array
+        Intensity of the magnetic vector.
     """
     vector = np.asarray(vector)
     x, y, z = vector.T
-    amplitude = np.sqrt(x**2 + y**2 + z**2)
+    intensity = np.sqrt(x**2 + y**2 + z**2)
     inclination = -np.degrees(np.arctan2(z, np.hypot(x, y)))
     declination = np.degrees(np.arctan2(x, y))
-    return inclination, declination, amplitude
+    return inclination, declination, intensity
