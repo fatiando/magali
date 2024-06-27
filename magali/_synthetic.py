@@ -17,7 +17,7 @@ import verde as vd
 def random_directions(
     inclination, declination, dispersion_angle, size, random_state=None
 ):
-    """
+    r"""
     Creates a random directions around a preferred direction.
 
     Parameters
@@ -50,6 +50,25 @@ def random_directions(
     - Generate random directions
     - Rotation
     >- R_z(phi)*R_y(theta)
+
+    
+    .. math::
+
+        R_z(\phi)R_y(\theta) = \begin{bmatrix}
+        \cos(\theta) & 0 & \sin(\theta) \\
+        0 & 1 & 0 \\
+        -\sin(\theta) & 0 & \cos(\cos)
+        \end{bmatrix} \begin{bmatrix}
+         \cos(\phi) & -\sin(\phi) & 0 \\
+         \sin(\phi) & \cos(\phi) & 0 \\
+         0 & 0 & 1
+        \end{bmatrix}  \begin{bmatrix}
+         x \\ y \\ z   
+        \end{bmatrix} = \begin{bmatrix}
+        \cos(\phi)(X\cos(\theta)+Z\sin(\theta))-Y\sin(\phi) \\
+        \sin(\phi)(X\cos(\theta)+Z\sin(\theta))+Y\cos(\phi) \\
+        -X\sin(\theta)+Z\cos(\theta)
+        \end{bmatrix}
     """
     alpha = np.deg2rad(np.random.uniform(0, 360, size))
     r = np.random.normal(0, dispersion_angle, size)
