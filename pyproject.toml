@@ -22,20 +22,20 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
-    "numpy>=1.19",
-    "scipy>=1.8",
-    "xarray>=0.16",
-    "scikit-image>=0.18",
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "scikit-image>=0.20",
+    "xarray>=2022.6.0",
     "harmonica>=0.6",
-    "verde>=1.7",
-    "choclo==0.0.1",
+    "verde>=1.8.1",
+    "choclo>=0.2.0",
 ]
 
 [project.urls]
