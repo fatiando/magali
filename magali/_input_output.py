@@ -193,22 +193,22 @@ def rotate_vector(r_vector, inc, dec):
         Inclination of the magnetic vector in degrees.
     declination : float or array
         Declination of the magnetic vector in degrees
-        
+
     Returns
     -------
     rotatated_vector : :class:'numpy.ndarray'
         The rotated vector.
     """
-    theta = np.deg2rad(90+inc)
-    phi = np.deg2rad(90-dec)
+    theta = np.deg2rad(90 + inc)
+    phi = np.deg2rad(90 - dec)
 
     x = r_vector[0]
     y = r_vector[1]
     z = r_vector[2]
 
     rotatated_vector = [
-        np.cos(phi)*(x*np.cos(theta)+z*np.sin(theta))-y*np.sin(phi),
-        np.sin(phi)*(x*np.cos(theta)+z*np.sin(theta))+y*np.cos(phi),
-        -x*np.sin(theta)+z*np.cos(theta)
+        np.cos(phi) * (x * np.cos(theta) + z * np.sin(theta)) - y * np.sin(phi),
+        np.sin(phi) * (x * np.cos(theta) + z * np.sin(theta)) + y * np.cos(phi),
+        -x * np.sin(theta) + z * np.cos(theta),
     ]
     return np.asanyarray(rotatated_vector)
