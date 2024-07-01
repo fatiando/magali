@@ -18,7 +18,7 @@ def random_directions(
     inclination, declination, dispersion_angle, size, random_state=None
 ):
     r"""
-    Creates a random directions around a preferred direction.
+    Creates random directions around a preferred direction.
 
     Parameters
     ----------
@@ -38,9 +38,9 @@ def random_directions(
 
     Returns
     -------
-    inclination : array
+    inclination : numpy.array
         Inclination of the generated directions in degrees.
-    declination : array
+    declination : numpy.array
         Declination of the generated directions in degre
 
     Notes
@@ -50,11 +50,27 @@ def random_directions(
     - Generate random directions
     - Rotation
     >- R_z(phi)*R_y(theta)
+    
+    This function returns random directions to a preferred direction in a
+    spherographic projection. That is achieved in two steps: the creation of 
+    random vectors representing the projetction of a magnetic vector and the
+    rotation of specific inclination and declination.
 
+    Creation of random vectors:
+    
+    First, a colection of values is obtained in an uniform distribution ranging
+    from 0 to 360 degrees to represent the directions of the projection of the 
+    vectors.
+
+    From this distribution, the verctors and its cartesian coordinates are 
+    calculated 
+
+    Rotation of vectors: 
+    
     
     .. math::
 
-        R_z(\phi)R_y(\theta) = \begin{bmatrix}
+        R_z(\phi)R_y(\theta) =      \begin{bmatrix}
         \cos(\theta) & 0 & \sin(\theta) \\
         0 & 1 & 0 \\
         -\sin(\theta) & 0 & \cos(\cos)
@@ -64,7 +80,11 @@ def random_directions(
          0 & 0 & 1
         \end{bmatrix}  \begin{bmatrix}
          x \\ y \\ z   
-        \end{bmatrix} = \begin{bmatrix}
+        \end{bmatrix} \\
+    
+    .. math::
+
+        R_z(\phi)R_y(\theta) =   \begin{bmatrix}
         \cos(\phi)(X\cos(\theta)+Z\sin(\theta))-Y\sin(\phi) \\
         \sin(\phi)(X\cos(\theta)+Z\sin(\theta))+Y\cos(\phi) \\
         -X\sin(\theta)+Z\cos(\theta)
