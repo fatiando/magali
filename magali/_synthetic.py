@@ -74,7 +74,7 @@ def random_directions(
         \end{bmatrix} \\
     
     .. math::
-    
+
         \mathbf{R}_z(\phi) \mathbf{R}_y(\theta)\mathbf{u} =     \begin{bmatrix}
         \cos(\theta) & 0 & \sin(\theta) \\
         0 & 1 & 0 \\
@@ -110,8 +110,6 @@ def random_directions(
 def _rotate_vector(x, y, z, inclination, declination):
     """
     Creates a random unitary vector from a defined dispersion angle.
-
-
 
     Parameters
     ----------
