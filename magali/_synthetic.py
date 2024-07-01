@@ -60,17 +60,22 @@ def random_directions(
     
     First, a colection of values is obtained in an uniform distribution ranging
     from 0 to 360 degrees to represent the directions of the projection of the 
-    vectors.
+    vectors. From this distribution, the verctors are calculated to the 
+    directions previously obtained within a specified dispersion angle.
 
-    From this distribution, the verctors and its cartesian coordinates are 
-    calculated 
+    
 
     Rotation of vectors: 
     
     
     .. math::
-
-        R_z(\phi)R_y(\theta) =      \begin{bmatrix}
+        \mathbf{u} = \begin{bmatrix}
+         x \\ y \\ z   
+        \end{bmatrix} \\
+    
+    .. math::
+    
+        \mathbf{R}_z(\phi) \mathbf{R}_y(\theta)\mathbf{u} =     \begin{bmatrix}
         \cos(\theta) & 0 & \sin(\theta) \\
         0 & 1 & 0 \\
         -\sin(\theta) & 0 & \cos(\cos)
@@ -84,7 +89,7 @@ def random_directions(
     
     .. math::
 
-        R_z(\phi)R_y(\theta) =   \begin{bmatrix}
+        \mathbf{R}_z(\phi) \mathbf{R}_y(\theta)\mathbf{u}  =   \begin{bmatrix}
         \cos(\phi)(X\cos(\theta)+Z\sin(\theta))-Y\sin(\phi) \\
         \sin(\phi)(X\cos(\theta)+Z\sin(\theta))+Y\cos(\phi) \\
         -X\sin(\theta)+Z\cos(\theta)
