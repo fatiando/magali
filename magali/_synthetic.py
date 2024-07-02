@@ -10,8 +10,6 @@ Functions to generate synthetic data
 
 import harmonica as hm
 import numpy as np
-import scipy.io
-import verde as vd
 
 
 def random_directions(
@@ -45,55 +43,44 @@ def random_directions(
 
     Notes
     -----
-
-    Explain everything
-    - Generate random directions
-    - Rotation
-    >- R_z(phi)*R_y(theta)
-    
-    We calculate the azimuth (\alpha) via a random uniform distribution ranging 
-    from 0 to 360 degrees, to represent the equal probability for each value
-    in a stereographic polar projection.
-
-    The distance to the pole (\psi) for each vector is obtained with a normal 
+    We calculate the azimuth (\alpha) via a random uniform distribution
+    ranging from 0 to 360 degrees, to represent the equal probability for each
+    value in a stereographic polar projection.
+    The distance to the pole (\psi) for each vector is obtained with a normal
     distribution, in which the maximum distance corresponds to the
     variance of the distribution.
-
-    Given the values of azimuth (\alpha) and distance to the pole (\psi), we 
+    Given the values of azimuth (\alpha) and distance to the pole (\psi), we
     calculate the catesian coordinates
 
     .. math::
         x = \sin(\psi) * cos(\alpha)
-    .. math::        
+    .. math::
         y = np.sin(\psi) * sin(\alpha)
-    .. math::        
+    .. math::
         z = np.cos(\psi)
 
     The rotation of the pole is performed to the preferred direction using the
     specified values of inclination and declination to obtain the rotation
-    vector. With :math:`\theta = 90° + inclination` and 
-    :math:`\phi = 90° - declination` we calculate the rotation 
+    vector. With :math:`\theta=90°+inclination` and
+    :math:`\phi=90°-declination` we calculate the rotation
     vector by
 
     .. math::
-        \mathbf{u} = \begin{bmatrix}
-         x \\ y \\ z   
-        \end{bmatrix} \\
-    
+        \mathbf{u}=\begin{bmatrix}
+        x\\y\\z
+        \end{bmatrix}\\
     .. math::
-
-        \mathbf{R}_z(\phi) \mathbf{R}_y(\theta)\mathbf{u} =     \begin{bmatrix}
-        \cos(\theta) & 0 & \sin(\theta) \\
-        0 & 1 & 0 \\
-        -\sin(\theta) & 0 & \cos(\cos)
-        \end{bmatrix} \begin{bmatrix}
-         \cos(\phi) & -\sin(\phi) & 0 \\
-         \sin(\phi) & \cos(\phi) & 0 \\
-         0 & 0 & 1
-        \end{bmatrix}  \begin{bmatrix}
-         x \\ y \\ z   
-        \end{bmatrix} \\
-    
+        \mathbf{R}_z(\phi)\mathbf{R}_y(\theta)\mathbf{u}=\begin{bmatrix}
+        \cos(\theta)&0&\sin(\theta)\\
+        0&1&0\\
+        -\sin(\theta)&0&\cos(\cos)
+        \end{bmatrix}\begin{bmatrix}
+        \cos(\phi)&-\sin(\phi)&0\\
+        \sin(\phi)&\cos(\phi)&0\\
+        0&0&1
+        \end{bmatrix}\begin{bmatrix}
+        x\\y\\z
+        \end{bmatrix}\\
     .. math::
 
         \mathbf{R}_z(\phi) \mathbf{R}_y(\theta)\mathbf{u}  =   \begin{bmatrix}
@@ -110,7 +97,9 @@ def random_directions(
 
     x_r, y_r, z_r = _rotate_vector(x, y, z, inclination, declination)
 
-    _, directions_inclination, directions_declination = hm.magnetic_vec_to_angles(x_r, y_r, z_r)
+    _, directions_inclination, directions_declination = hm.magnetic_vec_to_angles(
+        x_r, y_r, z_r
+    )
     return directions_inclination, directions_declination
 
 
