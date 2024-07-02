@@ -102,16 +102,16 @@ def random_directions(
         -X\sin(\theta)+Z\cos(\theta)
         \end{bmatrix}
     """
-    alpha = np.deg2rad(np.random.uniform(0, 360, size))
-    r = np.random.normal(0, dispersion_angle, size)
-    x = np.sin(r) * np.cos(alpha)
-    y = np.sin(r) * np.sin(alpha)
-    z = np.cos(r)
+    azimuth = np.deg2rad(np.random.uniform(0, 360, size))
+    distance = np.random.normal(0, dispersion_angle, size)
+    x = np.sin(distance) * np.cos(azimuth)
+    y = np.sin(distance) * np.sin(azimuth)
+    z = np.cos(distance)
 
     x_r, y_r, z_r = _rotate_vector(x, y, z, inclination, declination)
 
-    _, inc, dec = hm.magnetic_vec_to_angles(x_r, y_r, z_r)
-    return inc, dec
+    _, directions_inclination, directions_declination = hm.magnetic_vec_to_angles(x_r, y_r, z_r)
+    return directions_inclination, directions_declination
 
 
 def _rotate_vector(x, y, z, inclination, declination):
