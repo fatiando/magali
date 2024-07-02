@@ -51,23 +51,30 @@ def random_directions(
     - Rotation
     >- R_z(phi)*R_y(theta)
     
-    This function returns random directions to a preferred direction in a
-    spherographic projection. That is achieved in two steps: the creation of 
-    random vectors representing the projetction of a magnetic vector and the
-    rotation of specific inclination and declination.
+    We calculate the azimuth (\alpha) via a random uniform distribution ranging 
+    from 0 to 360 degrees, to represent the equal probability for each value
+    in a stereographic polar projection.
 
-    Creation of random vectors:
-    
-    First, a colection of values is obtained in an uniform distribution ranging
-    from 0 to 360 degrees to represent the directions of the projection of the 
-    vectors. From this distribution, the verctors are calculated to the 
-    directions previously obtained within a specified dispersion angle.
+    The distance to the pole (\psi) for each vector is obtained with a normal 
+    distribution, in which the maximum distance corresponds to the
+    variance of the distribution.
 
-    
+    Given the values of azimuth (\alpha) and distance to the pole (\psi), we 
+    calculate the catesian coordinates
 
-    Rotation of vectors: 
-    
-    
+    .. math::
+        x = \sin(\psi) * cos(\alpha)
+    .. math::        
+        y = np.sin(\psi) * sin(\alpha)
+    .. math::        
+        z = np.cos(\psi)
+
+    The rotation of the pole is performed to the preferred direction using the
+    specified values of inclination and declination to obtain the rotation
+    vector. With :math:`\theta = 90° + inclination` and 
+    :math:`\theta = 90° - declination` we calculate the rotation 
+    vector by
+
     .. math::
         \mathbf{u} = \begin{bmatrix}
          x \\ y \\ z   
