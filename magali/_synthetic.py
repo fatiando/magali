@@ -72,7 +72,7 @@ def random_directions(
     The rotation of the pole is performed to the preferred direction using the
     specified values of inclination and declination to obtain the rotation
     vector. With :math:`\theta = 90° + inclination` and 
-    :math:`\theta = 90° - declination` we calculate the rotation 
+    :math:`\phi = 90° - declination` we calculate the rotation 
     vector by
 
     .. math::
