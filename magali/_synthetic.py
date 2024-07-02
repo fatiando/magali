@@ -23,7 +23,7 @@ def random_directions(
     inclination : float
         Inclination of the preferred direction in degrees.
     declination : float
-        Declination of the preferred direction in degrees
+        Declination of the preferred direction in degrees.
     dispersion_angle : float
         Dispersion angle that defines a region on the surface of a sphere.
     size : int
@@ -44,7 +44,7 @@ def random_directions(
     Notes
     -----
     We calculate the azimuth (\alpha) via a random uniform distribution
-    ranging from 0 to 360 degrees, to represent the equal probability for each
+    ranging from 0° to 360°, to represent the equal probability for each
     value in a stereographic polar projection.
     The distance to the pole (\psi) for each vector is obtained with a normal
     distribution, in which the maximum distance corresponds to the
@@ -105,21 +105,29 @@ def random_directions(
 
 def _rotate_vector(x, y, z, inclination, declination):
     """
-    Creates a random unitary vector from a defined dispersion angle.
+    Rotates vectors using its cartesian coordines towards specific direction.
 
     Parameters
     ----------
-    r_vector : :class:'numpy.ndarray'
-        A random unitary vector.
-    inclination : float or array
-        Inclination of the magnetic vector in degrees.
-    declination : float or array
-        Declination of the magnetic vector in degrees
+    inclination : float
+        Inclination of the preferred direction in degrees.
+    declination : float
+        Declination of the preferred direction in degrees.
+    x : numpy.array
+        x coordinates of vectors to be rotated.
+    y : numpy.array
+        y coordinates of vectors to be rotated.
+    z : numpy.array
+        z coordinates of vectors to be rotated.
 
     Returns
     -------
-    rotatated_vector : :class:'numpy.ndarray'
-        The rotated vector.
+    x_r : numpy.array
+        x coordinates of rotated vectors.
+    y_r : numpy.array
+        y coordinates of rotated vectors.
+    z_r : numpy.array
+        z coordinates of rotated vectors.
     """
 
     theta = np.deg2rad(90 + inclination)
