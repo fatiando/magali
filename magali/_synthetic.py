@@ -92,8 +92,11 @@ def random_directions(
     in which :math:`\mathbf{R}_z(\phi)` and :math:`\mathbf{R}_z(\phi)` are the
     rotation matrices on the z and y axes, respctively.
     """
-    azimuth = np.deg2rad(np.random.uniform(0, 360, size))
-    distance = np.random.normal(0, dispersion_angle, size)
+    # Set random number generator
+    rng = np.random.default_rng(random_state)
+
+    azimuth = np.deg2rad(rng.uniform(0, 360, size))
+    distance = rng.normal(0, dispersion_angle, size)
     x = np.sin(distance) * np.cos(azimuth)
     y = np.sin(distance) * np.sin(azimuth)
     z = np.cos(distance)
