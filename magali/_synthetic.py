@@ -103,8 +103,8 @@ def random_directions(
 
     x_r, y_r, z_r = _rotate_vector(x, y, z, inclination, declination)
 
-    _, directions_inclination, directions_declination = hm.magnetic_vec_to_angles(
-        x_r, y_r, z_r
+    _, directions_inclination, directions_declination = (
+        hm.magnetic_vec_to_angles(x_r, y_r, z_r)
     )
     return directions_inclination, directions_declination
 

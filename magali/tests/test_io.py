@@ -8,11 +8,9 @@
 Test the IO functions
 """
 
-import numpy as np
 import pooch
-import scipy as sp
 
-from .._input_output import random_unitary_vector, read_qdm_harvard
+from .._input_output import read_qdm_harvard
 
 
 def test_read_qdm_harvard():
@@ -23,12 +21,3 @@ def test_read_qdm_harvard():
     )
     data = read_qdm_harvard(path)
     assert data.bz.size == 576_000
-
-
-def test_random_unitary_vector():
-    "Perform a shapiro test, in order to check normal distribution"
-    r_vector = random_unitary_vector(np.deg2rad(50))
-
-    assert (sp.stats.shapiro(r_vector[0]).pvalue >= 0.05) and (
-        sp.stats.shapiro(r_vector[1]).pvalue >= 0.05
-    )
