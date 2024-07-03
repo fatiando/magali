@@ -88,6 +88,9 @@ def random_directions(
         \sin(\phi)(X\cos(\theta)+Z\sin(\theta))+Y\cos(\phi) \\
         -X\sin(\theta)+Z\cos(\theta)
         \end{bmatrix}
+
+    in which :math:`\mathbf{R}_z(\phi)` and :math:`\mathbf{R}_z(\phi)` are the
+    rotation matrices on the z and y axes, respctively.
     """
     azimuth = np.deg2rad(np.random.uniform(0, 360, size))
     distance = np.random.normal(0, dispersion_angle, size)
