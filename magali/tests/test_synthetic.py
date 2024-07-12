@@ -8,15 +8,41 @@
 Test the _synthetic functions
 """
 
+import harmonica as hm
+import numpy as np
+
 from .._synthetic import random_directions
 
 
 def test_random_directions():
-    "Test values of inclination and declination for the random directions"
+    """
+    Tests inclination and declination inputs. Also compares the variance of
+    directions and compares to the dispersion angle input
+    """
+    true_inclination = 30
+    true_declination = 40
+    true_dispersion_angle = 5
+
     directions_inclination, directions_declination = random_directions(
-        30, 40, 5, 100, random_state=5
+        true_inclination,
+        true_declination,
+        true_dispersion_angle,
+        size=1000000,
+        random_state=5,
     )
 
-    assert (float(directions_inclination[0]) == -18.382758083412796) and (
-        float(directions_declination[0]) == -13.603233653244104
+    x, y, z = hm.magnetic_angles_to_vec(
+        1, directions_inclination, directions_declination
     )
+
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
+    z_mean = np.mean(z)
+
+    _, inclination_mean, declination_mean = hm.magnetic_vec_to_angles(
+        x_mean, y_mean, z_mean
+    )
+
+    np.testing.assert_allclose(inclination_mean, true_inclination, rtol=1e-4)
+
+    np.testing.assert_allclose(declination_mean, true_declination, rtol=1e-4)

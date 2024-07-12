@@ -39,7 +39,7 @@ def random_directions(
     inclination : numpy.array
         Inclination of the generated directions in degrees.
     declination : numpy.array
-        Declination of the generated directions in degre
+        Declination of the generated directions in degrees.
 
     Notes
     -----
@@ -96,15 +96,15 @@ def random_directions(
     rng = np.random.default_rng(random_state)
 
     azimuth = np.deg2rad(rng.uniform(0, 360, size))
-    distance = rng.normal(0, dispersion_angle, size)
+    distance = rng.normal(0, np.deg2rad(dispersion_angle), size)
     x = np.sin(distance) * np.cos(azimuth)
     y = np.sin(distance) * np.sin(azimuth)
     z = np.cos(distance)
 
     x_r, y_r, z_r = _rotate_vector(x, y, z, inclination, declination)
 
-    _, directions_inclination, directions_declination = (
-        hm.magnetic_vec_to_angles(x_r, y_r, z_r)
+    _, directions_inclination, directions_declination = hm.magnetic_vec_to_angles(
+        x_r, y_r, z_r
     )
     return directions_inclination, directions_declination
 
