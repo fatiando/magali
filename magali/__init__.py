@@ -5,6 +5,6 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 from ._input_output import read_qdm_harvard
-from ._synthetic import random_directions
 from ._statistics import _calculate_angular_distance, variance
+from ._synthetic import random_directions
 from ._version import __version__

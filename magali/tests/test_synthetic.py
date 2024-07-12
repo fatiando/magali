@@ -11,9 +11,10 @@ Test the _synthetic functions
 import harmonica as hm
 import numpy as np
 
+from .._statistics import _calculate_angular_distance, variance
 from .._synthetic import random_directions
 
-def angular
+
 def test_random_directions():
     """
     Tests inclination and declination inputs. Also compares the variance of
@@ -46,3 +47,11 @@ def test_random_directions():
     np.testing.assert_allclose(inclination_mean, true_inclination, rtol=1e-4)
     np.testing.assert_allclose(declination_mean, true_declination, rtol=1e-4)
 
+    directions_variance = variance(
+        directions_inclination,
+        directions_declination,
+        inclination_mean,
+        declination_mean,
+    )
+    std_dev = np.sqrt(directions_variance)
+    np.testing.assert_allclose(true_dispersion_angle, std_dev, rtol=1e-3)
