@@ -25,7 +25,7 @@ def random_directions(
     declination : float
         Declination of the preferred direction in degrees.
     dispersion_angle : float
-        Dispersion angle that defines a region on the surface of a sphere. 
+        Dispersion angle that defines a region on the surface of a sphere.
         Also corresponds to the variance of the generated directions.
     size : int
         Number of random directions to be generated.
