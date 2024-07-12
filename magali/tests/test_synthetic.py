@@ -11,7 +11,7 @@ Test the _synthetic functions
 import harmonica as hm
 import numpy as np
 
-from .._statistics import _calculate_angular_distance, variance
+from .._stats import _calculate_angular_distance, variance
 from .._synthetic import random_directions
 
 
