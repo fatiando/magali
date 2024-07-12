@@ -62,14 +62,10 @@ def variance(inclination, declination, inclination_mean, declination_mean):
         Angular distance between two vectors in degrees.
     """
 
-    sum_delta_angle = 0
-    angular_distances = list()
-    for i in range(len(inclination)):
-        distance = _calculate_angular_distance(
-            inclination[i], declination[i], inclination_mean, declination_mean
-        )
-        angular_distances.append(distance)
-        sum_delta_angle += distance**2
+    distance = _calculate_angular_distance(
+        inclination, declination, inclination_mean, declination_mean
+    )
+    sum_delta_angle = np.sum(distance**2)
 
     variance = (1 / (len(inclination) - 1)) * sum_delta_angle
 
