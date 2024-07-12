@@ -25,7 +25,8 @@ def random_directions(
     declination : float
         Declination of the preferred direction in degrees.
     dispersion_angle : float
-        Dispersion angle that defines a region on the surface of a sphere.
+        Dispersion angle that defines a region on the surface of a sphere. 
+        Also corresponds to the variance of the generated directions.
     size : int
         Number of random directions to be generated.
     random_state : numpy.random.RandomState or an int seed
@@ -47,8 +48,7 @@ def random_directions(
     ranging from 0° to 360°, to represent the equal probability for each
     value in a stereographic polar projection.
     The distance to the pole (\psi) for each vector is obtained with a normal
-    distribution, in which the maximum distance corresponds to the
-    variance of the distribution.
+    distribution.
     Given the values of azimuth (\alpha) and distance to the pole (\psi), we
     calculate the catesian coordinates
 
