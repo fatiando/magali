@@ -10,6 +10,7 @@ Functions to generate synthetic data
 
 import harmonica as hm
 import numpy as np
+import verde as vd
 
 
 def random_directions(
@@ -211,3 +212,81 @@ def random_coordinates(sources_region, number_of_sources, seed=5):
         np.random.randint(sources_region[4], sources_region[5], number_of_sources),
     )
     return np.asarray(coordinates)
+
+
+def generate_dipoles_grid(
+    region,
+    spacing,
+    sensor_sample_distance,
+    dipole_coordinates,
+    amplitude,
+    inclination,
+    declination,
+    field,
+):
+    """
+    Creates a regular grid of observation points.
+
+    Parameters
+    ----------
+    region: list
+        The boundaries of a given region in Cartesian coordinates in µm.
+    spacing : float, tuple = (s_north, s_east), or None
+        The number of blocks in the South-North and West-East directions,
+        respectively. If None, then spacing must be provided.
+    sensor_sample_distance : float
+        Distance between sensor and sample in µm.
+    dipole_coordinates : numpy.ndarray
+        A 2D numpy array of shape (3, number_of_sources) containing the
+        generated coordinates.The first row represents x coordinates.The second
+        row represents y coordinates. The third row represents z coordinates.
+    amplitude : ndarray or scalar
+        Samples drawn from the parameterized log-normal distribution,
+        representing random amplitude values in nT (nanoteslas).
+    inclination : numpy.array
+        Inclination of the dipoles directions in degrees.
+    declination : numpy.array
+        Declination of the dipoles directions in degrees.
+    field : str
+        Magnetic field that will be computed. The available fields are:
+
+        - The full magnetic vector: ``b``
+        - Easting component of the magnetic vector: ``b_e``
+        - Northing component of the magnetic vector: ``b_n``
+        - Upward component of the magnetic vector: ``b_u``
+
+    Returns
+    -------
+    grid : (xarray.DataArray)
+        xarray.DataArray containing the grid, its coordinates and header
+        information.
+
+
+
+    """
+    grid_coordinates = vd.grid_coordinates(
+        region=region,
+        spacing=spacing,
+        extra_coords=sensor_sample_distance,
+    )
+
+    x, y, z = hm.magnetic_angles_to_vec(amplitude, inclination, declination)
+
+    dipole_moments = (x, y, z)
+
+    # Coordinates are multiplied by 1.0E-6 to fix scale
+    bz = hm.dipole_magnetic(
+        np.asarray(grid_coordinates) * 1.0e-6,
+        np.asarray(dipole_coordinates) * 1.0e-6,
+        dipole_moments,
+        field,
+    )
+
+    grid = vd.make_xarray_grid(
+        grid_coordinates, bz, data_names=["bz"], dims=("y", "x"), extra_coords_names="z"
+    )
+    grid.x.attrs = {"units": "µm"}
+    grid.y.attrs = {"units": "µm"}
+    grid.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
+
+    return grid
