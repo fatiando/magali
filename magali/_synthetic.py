@@ -135,34 +135,36 @@ def _rotate_vector(x, y, z, inclination, declination):
     z_r : numpy.array
         z coordinates of rotated vectors.
     """
-
     theta = np.deg2rad(90 + inclination)
     phi = np.deg2rad(90 - declination)
+
     # R_z(phi)*R_y(theta)
     x_r = np.cos(phi) * (x * np.cos(theta) + z * np.sin(theta)) - y * np.sin(phi)
     y_r = np.sin(phi) * (x * np.cos(theta) + z * np.sin(theta)) + y * np.cos(phi)
     z_r = -x * np.sin(theta) + z * np.cos(theta)
     return x_r, y_r, z_r
 
-def amplitude_lognormal_distribution(mean, sigma, size, scale=1E-14):
+
+def amplitude_lognormal_distribution(size, mean=0, sigma=1.35, scale=1e-14):
     """
-    Generates amplitude values in a lognormal distribution
+    Generates amplitude values in a lognormal distribution.
     """
     lognormal_distribution = np.random.lognormal(mean, sigma, size)
     return lognormal_distribution * scale
+
 
 def random_coordinates(sources_region, number_of_sources, seed=5):
     """
     Generate random coordinates within a specified region.
 
     Parameters:
-    sources_region: list 
-        A list containing the limits for x, y, and z coordinates. 
+    sources_region: list
+        A list containing the limits for x, y, and z coordinates.
         Format: [x_min, x_max, y_min, y_max, z_min, z_max]
-    number_of_sources: list 
-        Number of sources for which coordinates will be generated. 
+    number_of_sources: list
+        Number of sources for which coordinates will be generated.
         Format: [n_sources_0, n_sources_1, ..., n_sources_n]
-    seed: int 
+    seed: int
         Seed value for reproducible random number generation. Default is 5.
 
     Returns:
@@ -174,6 +176,6 @@ def random_coordinates(sources_region, number_of_sources, seed=5):
     coordinates = (
         np.random.randint(sources_region[0], sources_region[1], number_of_sources),
         np.random.randint(sources_region[2], sources_region[3], number_of_sources),
-        np.random.randint(sources_region[4], sources_region[5], number_of_sources)
+        np.random.randint(sources_region[4], sources_region[5], number_of_sources),
     )
     return np.asarray(coordinates)
