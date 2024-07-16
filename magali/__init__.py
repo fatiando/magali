@@ -8,6 +8,7 @@ from ._input_output import read_qdm_harvard
 from ._stats import _calculate_angular_distance, variance
 from ._synthetic import (
     amplitude_lognormal_distribution,
+    generate_dipoles_grid,
     random_coordinates,
     random_directions,
 )
