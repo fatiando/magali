@@ -146,31 +146,65 @@ def _rotate_vector(x, y, z, inclination, declination):
 
 
 def amplitude_lognormal_distribution(size, mean=0, sigma=1.35, scale=1e-14):
+    r"""
+    Generate amplitude values in a lognormal distribution.
+
+    Parameters
+    ----------
+    mean : float or array_like of floats, optional
+        Mean value of the underlying normal distribution. Default is 0.
+
+    sigma : float or array_like of floats, optional
+        Standard deviation of the underlying normal distribution. Must be
+        non-negative. Default is 1.
+
+    size : int
+        Number of values to be generated.
+
+    Returns
+    -------
+    amplitude : ndarray or scalar
+        Samples drawn from the parameterized log-normal distribution,
+        representing random amplitude values. The output array is scaled
+        to represent values in nT (nanoteslas).
     """
-    Generates amplitude values in a lognormal distribution.
-    """
-    lognormal_distribution = np.random.lognormal(mean, sigma, size)
-    return lognormal_distribution * scale
+    amplitude = np.random.lognormal(mean, sigma, size)
+    amplitude = amplitude * scale
+    return amplitude
 
 
 def random_coordinates(sources_region, number_of_sources, seed=5):
-    """
+    r"""
     Generate random coordinates within a specified region.
 
+    This function generates a specified number of random (x, y, z) coordinates
+    within given boundaries. The coordinates are generated using a reproducible
+    random number generator.
+
     Parameters:
-    sources_region: list
-        A list containing the limits for x, y, and z coordinates.
-        Format: [x_min, x_max, y_min, y_max, z_min, z_max]
-    number_of_sources: list
-        Number of sources for which coordinates will be generated.
-        Format: [n_sources_0, n_sources_1, ..., n_sources_n]
-    seed: int
-        Seed value for reproducible random number generation. Default is 5.
+    -----------
+    sources_region : list of float
+        A list containing the limits for the x, y, and z coordinates.
+        Format: [x_min, x_max, y_min, y_max, z_min, z_max].
+        - x_min, x_max: The minimum and maximum bounds for the x coordinates.
+        - y_min, y_max: The minimum and maximum bounds for the y coordinates.
+        - z_min, z_max: The minimum and maximum bounds for the z coordinates.
+
+    number_of_sources : int
+        The number of sources for which coordinates will be generated.
+
+    seed : int, optional
+        Seed value for the random number generator to ensure reproducibility of
+        results. Default is 5.
 
     Returns:
-        numpy.ndarray: An array of shape (3, number_of_sources) containing the generated
-        coordinates. The first row represents x coordinates, the second row represents
-        y coordinates, and the third row represents z coordinates.
+    --------
+    numpy.ndarray
+        A 2D numpy array of shape (3, number_of_sources) containing the
+        generated coordinates.
+        - The first row represents x coordinates.
+        - The second row represents y coordinates.
+        - The third row represents z coordinates.
     """
     np.random.seed(seed)
     coordinates = (
