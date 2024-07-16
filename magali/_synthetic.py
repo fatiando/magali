@@ -187,9 +187,10 @@ def random_coordinates(sources_region, number_of_sources, seed=5):
     sources_region : list of float
         A list containing the limits for the x, y, and z coordinates.
         Format: [x_min, x_max, y_min, y_max, z_min, z_max].
-        * x_min, x_max: The minimum and maximum bounds for the x coordinates.
-        * y_min, y_max: The minimum and maximum bounds for the y coordinates.
-        * z_min, z_max: The minimum and maximum bounds for the z coordinates.
+        
+        - x_min, x_max: The minimum and maximum bounds for the x coordinates.
+        - y_min, y_max: The minimum and maximum bounds for the y coordinates.
+        - z_min, z_max: The minimum and maximum bounds for the z coordinates.
 
     number_of_sources : int
         The number of sources for which coordinates will be generated.
@@ -202,8 +203,8 @@ def random_coordinates(sources_region, number_of_sources, seed=5):
     -------
     coordinates : numpy.ndarray
         A 2D numpy array of shape (3, number_of_sources) containing the
-        generated coordinates.The first row represents x coordinates.The second
-        row represents y coordinates. The third row represents z coordinates.
+        generated coordinates. The rows represent x, y and z coordinates
+        respectively.
     """
     np.random.seed(seed)
     coordinates = (

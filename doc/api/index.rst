@@ -14,4 +14,5 @@ List of functions and classes (API)
    random_directions
    random_coordinates
    amplitude_lognormal_distribution
+   generate_dipoles_grid
 
