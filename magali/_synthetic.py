@@ -178,33 +178,31 @@ def random_coordinates(sources_region, number_of_sources, seed=5):
     Generate random coordinates within a specified region.
 
     This function generates a specified number of random (x, y, z) coordinates
-    within given boundaries. The coordinates are generated using a reproducible
-    random number generator.
+    within given boundaries. The coordinates are generated using a
+    reproducible random number generator.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     sources_region : list of float
         A list containing the limits for the x, y, and z coordinates.
         Format: [x_min, x_max, y_min, y_max, z_min, z_max].
-        - x_min, x_max: The minimum and maximum bounds for the x coordinates.
-        - y_min, y_max: The minimum and maximum bounds for the y coordinates.
-        - z_min, z_max: The minimum and maximum bounds for the z coordinates.
+        * x_min, x_max: The minimum and maximum bounds for the x coordinates.
+        * y_min, y_max: The minimum and maximum bounds for the y coordinates.
+        * z_min, z_max: The minimum and maximum bounds for the z coordinates.
 
     number_of_sources : int
         The number of sources for which coordinates will be generated.
 
     seed : int, optional
-        Seed value for the random number generator to ensure reproducibility of
-        results. Default is 5.
+        Seed value for the random number generator to ensure reproducibility
+        of results. Default is 5.
 
-    Returns:
-    --------
-    numpy.ndarray
+    Returns
+    -------
+    coordinates : numpy.ndarray
         A 2D numpy array of shape (3, number_of_sources) containing the
-        generated coordinates.
-        - The first row represents x coordinates.
-        - The second row represents y coordinates.
-        - The third row represents z coordinates.
+        generated coordinates.The first row represents x coordinates.The second
+        row represents y coordinates. The third row represents z coordinates.
     """
     np.random.seed(seed)
     coordinates = (

@@ -12,3 +12,6 @@ List of functions and classes (API)
 
    read_qdm_harvard
    random_directions
+   random_coordinates
+   amplitude_lognormal_distribution
+
