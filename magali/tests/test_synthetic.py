@@ -72,7 +72,7 @@ def test_generate_dipoles_grid():
     seed = 5
 
     coordinates = random_coordinates(sources_region, number_of_sources, seed)
-    amplitude = amplitude_lognormal_distribution(0, 1.35, 1000)
+    amplitude = amplitude_lognormal_distribution(1000)
 
     true_inclination = 30
     true_declination = 40
@@ -99,4 +99,12 @@ def test_generate_dipoles_grid():
         field,
     )
 
+    # Test size
     np.testing.assert_allclose(grid.bz.size, 1002001, atol=1e-4)
+    # Test spacing
+    np.testing.assert_allclose(
+        (grid.bz.x.size * spacing - spacing) / grid.bz.x.size, spacing, atol=1e-2
+    )
+    np.testing.assert_allclose(
+        (grid.bz.y.size * spacing - spacing) / grid.bz.y.size, spacing, atol=1e-2
+    )
