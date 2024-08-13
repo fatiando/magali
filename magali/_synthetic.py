@@ -25,8 +25,8 @@ def random_directions(
     declination : float
         Declination of the preferred direction in degrees.
     dispersion_angle : float
-        Dispersion angle that defines a region on the surface of a sphere.
-        Also corresponds to the variance of the generated directions.
+        Dispersion angle in degrees that defines a region on the surface of 
+        a sphere. Corresponds to the variance of the generated directions.
     size : int
         Number of random directions to be generated.
     random_state : numpy.random.RandomState or an int seed
@@ -111,20 +111,20 @@ def random_directions(
 
 def _rotate_vector(x, y, z, inclination, declination):
     """
-    Rotates vectors using its cartesian coordines towards specific direction.
+    Rotates vectors using its cartesian coordinates towards specific direction
 
     Parameters
     ----------
-    inclination : float
-        Inclination of the preferred direction in degrees.
-    declination : float
-        Declination of the preferred direction in degrees.
     x : numpy.array
         x coordinates of vectors to be rotated.
     y : numpy.array
         y coordinates of vectors to be rotated.
     z : numpy.array
         z coordinates of vectors to be rotated.
+    inclination : float
+        Inclination of the preferred direction in degrees.
+    declination : float
+        Declination of the preferred direction in degrees.
 
     Returns
     -------
