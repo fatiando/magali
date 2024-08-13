@@ -44,13 +44,13 @@ def random_directions(
 
     Notes
     -----
-    We calculate the azimuth (\alpha) via a random uniform distribution
+    We calculate the azimuth (:math:`\alpha`) via a random uniform distribution
     ranging from 0° to 360°, to represent the equal probability for each
     value in a stereographic polar projection.
-    The distance to the pole (\psi) for each vector is obtained with a normal
-    distribution.
-    Given the values of azimuth (\alpha) and distance to the pole (\psi), we
-    calculate the catesian coordinates
+    The distance to the pole (:math:`\psi`) for each vector is obtained with a
+    normal distribution.
+    Given the values of azimuth (:math:`\alpha`) and distance to the pole
+    (:math:`\psi`), we calculate the cartesian coordinates
 
     .. math::
         x = \sin(\psi) * cos(\alpha)
@@ -84,13 +84,13 @@ def random_directions(
     .. math::
 
         \mathbf{R}_z(\phi) \mathbf{R}_y(\theta)\mathbf{u}  =   \begin{bmatrix}
-        \cos(\phi)(X\cos(\theta)+Z\sin(\theta))-Y\sin(\phi) \\
-        \sin(\phi)(X\cos(\theta)+Z\sin(\theta))+Y\cos(\phi) \\
-        -X\sin(\theta)+Z\cos(\theta)
+        \cos(\phi)(x\cos(\theta)+z\sin(\theta))-y\sin(\phi) \\
+        \sin(\phi)(x\cos(\theta)+z\sin(\theta))+y\cos(\phi) \\
+        -x\sin(\theta)+z\cos(\theta)
         \end{bmatrix}
 
     in which :math:`\mathbf{R}_z(\phi)` and :math:`\mathbf{R}_z(\phi)` are the
-    rotation matrices on the z and y axes, respctively.
+    rotation matrices on the z and y axes, respectively.
     """
     # Set random number generator
     rng = np.random.default_rng(random_state)
