@@ -8,6 +8,7 @@
 
 import numpy as np
 
+
 def vector_to_angles(vector):
     """
     Generate inclination, declination, and amplitude from a 3-component vector
@@ -37,6 +38,7 @@ def vector_to_angles(vector):
     inclination = -np.degrees(np.arctan2(z, np.hypot(x, y)))
     declination = np.degrees(np.arctan2(x, y))
     return inclination, declination, amplitude
+
 
 def angles_to_vector(inclination, declination, amplitude):
     """
