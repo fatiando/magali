@@ -14,7 +14,7 @@ dependencies:
   - harmonica
   - verde
   # Build
-  - build
+  - python-build
   - twine
   # Test
   - pooch
