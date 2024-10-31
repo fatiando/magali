@@ -7,3 +7,11 @@
 
 rcParams = matplotlib.rcParams
 
+
+class Sterogram:
+    """
+    A custom class stereogram projections applied to magnetic microscopy studies.
+
+    """
+
+    name = "custom_stereoplot"
