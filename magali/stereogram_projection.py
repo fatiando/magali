@@ -7,10 +7,11 @@
 
 import matplotlib as mpl
 import numpy as np
-from matplotlib.projections.geo import LambertAxes
 from matplotlib.projections import register_projection
+from matplotlib.projections.geo import LambertAxes
 
 rcParams = mpl.rcParams
+
 
 class Stereoplot(LambertAxes):
     """
@@ -22,7 +23,9 @@ class Stereoplot(LambertAxes):
     _default_center_longitude = 0
     _default_resolution = 60
 
-    def __init__(self, *args, center_latitude=None, center_longitude=None, rotation=0, **kwargs):
+    def __init__(
+        self, *args, center_latitude=None, center_longitude=None, rotation=0, **kwargs
+    ):
         """
         Initialize the custom Axes object, similar to a standard Axes
         initialization, but with additional parameters for stereonet configuration.
@@ -56,5 +59,6 @@ class Stereoplot(LambertAxes):
         self._overlay_axes = None
 
         super().__init__(*args, **kwargs)
+
 
 register_projection(Stereoplot)
