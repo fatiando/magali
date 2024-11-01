@@ -12,49 +12,49 @@ from matplotlib.projections import register_projection
 
 rcParams = mpl.rcParams
 
-
 class Stereoplot(LambertAxes):
     """
-    A custom class stereogram projections applied to magnetic microscopy
-    studies.
-
+    A custom class for stereogram projections applied to magnetic microscopy studies.
     """
 
     name = "stereoplot"
     _default_center_latitude = 0
     _default_center_longitude = 0
+    _default_resolution = 60
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, center_latitude=None, center_longitude=None, rotation=0, **kwargs):
         """
         Initialize the custom Axes object, similar to a standard Axes
-        initialization,but with additional parameters for stereonet
-        configuration.
+        initialization, but with additional parameters for stereonet configuration.
 
         Parameters
         ----------
         center_latitude : float, optional
             Center latitude of the stereonet in degrees
-            (default is _default_center_lat).
+            (default is _default_center_latitude).
         center_longitude : float, optional
             Center longitude of the stereonet in degrees
-            (default is _default_center_lon).
+            (default is _default_center_longitude).
         rotation : float, optional
             Rotation angle of the stereonet in degrees clockwise from North
             (default is 0).
         """
-        # Convert rotation to radians and store as a negative value
+        # Store the rotation as radians (converted to a negative value)
         self.horizon = np.radians(90)
-        self._rotation = -np.radians(kwargs.pop("rotation", 0))
+        self._rotation = -np.radians(rotation)
 
-        # Extract center latitude and longitude, using defaults if not provided
-        kwargs.setdefault("center_latitude", self._default_center_lat)
-        kwargs.setdefault("center_longitude", self._default_center_lon)
+        # Set center latitude and longitude, using defaults if not provided
+        center_latitude = center_latitude or self._default_center_latitude
+        center_longitude = center_longitude or self._default_center_longitude
+
+        # Store center latitude and longitude in kwargs for the base class
+        kwargs["center_latitude"] = center_latitude
+        kwargs["center_longitude"] = center_longitude
         kwargs.setdefault("resolution", self._default_resolution)
 
-        # Initialize overlay axes
+        # Initialize overlay axes (for potential future use)
         self._overlay_axes = None
 
-        # Call LambertAxes base class constructor
-        LambertAxes.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 register_projection(Stereoplot)
