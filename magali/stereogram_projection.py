@@ -21,6 +21,8 @@ class Stereoplot(LambertAxes):
     """
 
     name = "stereoplot"
+    _default_center_latitude = 0
+    _default_center_longitude = 0
 
     def __init__(self, *args, **kwargs):
         """
@@ -30,10 +32,10 @@ class Stereoplot(LambertAxes):
 
         Parameters
         ----------
-        center_lat : float, optional
+        center_latitude : float, optional
             Center latitude of the stereonet in degrees
             (default is _default_center_lat).
-        center_lon : float, optional
+        center_longitude : float, optional
             Center longitude of the stereonet in degrees
             (default is _default_center_lon).
         rotation : float, optional
@@ -45,8 +47,8 @@ class Stereoplot(LambertAxes):
         self._rotation = -np.radians(kwargs.pop("rotation", 0))
 
         # Extract center latitude and longitude, using defaults if not provided
-        kwargs.setdefault("center_lat", self._default_center_lat)
-        kwargs.setdefault("center_lon", self._default_center_lon)
+        kwargs.setdefault("center_latitude", self._default_center_lat)
+        kwargs.setdefault("center_longitude", self._default_center_lon)
         kwargs.setdefault("resolution", self._default_resolution)
 
         # Initialize overlay axes
