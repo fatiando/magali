@@ -7,7 +7,8 @@
 
 import matplotlib as mpl
 import numpy as np
-from matplotlib.projections.geo import LambertAxes, register_projection
+from matplotlib.projections.geo import LambertAxes
+from matplotlib.projections import register_projection
 
 rcParams = mpl.rcParams
 
@@ -54,4 +55,4 @@ class Stereoplot(LambertAxes):
         # Call LambertAxes base class constructor
         LambertAxes.__init__(*args, **kwargs)
 
-register_projection(HammerAxes)
+register_projection(Stereoplot)

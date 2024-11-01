@@ -6,4 +6,5 @@
 #
 from ._input_output import read_qdm_harvard
 from ._synthetic import random_directions
+from .stereogram_projection import Stereoplot
 from ._version import __version__
