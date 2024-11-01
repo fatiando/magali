@@ -5,13 +5,51 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 
-rcParams = matplotlib.rcParams
+import matplotlib as mpl
+import numpy as np
+from matplotlib.projections.geo import LambertAxes
+
+rcParams = mpl.rcParams
 
 
-class Sterogram:
+class Stereoplot(LambertAxes):
     """
-    A custom class stereogram projections applied to magnetic microscopy studies.
+    A custom class stereogram projections applied to magnetic microscopy
+    studies.
 
     """
 
-    name = "custom_stereoplot"
+    name = "stereoplot"
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the custom Axes object, similar to a standard Axes
+        initialization,but with additional parameters for stereonet
+        configuration.
+
+        Parameters
+        ----------
+        center_lat : float, optional
+            Center latitude of the stereonet in degrees
+            (default is _default_center_lat).
+        center_lon : float, optional
+            Center longitude of the stereonet in degrees
+            (default is _default_center_lon).
+        rotation : float, optional
+            Rotation angle of the stereonet in degrees clockwise from North
+            (default is 0).
+        """
+        # Convert rotation to radians and store as a negative value
+        self.horizon = np.radians(90)
+        self._rotation = -np.radians(kwargs.pop("rotation", 0))
+
+        # Extract center latitude and longitude, using defaults if not provided
+        kwargs.setdefault("center_lat", self._default_center_lat)
+        kwargs.setdefault("center_lon", self._default_center_lon)
+        kwargs.setdefault("resolution", self._default_resolution)
+
+        # Initialize overlay axes
+        self._overlay_axes = None
+
+        # Call LambertAxes base class constructor
+        LambertAxes.__init__(*args, **kwargs)
