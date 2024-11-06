@@ -10,12 +10,22 @@ import numpy as np
 from matplotlib.projections import register_projection
 from matplotlib.projections.geo import LambertAxes
 
-rcParams = mpl.rcParams
+rcparams = mpl.rcParams
 
 
 class Stereoplot(LambertAxes):
     """
-    A custom class for stereogram projections applied to magnetic microscopy studies.
+    A custom class for creating stereogram projections, particularly useful
+    for applications in magnetic microscopy studies.
+
+    The `Stereoplot` class extends the `LambertAxes` base class to implement
+    a stereographic projection of vector orientations, such as magnetic field
+    vectors. This projection is based on the `mplstereonet` project
+    (https://github.com/joferkington/mplstereonet), which provides robust
+    implementations for geological stereographic plots. This type of projection
+    is valuable for visualizing orientation data in geoscience and related
+    fields.
+
     """
 
     name = "stereoplot"
@@ -27,7 +37,8 @@ class Stereoplot(LambertAxes):
     ):
         """
         Initialize the custom Axes object, similar to a standard Axes
-        initialization, but with additional parameters for stereonet configuration.
+        initialization, but with additional parameters for stereonet
+        configuration.
 
         Parameters
         ----------
@@ -57,6 +68,43 @@ class Stereoplot(LambertAxes):
         self._overlay_axes = None
 
         super().__init__(*args, **kwargs)
+
+    def calculate_stereonet_projection(self, azimuth, inclination):
+        """
+        Converts azimuth and inclination to x, y coordinates on a stereonet.
+
+        Parameters
+        ----------
+        azimuth : float or array-like
+            Azimuth angle(s) in degrees, measured clockwise from North.
+        inclination : float or array-like
+            Inclination angle(s) in degrees, with positive values downward and
+            negative values upward.
+
+        Returns
+        -------
+        x : float or array-like
+            x-coordinate(s) on the stereonet.
+        y : float or array-like
+            y-coordinate(s) on the stereonet.
+
+        Notes
+        -----
+        This function uses a stereographic projection, commonly used in
+        geological and geophysical applications, where azimuth and inclination
+        are mapped onto a plane for visual analysis of vector orientations.
+
+        """
+
+        azimuth_rad = np.radians(azimuth)
+        inclination_rad = np.radians(inclination)
+
+        # Compute the stereonet projection (Schmidt or Wulff projection)
+        r = np.tan((np.pi / 4) - (inclination_rad / 2))
+        x = r * np.sin(azimuth_rad)
+        y = r * np.cos(azimuth_rad)
+
+        return x, y
 
 
 register_projection(Stereoplot)
