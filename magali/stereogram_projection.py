@@ -21,7 +21,6 @@ class Stereoplot(LambertAxes):
     name = "stereoplot"
     _default_center_latitude = 0
     _default_center_longitude = 0
-    _default_resolution = 60
 
     def __init__(
         self, *args, center_latitude=None, center_longitude=None, rotation=0, **kwargs
@@ -53,7 +52,6 @@ class Stereoplot(LambertAxes):
         # Store center latitude and longitude in kwargs for the base class
         kwargs["center_latitude"] = center_latitude
         kwargs["center_longitude"] = center_longitude
-        kwargs.setdefault("resolution", self._default_resolution)
 
         # Initialize overlay axes (for potential future use)
         self._overlay_axes = None
