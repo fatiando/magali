@@ -69,7 +69,8 @@ class Stereoplot(LambertAxes):
 
         super().__init__(*args, **kwargs)
 
-    def calculate_stereonet_projection(self, azimuth, inclination):
+    @staticmethod
+    def calculate_stereonet_projection(azimuth, inclination):
         """
         Converts azimuth and inclination to x, y coordinates on a stereonet.
 
