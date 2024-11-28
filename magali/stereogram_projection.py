@@ -5,27 +5,59 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.projections import register_projection
 from matplotlib.projections.geo import LambertAxes
+from matplotlib.ticker import FixedLocator
+from matplotlib.transforms import Affine2D
 
-rcparams = mpl.rcParams
 
-
-class Stereoplot(LambertAxes):
+class HalfLambertAxes(LambertAxes):
     """
-    A custom class for creating stereogram projections, particularly useful
-    for applications in magnetic microscopy studies.
+    A custom projection class based on LambertAxes, representing a half-sphere projection.
 
-    The `Stereoplot` class extends the `LambertAxes` base class to implement
-    a stereographic projection of vector orientations, such as magnetic field
-    vectors. This projection is based on the `mplstereonet` project
+    This class includes methods for configuring the grid and applying an affine transformation
+    specific to the half-sphere Lambert projection.
+    """
+
+    def set_longitude_grid(self, degrees):
+        """
+        Sets the longitude grid interval.
+
+        Parameters:
+        ----------
+        degrees : float
+            The interval in degrees between each longitude grid line.
+
+        This method sets up a grid with tick marks at specified longitude intervals,
+        using a fixed locator for the major ticks and a custom formatter.
+        """
+        grid = np.arange(-90, 90 + degrees, degrees)
+        self.xaxis.set_major_locator(FixedLocator(np.deg2rad(grid)))
+        self.xaxis.set_major_formatter(self.ThetaFormatter(degrees))
+
+    def _get_affine_transform(self):
+        """
+        Returns an affine transformation for scaling and translating the half-sphere projection.
+
+        Returns:
+        -------
+        Affine2D : Transformation for scaling and translating the plot within its axis limits.
+        """
+        return Affine2D().scale(0.356).translate(0.5, 0.5)
+
+
+class Stereoplot(HalfLambertAxes):
+    """
+    A stereographic projection class for plotting data on a stereonet.
+
+    Inherits from HalfLambertAxes to represent a stereographic view with options for specifying
+    the center latitude, center longitude, and rotation. This projection is based on the `mplstereonet` project
     (https://github.com/joferkington/mplstereonet), which provides robust
     implementations for geological stereographic plots. This type of projection
     is valuable for visualizing orientation data in geoscience and related
     fields.
-
     """
 
     name = "stereoplot"
@@ -36,76 +68,27 @@ class Stereoplot(LambertAxes):
         self, *args, center_latitude=None, center_longitude=None, rotation=0, **kwargs
     ):
         """
-        Initialize the custom Axes object, similar to a standard Axes
-        initialization, but with additional parameters for stereonet
-        configuration.
+        Initializes the Stereoplot projection with optional parameters for center and rotation.
 
-        Parameters
+        Parameters:
         ----------
         center_latitude : float, optional
-            Center latitude of the stereonet in degrees
-            (default is _default_center_latitude).
+            Latitude for the center of the projection, defaults to 0.
         center_longitude : float, optional
-            Center longitude of the stereonet in degrees
-            (default is _default_center_longitude).
+            Longitude for the center of the projection, defaults to 0.
         rotation : float, optional
-            Rotation angle of the stereonet in degrees clockwise from North
-            (default is 0).
+            Rotation angle in degrees to apply to the projection, defaults to 0.
         """
-        # Store the rotation as radians (converted to a negative value)
         self.horizon = np.radians(90)
         self._rotation = -np.radians(rotation)
 
-        # Set center latitude and longitude, using defaults if not provided
         center_latitude = center_latitude or self._default_center_latitude
         center_longitude = center_longitude or self._default_center_longitude
 
-        # Store center latitude and longitude in kwargs for the base class
         kwargs["center_latitude"] = center_latitude
         kwargs["center_longitude"] = center_longitude
 
-        # Initialize overlay axes (for potential future use)
-        self._overlay_axes = None
-
         super().__init__(*args, **kwargs)
-
-    @staticmethod
-    def calculate_stereonet_projection(azimuth, inclination):
-        """
-        Converts azimuth and inclination to x, y coordinates on a stereonet.
-
-        Parameters
-        ----------
-        azimuth : float or array-like
-            Azimuth angle(s) in degrees, measured clockwise from North.
-        inclination : float or array-like
-            Inclination angle(s) in degrees, with positive values downward and
-            negative values upward.
-
-        Returns
-        -------
-        x : float or array-like
-            x-coordinate(s) on the stereonet.
-        y : float or array-like
-            y-coordinate(s) on the stereonet.
-
-        Notes
-        -----
-        This function uses a stereographic projection, commonly used in
-        geological and geophysical applications, where azimuth and inclination
-        are mapped onto a plane for visual analysis of vector orientations.
-
-        """
-
-        azimuth_rad = np.radians(azimuth)
-        inclination_rad = np.radians(inclination)
-
-        # Compute the stereonet projection (Schmidt or Wulff projection)
-        r = np.tan((np.pi / 4) - (inclination_rad / 2))
-        x = r * np.sin(azimuth_rad)
-        y = r * np.cos(azimuth_rad)
-
-        return x, y
 
 
 register_projection(Stereoplot)
