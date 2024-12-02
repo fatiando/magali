@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.projections import register_projection
 from matplotlib.projections.geo import LambertAxes
-from matplotlib.ticker import FixedLocator
+from matplotlib.ticker import FixedLocator, NullFormatter, NullLocator
 from matplotlib.transforms import Affine2D
 
 
@@ -33,9 +33,27 @@ class HalfLambertAxes(LambertAxes):
         This method sets up a grid with tick marks at specified longitude intervals,
         using a fixed locator for the major ticks and a custom formatter.
         """
-        grid = np.arange(-90, 90 + degrees, degrees)
+        grid = np.arange(-180, 180 + 10 , 10)
+        self.xaxis.set_major_locator(FixedLocator(np.deg2rad(grid)))
+        self.xaxis.set_major_formatter(self.ThetaFormatter(10))
+
+    def set_latitude_grid(self, degrees):
+        """
+        Sets the longitude grid interval.
+
+        Parameters:
+        ----------
+        degrees : float
+            The interval in degrees between each longitude grid line.
+
+        This method sets up a grid with tick marks at specified longitude intervals,
+        using a fixed locator for the major ticks and a custom formatter.
+        """
+        grid = np.arange(-180, 180, degrees)
         self.xaxis.set_major_locator(FixedLocator(np.deg2rad(grid)))
         self.xaxis.set_major_formatter(self.ThetaFormatter(degrees))
+
+
 
     def _get_affine_transform(self):
         """
@@ -45,7 +63,8 @@ class HalfLambertAxes(LambertAxes):
         -------
         Affine2D : Transformation for scaling and translating the plot within its axis limits.
         """
-        return Affine2D().scale(0.356).translate(0.5, 0.5)
+        return Affine2D().scale(0.354).translate(0.5, 0.5)
+
 
 
 class Stereoplot(HalfLambertAxes):
