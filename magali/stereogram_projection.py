@@ -84,7 +84,7 @@ class Stereoplot(HalfLambertAxes):
     _default_center_longitude = 0
 
     def __init__(
-        self, *args, center_latitude=None, center_longitude=None, rotation=0, **kwargs
+        self, *args, center_latitude=None, center_longitude=None, rotation=0, vertical=False, **kwargs
     ):
         """
         Initializes the Stereoplot projection with optional parameters for center and rotation.
@@ -100,6 +100,9 @@ class Stereoplot(HalfLambertAxes):
         """
         self.horizon = np.radians(90)
         self._rotation = -np.radians(rotation)
+        
+        if vertical:
+            center_latitude=+0.65+180
 
         center_latitude = center_latitude or self._default_center_latitude
         center_longitude = center_longitude or self._default_center_longitude
