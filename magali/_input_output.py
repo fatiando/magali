@@ -37,7 +37,7 @@ def read_qdm_harvard(path):
     contents = scipy.io.loadmat(path)
     coordinates, data_names, bz = _extract_data_qdm_harvard(contents)
     data = _create_qdm_harvard_grid(coordinates, data_names, bz, path)
-    return data
+    return data.bz
 
 
 def _extract_data_qdm_harvard(contents):
