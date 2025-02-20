@@ -5,9 +5,8 @@ Overview
 
 The library
 -----------
-
-All functionality in magali is available from the base namespace of the
-:mod:`magali` package. This means that you can access all of them with a
+All functionality in magali is available from the base namespace of the 
+:mod:`magali` package. This means that you can access all of them with a 
 single import:
 
 .. jupyter-execute::
@@ -15,7 +14,7 @@ single import:
     # magali is usually imported as mg
     import magali as mg
 
-    import ensaio
+    import pooch
     import matplotlib.pyplot as plt
 
 
@@ -23,15 +22,21 @@ Load some data:
 
 .. jupyter-execute::
 
-    fname = ensaio.fetch_morroco_speleothem_qdm(version=1, file_format="netcdf")
-    print(fname)
+    path = pooch.retrieve(
+        "doi:10.6084/m9.figshare.22965200.v1/Bz_uc0.mat",
+        known_hash="md5:268bd3af5e350188d239ff8bd0a88227",
+    )
+    print(path)
 
 .. jupyter-execute::
 
-    data = mg.read_qdm_harvard(fname)
+    data = mg.read_qdm_harvard(path)
     data
 
 .. jupyter-execute::
 
-    data.bz.plot(cmap="RdBu_r", vmin=-1000, vmax=1000)
-
+    fig, ax = plt.subplots(1, 1, figsize=(9, 4.8), layout="constrained")
+    scale = 2500
+    data.plot.imshow(ax=ax, cmap="RdBu_r", vmin=-scale, vmax=scale)
+    ax.set_aspect("equal")
+    plt.show()
