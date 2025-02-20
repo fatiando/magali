@@ -19,20 +19,22 @@ def read_qdm_harvard(path):
     """
     Load QDM microscopy data in the Harvard group format.
 
-    This is the file type used by Roger Fu's group to distribute QDM data. It's
-    a Matlab binary file that has the data and some information about grid
-    spacing.
+    This function loads quantum diamond microscope (QDM) data stored in the
+    Matlab binary format used by Roger Fu's research group at Harvard.
+    The file contains magnetic field measurements and metadata, including
+    grid spacing information.
 
     Parameters
     ----------
     path : str or pathlib.Path
-        Path to the input Matlab binary file.
+        Path to the input Matlab (.mat) file.
 
     Returns
     -------
-    data : xarray.Dataset
-        The magnetic field data as a regular grid with coordinates. The
-        coordinates are in µm and magnetic field in nT.
+    data.bz : xarray.DataArray
+        A 2D array representing the magnetic field component (Bz) on a
+        regular grid. The coordinates are in micrometers (µm), and the
+        magnetic field values are in nanotesla (nT).
     """
     contents = scipy.io.loadmat(path)
     coordinates, data_names, bz = _extract_data_qdm_harvard(contents)
