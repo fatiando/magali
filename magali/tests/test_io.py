@@ -8,16 +8,13 @@
 Test the IO functions
 """
 
-import pooch
+import ensaio
 
 from .._input_output import read_qdm_harvard
 
 
 def test_read_qdm_harvard():
     "Try loading a sample dataset"
-    path = pooch.retrieve(
-        "doi:10.6084/m9.figshare.22965200.v1/Bz_uc0.mat",
-        known_hash="md5:268bd3af5e350188d239ff8bd0a88227",
-    )
-    bz = read_qdm_harvard(path)
+    fname = ensaio.fetch_morroco_speleothem_qdm(version=1, file_format="netcdf")
+    bz = read_qdm_harvard(fname)
     assert bz.size == 576_000
