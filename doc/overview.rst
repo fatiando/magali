@@ -36,4 +36,8 @@ Load some data:
 
 .. jupyter-execute::
 
-    data.bz.plot(cmap="RdBu_r", vmin=-1000, vmax=1000)
+    fig, ax = plt.subplots(1, 1, figsize=(9, 4.8), layout="constrained")
+    scale = 2500
+    data.plot.imshow(ax=ax, cmap="RdBu_r", vmin=-scale, vmax=scale)
+    ax.set_aspect("equal")
+    plt.show()
