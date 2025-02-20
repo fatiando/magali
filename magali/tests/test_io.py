@@ -15,6 +15,6 @@ from .._input_output import read_qdm_harvard
 
 def test_read_qdm_harvard():
     "Try loading a sample dataset"
-    fname = ensaio.fetch_morroco_speleothem_qdm(version=1, file_format="netcdf")
+    fname = ensaio.fetch_morroco_speleothem_qdm(version=1, file_format="matlab")
     bz = read_qdm_harvard(fname)
     assert bz.size == 576_000
