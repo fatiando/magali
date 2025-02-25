@@ -13,6 +13,7 @@ dependencies:
   - choclo
   - harmonica
   - verde
+  - ensaio
   # Build
   - python-build
   - twine
