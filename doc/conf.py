@@ -11,13 +11,9 @@ import magali
 # Project information
 # -----------------------------------------------------------------------------
 project = "magali"
-copyright = (  # noqa: A001
-    f"{datetime.date.today().year}, The {project.title()} developers"
-)
-if len(magali.__version__.split(".")) > 3:
-    version = "dev"
-else:
-    version = magali.__version__
+copyright = f"{datetime.date.today().year}, The {project} Developers"
+is_dev_version = len(magali.__version__.split(".")) > 3
+version = "dev" if is_dev_version else magali.__version__
 
 # General configuration
 # -----------------------------------------------------------------------------

@@ -72,7 +72,7 @@ notice = '''
 line-length = 88
 exclude = [
     "doc/_build",
-    "choclo/_version.py",
+    "magali/_version.py",
 ]
 
 [tool.ruff.lint]
