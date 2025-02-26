@@ -40,4 +40,4 @@ def test_read_qdm_harvard():
     assert isinstance(bz, xr.DataArray)
     assert isinstance(bz.x, xr.DataArray)
     assert isinstance(bz.y, xr.DataArray)
-    assert isinstance(bz.z, xr.DataArray) 
+    assert isinstance(bz.z, xr.DataArray)
