@@ -17,4 +17,20 @@ def test_read_qdm_harvard():
     "Try loading a sample dataset"
     fname = ensaio.fetch_morroco_speleothem_qdm(version=1, file_format="matlab")
     bz = read_qdm_harvard(fname)
+
+    # Test units
+    assert bz.x.units == "µm"
+    assert bz.y.units == "µm"
+    assert bz.z.units == "µm"
+    assert bz.units == "nT"
+
+    # Test array sizes
     assert bz.size == 576_000
+    assert bz.x.size == 960
+    assert bz.y.size == 600
+    assert bz.z.size == 576000
+    assert bz.size == 576000
+
+    # Test data name
+    assert bz.long_name == "vertical magnetic field"
+    
