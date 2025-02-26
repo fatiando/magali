@@ -9,6 +9,7 @@ Test the IO functions
 """
 
 import ensaio
+import xarray as xr
 
 from .._input_output import read_qdm_harvard
 
@@ -33,4 +34,9 @@ def test_read_qdm_harvard():
 
     # Test data name
     assert bz.long_name == "vertical magnetic field"
-    
+
+    # Test if bz is a DataArray
+    assert isinstance(bz, xr.DataArray)
+    assert isinstance(bz.x, xr.DataArray)
+    assert isinstance(bz.y, xr.DataArray)
+    assert isinstance(bz.z, xr.DataArray)
