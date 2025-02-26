@@ -34,9 +34,10 @@ def test_read_qdm_harvard():
 
     # Test data name
     assert bz.long_name == "vertical magnetic field"
+    assert bz.z.long_name == "sensor sample distance"
 
     # Test if bz is a DataArray
     assert isinstance(bz, xr.DataArray)
     assert isinstance(bz.x, xr.DataArray)
     assert isinstance(bz.y, xr.DataArray)
-    assert isinstance(bz.z, xr.DataArray)
+    assert isinstance(bz.z, xr.DataArray) 
