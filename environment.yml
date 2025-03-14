@@ -11,7 +11,7 @@ dependencies:
   - xarray
   - scikit-image
   - choclo
-  - harmonica
+  - harmonica==0.7.0
   - verde
   - ensaio
   # Build
