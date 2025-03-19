@@ -11,6 +11,8 @@ Functions to generate synthetic data
 import harmonica as hm
 import numpy as np
 
+from ._utils import convet_micrometer_to_meter
+
 
 def random_directions(
     inclination, declination, dispersion_angle, size, random_state=None
@@ -143,3 +145,28 @@ def _rotate_vector(x, y, z, inclination, declination):
     y_r = np.sin(phi) * (x * np.cos(theta) + z * np.sin(theta)) + y * np.cos(phi)
     z_r = -x * np.sin(theta) + z * np.cos(theta)
     return x_r, y_r, z_r
+
+
+def dipole_bz(coordinates, dipole_coordinates, dipole_moments):
+    """
+    Computes the vertical component of the magnetic field (Bz) produced by a magnetic dipole.
+
+    Parameters
+    ----------
+    coordinates : tuple of float
+        Observation point coordinates in micrometers (μm).
+    dipole_coordinates : tuple of float
+        Dipole location coordinates in micrometers (μm).
+    dipole_moments : tuple of float
+        Dipole moment components (Am²).
+
+    Returns
+    -------
+    bz : float
+        The vertical component of the magnetic field (Bz) at the given observation point.
+    """
+    coordinates_m = convet_micrometer_to_meter(coordinates)
+    dipole_coordinates_m = convet_micrometer_to_meter(dipole_coordinates)
+    return hm.dipole_magnetic(
+        coordinates_m, dipole_coordinates_m, dipole_moments, field="b_u"
+    )
