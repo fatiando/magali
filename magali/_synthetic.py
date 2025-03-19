@@ -10,6 +10,7 @@ Functions to generate synthetic data
 
 import harmonica as hm
 import numpy as np
+import verde as vd
 
 from ._utils import _convert_micrometer_to_meter
 
@@ -194,7 +195,7 @@ def dipole_bz_grid(coordinates, dipole_coordinates, dipole_moments):
         - "bz" : vertical magnetic field (nT)
         - "x" and "y" coordinates with units in micrometers (μm)
     """
-    bz = mg.dipole_bz(coordinates, dipole_coordinates, dipole_moments)
+    bz = dipole_bz(coordinates, dipole_coordinates, dipole_moments)
     data = vd.make_xarray_grid(
         coordinates, bz, data_names=["bz"], dims=("y", "x"), extra_coords_names="z"
     )
