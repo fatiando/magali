@@ -8,15 +8,19 @@
 from ._constants import MICROMETER_TO_METER
 
 
-def convet_micrometer_to_meter(coordinates):
+def _convert_micrometer_to_meter(coordinates):
     """
-    Convert coordinates from micrometers to meters.
+    Converts coordinates from micrometers to meters.
 
-    Parameters:
-    coordinates (tuple of float): A tuple containing coordinate values in micrometers.
+    Parameters
+    ----------
+    coordinates : tuple of float
+        Coordinate values in micrometers (μm).
 
-    Returns:
-    tuple of float: A tuple containing coordinate values converted to meters.
+    Returns
+    -------
+    coordinates_m : tuple of float
+        Coordinate values converted to meters (m).
     """
 
     return tuple(c * MICROMETER_TO_METER for c in coordinates)
