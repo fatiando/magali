@@ -170,3 +170,35 @@ def dipole_bz(coordinates, dipole_coordinates, dipole_moments):
     return hm.dipole_magnetic(
         coordinates_m, dipole_coordinates_m, dipole_moments, field="b_u"
     )
+
+
+def dipole_bz_grid(coordinates, dipole_coordinates, dipole_moments):
+    """
+    Computes the vertical component of the magnetic field (Bz) produced by a magnetic dipole
+    and returns it as a gridded dataset.
+
+    Parameters
+    ----------
+    coordinates : tuple of numpy.array
+        Grid coordinates in micrometers (μm) with shape (3, N), where N is the number of points.
+    dipole_coordinates : tuple of float
+        Dipole location coordinates in micrometers (μm).
+    dipole_moments : tuple of float
+        Dipole moment components (Am²).
+
+    Returns
+    -------
+    data : xarray.Dataset
+        Gridded dataset containing the vertical component of the magnetic field (Bz).
+        The dataset includes:
+        - "bz" : vertical magnetic field (nT)
+        - "x" and "y" coordinates with units in micrometers (μm)
+    """
+    bz = mg.dipole_bz(coordinates, dipole_coordinates, dipole_moments)
+    data = vd.make_xarray_grid(
+        coordinates, bz, data_names=["bz"], dims=("y", "x"), extra_coords_names="z"
+    )
+    data.x.attrs = {"units": "µm"}
+    data.y.attrs = {"units": "µm"}
+    data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
+    return data
