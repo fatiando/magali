@@ -177,13 +177,13 @@ def dipole_bz_grid(
     region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
 ):
     """
-    Computes the vertical component of the magnetic field (Bz) produced by a magnetic dipole
-    and returns it as a gridded dataset.
+    Generate a grid of the vertical component of the magnetic field of a dipole.
 
     Parameters
     ----------
     region : tuple of float
-        The spatial region for the grid in micrometers (μm), defined as (x_min, x_max, y_min, y_max).
+        The spatial region for the grid in micrometers (μm), defined as
+        (x_min, x_max, y_min, y_max).
     spacing : float
         Grid spacing in micrometers (μm).
     sensor_sample_distance : float
@@ -195,8 +195,9 @@ def dipole_bz_grid(
 
     Returns
     -------
-    data : xarray.Dataset
-        Gridded dataset containing the vertical component of the magnetic field (Bz).
+    data : xarray.DataArray
+        Gridded dataset containing the vertical component of the magnetic
+        field (Bz).
         The dataset includes:
         - "bz" : vertical magnetic field (nT)
         - "x" and "y" coordinates with units in micrometers (μm)
@@ -213,4 +214,4 @@ def dipole_bz_grid(
     data.x.attrs = {"units": "µm"}
     data.y.attrs = {"units": "µm"}
     data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
-    return data
+    return data.bz
