@@ -212,6 +212,5 @@ def dipole_bz_grid(
     )
     data.x.attrs = {"units": "µm"}
     data.y.attrs = {"units": "µm"}
-    data.z.attrs = {"units": "µm"}
     data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
     return data
