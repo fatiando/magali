@@ -8,7 +8,6 @@
 Test the _utils functions
 """
 
-import numpy as np
 import verde as vd
 
 from .._utils import _convert_micrometer_to_meter
