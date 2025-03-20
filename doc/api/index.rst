@@ -12,3 +12,5 @@ List of functions and classes (API)
 
    read_qdm_harvard
    random_directions
+   dipole_bz
+   dipole_bz_grid
