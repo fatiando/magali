@@ -8,8 +8,8 @@
 Test the _utils functions
 """
 
-import verde as vd
 import numpy as np
+import verde as vd
 
 from .._utils import _convert_micrometer_to_meter
 
@@ -23,4 +23,4 @@ def test_convert_micrometer_to_meter():
 
     assert len(coordinates_m) == 2
 
-    _convert_micrometer_to_meter(coordinates_micrometer)[0][0][1] == 2e-6
+    _convert_micrometer_to_meter(coordinates_micrometer)[0][0][1] == 2e-6  # noqa: B015
