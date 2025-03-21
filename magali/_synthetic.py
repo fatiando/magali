@@ -10,6 +10,9 @@ Functions to generate synthetic data
 
 import harmonica as hm
 import numpy as np
+import verde as vd
+
+from ._utils import _convert_micrometer_to_meter
 
 
 def random_directions(
@@ -143,3 +146,72 @@ def _rotate_vector(x, y, z, inclination, declination):
     y_r = np.sin(phi) * (x * np.cos(theta) + z * np.sin(theta)) + y * np.cos(phi)
     z_r = -x * np.sin(theta) + z * np.cos(theta)
     return x_r, y_r, z_r
+
+
+def dipole_bz(coordinates, dipole_coordinates, dipole_moments):
+    """
+    Computes the vertical component of the magnetic field (Bz) produced by a magnetic dipole.
+
+    Parameters
+    ----------
+    coordinates : tuple of float
+        Observation point coordinates in micrometers (μm).
+    dipole_coordinates : tuple of float
+        Dipole location coordinates in micrometers (μm).
+    dipole_moments : tuple of float
+        Dipole moment components (Am²).
+
+    Returns
+    -------
+    bz : float
+        The vertical component of the magnetic field (Bz) at the given observation point.
+    """
+    coordinates_m = _convert_micrometer_to_meter(coordinates)
+    dipole_coordinates_m = _convert_micrometer_to_meter(dipole_coordinates)
+    return hm.dipole_magnetic(
+        coordinates_m, dipole_coordinates_m, dipole_moments, field="b_u"
+    )
+
+
+def dipole_bz_grid(
+    region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+):
+    """
+    Generate a grid of the vertical component of the magnetic field of a dipole.
+
+    Parameters
+    ----------
+    region : tuple of float
+        The spatial region for the grid in micrometers (μm), defined as
+        (x_min, x_max, y_min, y_max).
+    spacing : float
+        Grid spacing in micrometers (μm).
+    sensor_sample_distance : float
+        Distance of the sensor from the grid in micrometers (μm).
+    dipole_coordinates : tuple of float
+        Dipole location coordinates in micrometers (μm).
+    dipole_moments : tuple of float
+        Dipole moment components (Am²).
+
+    Returns
+    -------
+    data : xarray.DataArray
+        Gridded dataset containing the vertical component of the magnetic
+        field (Bz).
+        The dataset includes:
+        - "bz" : vertical magnetic field (nT)
+        - "x" and "y" coordinates with units in micrometers (μm)
+    """
+    coordinates = vd.grid_coordinates(
+        region=region,  # µm
+        spacing=spacing,  # µm
+        extra_coords=sensor_sample_distance,
+    )
+    bz = dipole_bz(coordinates, dipole_coordinates, dipole_moments)
+    data = vd.make_xarray_grid(
+        coordinates, bz, data_names=["bz"], dims=("y", "x"), extra_coords_names="z"
+    )
+    data.x.attrs = {"units": "µm"}
+    data.y.attrs = {"units": "µm"}
+    data.bz.attrs = {"long_name": "vertical magnetic field", "units": "nT"}
+    return data.bz
