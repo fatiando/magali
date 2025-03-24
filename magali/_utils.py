@@ -27,28 +27,6 @@ def _convert_micrometer_to_meter(coordinates):
     """
     return tuple(c * MICROMETER_TO_METER for c in coordinates)
 
-
-def horizontal_derivatives(data):
-    """
-    Compute first-order spatial derivatives in the x and y directions.
-
-    Parameters
-    ----------
-    data : xr.DataArray
-        Input data array with coordinates "x" and "y".
-
-    Returns
-    -------
-    dx : xr.DataArray
-        First derivative along the x-direction.
-    dy : xr.DataArray
-        First derivative along the y-direction.
-    """
-    dx = hm.derivative_easting(data)
-    dy = hm.derivative_northing(data)
-    return dx, dy
-
-
 def _estimate_grid_spacing(data):
     """
     Estimate grid spacing as the mean difference in x and y coordinates.
@@ -66,29 +44,43 @@ def _estimate_grid_spacing(data):
     return np.mean([np.abs(data.x[1] - data.x[0]), np.abs(data.y[1] - data.y[0])])
 
 
-def vertical_derivative(data, spacing):
+def gradients(data):
     """
-    Compute the first-order vertical derivative using finite differences.
-
-    The vertical derivative is estimated using the difference between an
-    upward-continued and a downward-continued version of the data. This avoids
-    downward continuation, which can amplify noise.
+    Compute first-order spatial derivatives in the x, y, and z directions.
 
     Parameters
     ----------
     data : xr.DataArray
-        Input data array.
-    spacing : float
-        Grid spacing used for upward and downward continuation.
+        Input data array with coordinates "x" and "y".
 
     Returns
     -------
+    dx : xr.DataArray
+        First derivative along the x-direction.
+    dy : xr.DataArray
+        First derivative along the y-direction.
     dz : xr.DataArray
         First derivative along the z-direction.
+
+    Notes
+    -----
+    The vertical derivative is estimated using the difference between an
+    upward-continued and a downward-continued version of the data. This avoids
+    downward continuation, which can amplify noise.
     """
+    # Compute horizontal derivatives
+    dx = hm.derivative_easting(data)
+    dy = hm.derivative_northing(data)
+    
+    # Estimate grid spacing
+    spacing = _estimate_grid_spacing(data)
+    
+    # Compute vertical derivative
     data_up = hm.upward_continuation(data, spacing).assign_coords(x=data.x, y=data.y)
     data_down = hm.upward_continuation(data, -spacing).assign_coords(x=data.x, y=data.y)
-    return (data_up - data_down) / (2 * spacing)
+    dz = (data_up - data_down) / (2 * spacing)
+    
+    return dx, dy, dz
 
 
 def total_gradient_amplitude(dx, dy, dz):
@@ -129,9 +121,7 @@ def total_gradient_amplitude_grid(data):
     tga : xr.DataArray
         Dataset containing the total gradient amplitude (TGA).
     """
-    dx, dy = horizontal_derivatives(data)
-    spacing = _estimate_grid_spacing(data)
-    dz = vertical_derivative(data, spacing)
+    dx, dy, dz = gradients(data)
     tga = total_gradient_amplitude(dx, dy, dz)
 
     # Assign attributes
