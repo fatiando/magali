@@ -27,6 +27,7 @@ def _convert_micrometer_to_meter(coordinates):
     """
     return tuple(c * MICROMETER_TO_METER for c in coordinates)
 
+
 def _estimate_grid_spacing(data):
     """
     Estimate grid spacing as the mean difference in x and y coordinates.
@@ -71,15 +72,15 @@ def gradients(data):
     # Compute horizontal derivatives
     dx = hm.derivative_easting(data)
     dy = hm.derivative_northing(data)
-    
+
     # Estimate grid spacing
     spacing = _estimate_grid_spacing(data)
-    
+
     # Compute vertical derivative
     data_up = hm.upward_continuation(data, spacing).assign_coords(x=data.x, y=data.y)
     data_down = hm.upward_continuation(data, -spacing).assign_coords(x=data.x, y=data.y)
     dz = (data_up - data_down) / (2 * spacing)
-    
+
     return dx, dy, dz
 
 
