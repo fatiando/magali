@@ -10,5 +10,6 @@ from ._utils import (
     gradients,
     total_gradient_amplitude,
     total_gradient_amplitude_grid,
+    detect_anomalies
 )
 from ._version import __version__
