@@ -7,9 +7,10 @@
 from ._input_output import read_qdm_harvard
 from ._synthetic import dipole_bz, dipole_bz_grid, random_directions
 from ._utils import (
-    detect_anomalies,
     gradients,
     total_gradient_amplitude,
     total_gradient_amplitude_grid,
 )
+from ._detection import detect_anomalies
+
 from ._version import __version__
