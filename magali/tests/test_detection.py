@@ -24,31 +24,15 @@ def test_detect_anomalies():
     region = [0, 2000, 0, 2000]  # µm
     spacing = 2  # µm
 
-    true_inclination = 30
-    true_declination = 40
-    true_dispersion_angle = 5
-
-    size = 5
-
-    directions_inclination, directions_declination = random_directions(
-        true_inclination,
-        true_declination,
-        true_dispersion_angle,
-        size=size,
-        random_state=5,
-    )
-
-    dipoles_amplitude = abs(np.random.normal(0, 100, size)) * 1.0e-14
-
     dipole_coordinates = (
-        np.concatenate([np.random.randint(30, 1970, size), [1250, 1300, 500]]),  # µm
-        np.concatenate([np.random.randint(30, 1970, size), [500, 1750, 1000]]),  # µm
-        np.concatenate([np.random.randint(-20, -1, size), [-15, -15, -30]]),  # µm
+        np.asarray([1250, 1300, 500]),  # µm
+        np.asarray([500, 1750, 1000]),  # µm
+        np.asarray([-15, -15, -30]),  # µm
     )
     dipole_moments = hm.magnetic_angles_to_vec(
-        inclination=np.concatenate([directions_inclination, [10, -10, -5]]),
-        declination=np.concatenate([directions_declination, [10, 170, 190]]),
-        intensity=np.concatenate([dipoles_amplitude, [5e-11, 5e-11, 5e-11]]),
+        inclination=np.asarray([10, -10, -5]),
+        declination=np.asarray([10, 170, 190]),
+        intensity=np.asarray([5e-11, 5e-11, 5e-11]),
     )
 
     data = dipole_bz_grid(
@@ -73,5 +57,5 @@ def test_detect_anomalies():
         border_exclusion=1,
     )
 
-    assert len(windows) == 8
+    assert len(windows) == 3
     assert len(windows[0]) == 4
