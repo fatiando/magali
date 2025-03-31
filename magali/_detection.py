@@ -4,8 +4,6 @@
 #
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
-
-import harmonica as hm
 import numpy as np
 import skimage.exposure
 

@@ -5,7 +5,7 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 """
-Define some constants used throughout the project
+Define some constants used throughout the project.
 """
 
 TESLA_TO_NANOTESLA = 1e9
