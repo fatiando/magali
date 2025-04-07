@@ -14,7 +14,8 @@ import verde as vd
 import xarray as xr
 
 from .._stats import variance
-from .._synthetic import dipole_bz, dipole_bz_grid, random_directions
+from .._synthetic import dipole_bz, random_directions
+from ._models import simple_model, souza_junior_model
 
 
 def test_random_directions():
@@ -103,40 +104,9 @@ def test_dipole_bz():
     np.testing.assert_allclose(bz.size, 1002001, rtol=1e5)
 
 
-def test_dipole_bz_grid():
-    sensor_sample_distance = 5.0  # µm
-    region = [0, 2000, 0, 2000]
-    spacing = 2
-
-    true_inclination = 30
-    true_declination = 40
-    true_dispersion_angle = 5
-
-    size = 10
-
-    directions_inclination, directions_declination = random_directions(
-        true_inclination,
-        true_declination,
-        true_dispersion_angle,
-        size=size,
-        random_state=5,
-    )
-
-    amplitude = abs(np.random.normal(0, 100, size)) * 1.0e-14
-
-    dipole_moments = hm.magnetic_angles_to_vec(
-        directions_inclination, directions_declination, amplitude
-    )
-
-    dipole_coordinates = (
-        np.random.randint(30, 1970, size),  # µm
-        np.random.randint(30, 1970, size),  # µm
-        np.random.randint(-20, -1, size),  # µm
-    )
-
-    data = dipole_bz_grid(
-        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
-    )
+def test_dipole_bz_grid(souza_junior_model):
+    # Use model fixture from _models.py
+    data = souza_junior_model
 
     # Test units
     assert data.x.units == "µm"

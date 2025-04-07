@@ -8,38 +8,18 @@
 Test the _detection functions
 """
 
-import harmonica as hm
 import numpy as np
 import skimage.exposure
 import xarray as xr
 
 from .._detection import detect_anomalies
-from .._synthetic import dipole_bz_grid, random_directions
 from .._utils import total_gradient_amplitude_grid
+from ._models import simple_model
 
 
-def test_detect_anomalies():
-    # Synthetic
-    sensor_sample_distance = 5.0  # µm
-    region = [0, 2000, 0, 2000]  # µm
-    spacing = 2  # µm
-
-    dipole_coordinates = (
-        np.asarray([1250, 1300, 500]),  # µm
-        np.asarray([500, 1750, 1000]),  # µm
-        np.asarray([-15, -15, -30]),  # µm
-    )
-    dipole_moments = hm.magnetic_angles_to_vec(
-        inclination=np.asarray([10, -10, -5]),
-        declination=np.asarray([10, 170, 190]),
-        intensity=np.asarray([5e-11, 5e-11, 5e-11]),
-    )
-
-    data = dipole_bz_grid(
-        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
-    )
-
-    data_tga = total_gradient_amplitude_grid(data)
+def test_detect_anomalies(simple_model):
+    # Use model fixture from _models.py
+    data_tga = total_gradient_amplitude_grid(simple_model)
     stretched = skimage.exposure.rescale_intensity(
         data_tga,
         in_range=tuple(np.percentile(data_tga, (1, 99))),
