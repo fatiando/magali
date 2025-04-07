@@ -15,13 +15,13 @@ import xarray as xr
 
 from .._detection import detect_anomalies
 from .._utils import total_gradient_amplitude_grid
+from ._models import simple_model
+
 
 
 def test_detect_anomalies(simple_model):
     # Use model fixture from _models.py
-    data = simple_model
-
-    data_tga = total_gradient_amplitude_grid(data)
+    data_tga = total_gradient_amplitude_grid(simple_model)
     stretched = skimage.exposure.rescale_intensity(
         data_tga,
         in_range=tuple(np.percentile(data_tga, (1, 99))),

@@ -15,7 +15,7 @@ import xarray as xr
 
 from .._stats import variance
 from .._synthetic import dipole_bz, random_directions
-
+from ._models import simple_model, souza_junior_model
 
 def test_random_directions():
     """

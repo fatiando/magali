@@ -20,6 +20,8 @@ from .._utils import (
     total_gradient_amplitude,
     total_gradient_amplitude_grid,
 )
+from ._models import simple_model, souza_junior_model
+
 
 
 def test_convert_micrometer_to_meter():
@@ -36,18 +38,14 @@ def test_convert_micrometer_to_meter():
 
 def test_estimate_grid_spacing(souza_junior_model):
     # Use model fixture from _models.py
-    data = souza_junior_model
-
-    spacing = _estimate_grid_spacing(data)
+    spacing = _estimate_grid_spacing(souza_junior_model)
 
     assert spacing == 2.0
 
 
 def test_gradients(souza_junior_model):
     # Use model fixture from _models.py
-    data = souza_junior_model
-
-    dx, dy, dz = gradients(data)
+    dx, dy, dz = gradients(souza_junior_model)
 
     np.testing.assert_allclose(dx.min().values, -92762.44269656, rtol=1e2)
     np.testing.assert_allclose(dy.min().values, -88701.89017599083, rtol=1e2)
