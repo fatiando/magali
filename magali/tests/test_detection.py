@@ -8,7 +8,6 @@
 Test the _detection functions
 """
 
-import harmonica as hm
 import numpy as np
 import skimage.exposure
 import xarray as xr
@@ -16,7 +15,6 @@ import xarray as xr
 from .._detection import detect_anomalies
 from .._utils import total_gradient_amplitude_grid
 from ._models import simple_model
-
 
 
 def test_detect_anomalies(simple_model):

@@ -17,6 +17,7 @@ from .._stats import variance
 from .._synthetic import dipole_bz, random_directions
 from ._models import simple_model, souza_junior_model
 
+
 def test_random_directions():
     """
     Tests inclination and declination inputs. Also compares the variance of

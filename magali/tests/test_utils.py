@@ -8,7 +8,6 @@
 Test the _utils functions
 """
 
-import harmonica as hm
 import numpy as np
 import verde as vd
 import xarray as xr
@@ -21,7 +20,6 @@ from .._utils import (
     total_gradient_amplitude_grid,
 )
 from ._models import simple_model, souza_junior_model
-
 
 
 def test_convert_micrometer_to_meter():
