@@ -126,6 +126,7 @@ particles in imagery, and perform inversions for magnetic dipole moments.
     :hidden:
     :caption: User Guide
 
+    user_guide/souza_junior_method.rst
 
 .. toctree::
     :maxdepth: 2
