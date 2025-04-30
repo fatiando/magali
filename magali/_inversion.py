@@ -23,10 +23,8 @@ class MagneticMomentBz:
         "data - bz vector"
         coordinates, data, _ = vdb.check_fit_input(coordinates, data, weights=None)
         x, y, z = vdb.n_1d_arrays(coordinates, 3)
-        r = np.sqrt(
-            (coordinates[0] - self.location[0]) ** 2
-            + (coordinates[1] - self.location[1]) ** 2
-            + (coordinates[2] - self.location[2]) ** 2
-        )
+        x_c, y_c, z_c = vdb.n_1d_arrays(self.location, 3)
+        r = np.sqrt((x - x_c) ** 2 + (y - y_c) ** 2 + (z - z_c) ** 2)
         r_5 = r**5
-        
+        n_data = data.size
+        jacobian = np.empty((n_data, 3))
