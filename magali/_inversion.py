@@ -28,3 +28,4 @@ class MagneticMomentBz:
         r_5 = r**5
         n_data = data.size
         jacobian = np.empty((n_data, 3))
+        

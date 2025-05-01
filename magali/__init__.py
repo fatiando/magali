@@ -13,3 +13,4 @@ from ._utils import (
     total_gradient_amplitude_grid,
 )
 from ._version import __version__
+from .inversion import MagneticMomentBz
