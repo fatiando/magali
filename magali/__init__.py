@@ -14,3 +14,4 @@ from ._utils import (
 )
 from ._version import __version__
 from ._inversion import MagneticMomentBz
+from ._constants import MICROMETER_TO_METER, METER_TO_MICROMETER, TESLA_TO_NANOTESLA
