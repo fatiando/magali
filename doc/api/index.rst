@@ -10,6 +10,7 @@ List of functions and classes (API)
 .. autosummary::
    :toctree: generated/
 
+   MagneticMomentBz
    read_qdm_harvard
    random_directions
    dipole_bz

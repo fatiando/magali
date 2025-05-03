@@ -37,6 +37,7 @@ dependencies = [
     "verde>=1.8.1",
     "choclo>=0.2.0",
     "ensaio>=0.7.0",
+    "matplotlib",
 ]
 
 [project.urls]
