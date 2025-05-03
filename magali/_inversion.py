@@ -100,7 +100,7 @@ class MagneticMomentBz:
         coordinates : tuple of arrays
             Coordinates (x, y, z) of the observations.
         data : array
-            Observed Bz component of the magnetic field (in tesla).
+            Observed Bz component of the magnetic field (in nT).
 
         Returns
         -------
