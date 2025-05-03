@@ -8,7 +8,6 @@
 Test the _synthetic functions
 """
 
-import choclo
 import harmonica as hm
 import numpy as np
 import verde as vd
@@ -64,11 +63,12 @@ def test_MagneticMomentBz():
     assert model.jacobian is None
 
     model.fit(coordinates, data)
-    dipole_moment = np.array([dipole_moment[0][0], dipole_moment[1][0], dipole_moment[2][0]])
-    
+    dipole_moment = np.array(
+        [dipole_moment[0][0], dipole_moment[1][0], dipole_moment[2][0]]
+    )
+
     # Assert estimated moment is close to true moment
     assert model.dipole_moment_ is not None
     assert model.jacobian is not None
     assert model.jacobian.shape == (coordinates[0].size, 3)
     np.testing.assert_allclose(model.dipole_moment_, dipole_moment, rtol=1e2)
-    
