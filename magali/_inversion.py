@@ -104,7 +104,7 @@ class MagneticMomentBz:
         Returns
         -------
         self
-            This estimator instance, updated with the estimated moment vector.
+            This estimator instance, updated with the estimated `dipole_moment_` vector.
         """
         coordinates, data, _ = vdb.check_fit_input(coordinates, data, weights=None)
         x, y, z = vdb.n_1d_arrays(coordinates, 3)
