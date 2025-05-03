@@ -115,5 +115,5 @@ class MagneticMomentBz:
         hessian = jacobian.T @ jacobian
         hessian_inv = np.linalg.inv(hessian)
         estimate = hessian_inv @ jacobian.T @ data
-        self.dipole_moment_ = estimate
+        self.dipole_moment_ = estimate * 1e-9
         return self
