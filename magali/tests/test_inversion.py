@@ -44,14 +44,14 @@ def test_MagneticMomentBz():
 
     dipole_coordinates = (500, 500, -15)
 
-    dipole_moments = hm.magnetic_angles_to_vec(
+    dipole_moment = hm.magnetic_angles_to_vec(
         inclination=directions_inclination,
         declination=directions_declination,
         intensity=5e-11,
     )
 
     data = dipole_bz_grid(
-        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moment
     )
 
     data.plot.pcolormesh(cmap="seismic", vmin=-5000, vmax=5000)
@@ -62,3 +62,13 @@ def test_MagneticMomentBz():
     assert model.location == dipole_coordinates
     assert model.dipole_moment_ is None
     assert model.jacobian is None
+
+    model.fit(coordinates, data)
+    dipole_moment = np.array([dipole_moment[0][0], dipole_moment[1][0], dipole_moment[2][0]])
+    
+    # Assert estimated moment is close to true moment
+    assert model.dipole_moment_ is not None
+    assert model.jacobian is not None
+    assert model.jacobian.shape == (coordinates[0].size, 3)
+    np.testing.assert_allclose(model.dipole_moment_, dipole_moment, rtol=1e2)
+    
