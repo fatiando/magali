@@ -10,7 +10,6 @@ Classes for inversions.
 
 import choclo
 import numpy as np
-import scipy as sp
 import verde.base as vdb
 
 from ._constants import MICROMETER_TO_METER
