@@ -67,3 +67,20 @@ The source detection process involves a few signal enhancement and segmentation 
 - **Contrast stretching**: weaker signals are highlighted through rescaling.
 - **Laplacian of Gaussian (LoG) segmentation**: anomalies are identified by detecting "blobs".
 - **Ranking**: windows are ranked by signal strength to prioritize processing.
+
+Upward Continuation
+```````````````````
+
+Upward continuation suppresses small-scale noise while preserving larger magnetic anomalies.  
+Using Harmonica, a minimal upward continuation height is applied to retain most of the original signal.
+
+.. jupyter-execute::
+
+    height_difference = 5
+    data_up = (
+        hm.upward_continuation(data, height_difference)
+        .assign_attrs(data.attrs)
+        .assign_coords(x=data.x, y=data.y)
+        .assign_coords(z=data.z + height_difference)
+    )
+    data_up.plot.pcolormesh(cmap="seismic", vmin=-50000, vmax=50000)
