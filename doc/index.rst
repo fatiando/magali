@@ -128,6 +128,7 @@ particles in imagery, and perform inversions for magnetic dipole moments.
 
     tutorial/loading_dataset.rst
     tutorial/creating_synthetic_data.rst
+    tutorial/detecting_sources.rst
 
 .. toctree::
     :maxdepth: 2
