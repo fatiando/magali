@@ -114,3 +114,47 @@ and high signal intensities by rescaling the data between its 1st and
         in_range=tuple(np.percentile(data_tga, (1, 99))),
     )
     data_stretched.plot.pcolormesh(cmap="seismic")
+
+Laplacian of Gaussian (LoG) Segmentation
+`````````````````````````````````````````
+
+The Laplacian of Gaussian (LoG) is a blob detection technique commonly used in 
+image analysis.
+It identifies regions that differ significantly in intensity compared to their 
+surroundings — often corresponding to compact sources or anomalies. 
+In our case, this is used to detect windows that contain magnetic anomalies, 
+helping to identify potential magnetic grains. 
+The objective is to isolate a single magnetic source within each window
+
+.. jupyter-execute::
+
+    windows = mg.detect_anomalies(
+        data_stretched,
+        size_range=[25, 50],  # Expected size range of anomalies (µm)
+        size_multiplier=2,
+        num_scales=10,
+        detection_threshold=0.01,
+        overlap_ratio=0.5,
+        border_exclusion=1,
+    )
+
+Finally, the data is plotted along with the windows to visually inspect 
+the final results.
+
+.. jupyter-execute::
+
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    ax = plt.subplot(111)
+    data_stretched.plot.pcolormesh(ax=ax, cmap="seismic")
+    for window in windows:
+        rect = matplotlib.patches.Rectangle(
+            xy=[window[0], window[2]],
+            width=window[1] - window[0],
+            height=window[3] - window[2],
+            edgecolor="k",
+            fill=False,
+            linewidth=2,
+        )
+        ax.add_patch(rect)   
