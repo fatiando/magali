@@ -60,7 +60,8 @@ algorithm. To achieve this, we will use the
 Source Detection
 ----------------
 
-The source detection process involves a few signal enhancement and segmentation steps:
+The source detection process involves a few signal enhancement and 
+segmentation steps:
 
 - **Upward continuation**: high-frequency noise is reduced.
 - **Total Gradient Amplitude (TGA)**: signal near magnetic sources is enhanced.
@@ -72,7 +73,8 @@ Upward Continuation
 ```````````````````
 
 Upward continuation suppresses small-scale noise while preserving larger magnetic anomalies.  
-Using Harmonica, a minimal upward continuation height is applied to retain most of the original signal.
+Using Harmonica, a minimal upward continuation height is applied to retain most of
+the original signal.
 
 .. jupyter-execute::
 
@@ -84,3 +86,31 @@ Using Harmonica, a minimal upward continuation height is applied to retain most 
         .assign_coords(z=data.z + height_difference)
     )
     data_up.plot.pcolormesh(cmap="seismic", vmin=-50000, vmax=50000)
+
+Total Gradient Amplitude (TGA)
+``````````````````````````````
+
+The TGA acts as a high-pass filter, emphasizing regions near magnetic sources.
+
+.. jupyter-execute::
+
+    data_tga = mg.total_gradient_amplitude_grid(data_up)
+    data_tga.plot.pcolormesh(cmap="seismic")
+
+Contrast Stretching
+```````````````````
+
+Using `skimage <https://scikit-image.org/docs/stable/api/skimage.html>`_, 
+contrast stretching is applied after the TGA calculation to enhance both low 
+and high signal intensities by rescaling the data between its 1st and 
+99th percentiles.
+
+.. jupyter-execute::
+
+    import skimage.exposure
+
+    data_stretched = skimage.exposure.rescale_intensity(
+        data_tga, 
+        in_range=tuple(np.percentile(data_tga, (1, 99))),
+    )
+    data_stretched.plot.pcolormesh(cmap="seismic")
