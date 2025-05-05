@@ -15,3 +15,91 @@ complex model with multiple sources.
 
     Beginning with a single dipole helps isolate and understand the basic shape of the magnetic anomaly, 
     the effect of dipole orientation, and the spatial decay of the magnetic field.
+
+Simulating a Single Dipole
+--------------------------
+
+We simulate a single magnetic dipole located at the center of a 1×1 mm area, 15 µm below the sample surface. The observation grid is placed 5 µm above the sample, and the dipole orientation is generated randomly around a mean direction.
+
+Step 1: Import necessary packages
+`````````````````````````````````
+.. jupyter-execute::
+
+    import numpy as np
+    import verde as vd
+    import magali as mg
+    import harmonica as hm
+
+Step 2: Define grid and simulation parameters
+`````````````````````````````````````````````
+
+We define the grid extent, spacing, and the height of the magnetic sensor above the sample.
+
+.. jupyter-execute::
+
+    sensor_sample_distance = 5.0  # µm
+    region = [0, 1000, 0, 1000]  # µm
+    spacing = 2  # µm
+
+Step 3: Set the dipole orientation parameters
+`````````````````````````````````````````````
+
+We define the mean direction (inclination and declination) of the dipole moment and a small dispersion angle.
+
+.. jupyter-execute::
+
+    true_inclination = 30  # degrees
+    true_declination = 40  # degrees
+    true_dispersion_angle = 5  # degrees
+    size = 1  # only one dipole
+
+Step 4: Generate random dipole orientation
+``````````````````````````````````````````
+
+We use a helper function to generate a random orientation around the true direction.
+
+.. jupyter-execute::
+
+    directions_inclination, directions_declination = mg.random_directions(
+        true_inclination,
+        true_declination,
+        true_dispersion_angle,
+        size=size,
+        random_state=5,
+    )
+
+Step 5: Define dipole location and moment
+`````````````````````````````````````````
+
+The dipole is located at the center of the region and placed 15 µm below the surface. Its moment has a small magnitude, pointing in the random direction defined earlier.
+
+.. jupyter-execute::
+
+    dipole_coordinates = (500, 500, -15)  # x, y, z in µm
+
+    dipole_moments = hm.magnetic_angles_to_vec(
+        inclination=directions_inclination,
+        declination=directions_declination,
+        intensity=5e-11,  # A·m²
+    )
+
+Step 6: Simulate the magnetic field
+```````````````````````````````````
+
+We now compute the vertical magnetic field (`Bz`) produced by this single dipole over the defined grid.
+
+.. jupyter-execute::
+
+    data = mg.dipole_bz_grid(
+        region, spacing, sensor_sample_distance,
+        dipole_coordinates, dipole_moments
+    )
+
+Step 7: Visualize the results
+`````````````````````````````
+
+The magnetic field is shown using a diverging colormap. Note the characteristic dipolar shape of the field.
+
+.. jupyter-execute::
+
+    data.plot.pcolormesh(cmap="seismic", vmin=-5000, vmax=5000)
