@@ -124,7 +124,9 @@ particles in imagery, and perform inversions for magnetic dipole moments.
 .. toctree::
     :maxdepth: 2
     :hidden:
-    :caption: User Guide
+    :caption: Tutorial
+
+    tutorial/loading_dataset.rst
 
 
 .. toctree::
