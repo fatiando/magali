@@ -19,7 +19,7 @@ complex model with multiple sources.
 Simulating a Single Dipole
 --------------------------
 
-We simulate a single magnetic dipole located at the center of a 1×1 mm area, 15 µm below the sample surface. The observation grid is placed 5 µm above the sample, and the dipole orientation is generated randomly around a mean direction.
+We simulate a single magnetic dipole located at the center of a 1x1 mm area, 15 µm below the sample surface. The observation grid is placed 5 µm above the sample, and the dipole orientation is generated randomly around a mean direction.
 
 Step 1: Import necessary packages
 `````````````````````````````````
@@ -99,6 +99,115 @@ Step 7: Visualize the results
 `````````````````````````````
 
 The magnetic field is shown using a diverging colormap. Note the characteristic dipolar shape of the field.
+
+.. jupyter-execute::
+
+    data.plot.pcolormesh(cmap="seismic", vmin=-5000, vmax=5000)
+
+Simulating a Complex Dipole Distribution
+----------------------------------------
+
+After understanding the basic behavior of a single magnetic source, we can now
+simulate a more realistic scenario with multiple dipoles. This setup includes
+dozens of randomly distributed and oriented dipoles, with a few manually 
+placed stronger sources.
+
+We simulate a complex magnetic source model containing 100 randomly oriented
+dipoles and 3 manually defined dipoles with known properties. The sources are
+located beneath a 2x2 mm area, and the magnetic field is computed on a dense
+observation grid 5 µm above the sample.
+
+Step 1: Import necessary packages
+```````````````````````````````````
+.. jupyter-execute::
+
+    import numpy as np
+    import verde as vd
+    import magali as mg
+    import harmonica as hm
+
+Step 2: Define grid and simulation parameters
+`````````````````````````````````````````````
+
+We define a larger simulation region and keep the same grid spacing and sensor-sample distance.
+
+.. jupyter-execute::
+
+    sensor_sample_distance = 5.0  # µm
+    region = [0, 2000, 0, 2000]  # µm
+    spacing = 2  # µm
+
+Step 3: Set dipole orientation model
+````````````````````````````````````
+
+We define a region on the surface of a sphere centered around a mean direction, with a small dispersion angle.
+
+.. jupyter-execute::
+
+    true_inclination = 30  # degrees
+    true_declination = 40  # degrees
+    true_dispersion_angle = 5  # degrees
+    size = 100  # number of random dipoles
+
+Step 4: Generate dipole directions
+``````````````````````````````````
+
+We sample inclination and declination angles from the distribution.
+
+.. jupyter-execute::
+
+    directions_inclination, directions_declination = mg.random_directions(
+        true_inclination,
+        true_declination,
+        true_dispersion_angle,
+        size=size,
+        random_state=5,
+    )
+
+Step 5: Define dipole locations and intensities
+````````````````````````````````````````````````
+
+Dipoles are randomly positioned within the region. We also manually append three additional dipoles with higher magnetic intensity.
+
+.. jupyter-execute::
+
+    dipoles_amplitude = abs(np.random.normal(0, 100, size)) * 1.0e-14
+
+    dipole_coordinates = (
+        np.concatenate([np.random.randint(30, 1970, size), [1250, 1300, 500]]),  # x
+        np.concatenate([np.random.randint(30, 1970, size), [500, 1750, 1000]]),  # y
+        np.concatenate([np.random.randint(-20, -1, size), [-15, -15, -30]]),     # z
+    )
+
+Step 6: Construct dipole moment vectors
+````````````````````````````````````````
+
+We combine the random and manual sources into a single set of moment vectors.
+
+.. jupyter-execute::
+
+    dipole_moments = hm.magnetic_angles_to_vec(
+        inclination=np.concatenate([directions_inclination, [10, -10, -5]]),
+        declination=np.concatenate([directions_declination, [10, 170, 190]]),
+        intensity=np.concatenate([dipoles_amplitude, [5e-11, 5e-11, 5e-11]]),
+    )
+
+Step 7: Simulate the magnetic field
+```````````````````````````````````
+
+We calculate the total vertical field (``Bz``) from all sources at each point on the grid.
+
+.. jupyter-execute::
+
+    data = mg.dipole_bz_grid(
+        region, spacing, sensor_sample_distance,
+        dipole_coordinates, dipole_moments
+    )
+
+Step 8: Visualize the results
+`````````````````````````````
+
+The resulting field shows the combined magnetic signal of all sources.
 
 .. jupyter-execute::
 
