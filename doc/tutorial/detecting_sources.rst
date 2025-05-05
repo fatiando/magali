@@ -12,7 +12,6 @@ First, we need magnetic microscopy data to process and apply the detection
 algorithm. To achieve this, we will use the 
 `complex synthetic  model <https://www.fatiando.org/magali/latest/tutorial/creating_synthetic_data.html#simulating-a-complex-dipole-distribution>`_.
 
-
 .. jupyter-execute::
 
         import numpy as np
@@ -57,3 +56,14 @@ algorithm. To achieve this, we will use the
         )
 
         data.plot.pcolormesh(cmap="seismic", vmin=-5000, vmax=5000)
+
+Source Detection
+----------------
+
+The source detection process involves a few signal enhancement and segmentation steps:
+
+- **Upward continuation**: high-frequency noise is reduced.
+- **Total Gradient Amplitude (TGA)**: signal near magnetic sources is enhanced.
+- **Contrast stretching**: weaker signals are highlighted through rescaling.
+- **Laplacian of Gaussian (LoG) segmentation**: anomalies are identified by detecting "blobs".
+- **Ranking**: windows are ranked by signal strength to prioritize processing.
