@@ -1,0 +1,59 @@
+Detecting Magnetic Sources
+==========================
+
+This tutorial demonstrates how to detect magnetic sources in a simulated 
+magnetic field using the total gradient amplitude (TGA) and a 
+Laplacian of Gaussian segmentation algorithm.
+
+Magnetic data
+-------------
+
+First, we need magnetic microscopy data to process and apply the detection 
+algorithm. To achieve this, we will use the 
+`complex synthetic  model <https://www.fatiando.org/magali/latest/tutorial/creating_synthetic_data.html#simulating-a-complex-dipole-distribution>`_.
+
+
+.. jupyter-execute::
+
+        import numpy as np
+        import verde as vd
+        import magali as mg
+        import harmonica as hm
+
+        sensor_sample_distance = 5.0  # µm
+        region = [0, 2000, 0, 2000]  # µm
+        spacing = 2  # µm
+
+        true_inclination = 30  # degrees
+        true_declination = 40  # degrees
+        true_dispersion_angle = 5  # degrees
+        size = 100  # number of random dipoles
+
+        directions_inclination, directions_declination = mg.random_directions(
+            true_inclination,
+            true_declination,
+            true_dispersion_angle,
+            size=size,
+            random_state=5,
+        )
+
+        dipoles_amplitude = abs(np.random.normal(0, 100, size)) * 1.0e-14
+
+        dipole_coordinates = (
+            np.concatenate([np.random.randint(30, 1970, size), [1250, 1300, 500]]),  # x
+            np.concatenate([np.random.randint(30, 1970, size), [500, 1750, 1000]]),  # y
+            np.concatenate([np.random.randint(-20, -1, size), [-15, -15, -30]]),     # z
+        )
+
+        dipole_moments = hm.magnetic_angles_to_vec(
+            inclination=np.concatenate([directions_inclination, [10, -10, -5]]),
+            declination=np.concatenate([directions_declination, [10, 170, 190]]),
+            intensity=np.concatenate([dipoles_amplitude, [5e-11, 5e-11, 5e-11]]),
+        )
+
+        data = mg.dipole_bz_grid(
+            region, spacing, sensor_sample_distance,
+            dipole_coordinates, dipole_moments
+        )
+
+        data.plot.pcolormesh(cmap="seismic", vmin=-5000, vmax=5000)
