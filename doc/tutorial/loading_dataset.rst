@@ -53,3 +53,11 @@ We can also check the coordinates units:
     print(bz.y.units)
     print(bz.z.units)
 
+Plotting the Data
+-------------------
+
+Finally, the data is plotted:
+
+.. jupyter-execute::
+
+    bz.plot.pcolormesh(cmap="seismic", vmin=-5000, vmax=5000)
