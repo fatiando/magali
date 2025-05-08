@@ -60,7 +60,6 @@ def test_MagneticMomentBz():
     # Test initalization
     assert model.location == dipole_coordinates
     assert model.dipole_moment_ is None
-    assert model.jacobian is None
 
     model.fit(coordinates, data)
     dipole_moment = np.array(
@@ -69,6 +68,4 @@ def test_MagneticMomentBz():
 
     # Assert estimated moment is close to true moment
     assert model.dipole_moment_ is not None
-    assert model.jacobian is not None
-    assert model.jacobian.shape == (coordinates[0].size, 3)
     np.testing.assert_allclose(model.dipole_moment_, dipole_moment, rtol=1e2)

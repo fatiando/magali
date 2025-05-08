@@ -50,7 +50,6 @@ class MagneticMomentBz:
     def __init__(self, location):
         self.location = location
         self.dipole_moment_ = None
-        self.jacobian = None
 
     def _calculate_jacobian(self, x, y, z):
         """
@@ -111,7 +110,6 @@ class MagneticMomentBz:
         data = np.ravel(np.asarray(data * 1e-9))
 
         jacobian = self._calculate_jacobian(x, y, z)
-        self.jacobian = jacobian
         hessian = jacobian.T @ jacobian
         hessian_inv = np.linalg.inv(hessian)
         estimate = hessian_inv @ jacobian.T @ data
