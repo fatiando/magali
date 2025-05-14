@@ -111,7 +111,7 @@ class MagneticMomentBz:
 
         jacobian = self._calculate_jacobian(x, y, z)
         hessian = jacobian.T @ jacobian
-        hessian_inv = np.linalg.inv(hessian)
-        estimate = hessian_inv @ jacobian.T @ data
+        right_hand_system = jacobian.T @ data
+        estimate = np.linalg.solve(hessian, right_hand_system)
         self.dipole_moment_ = estimate
         return self
