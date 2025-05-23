@@ -207,7 +207,7 @@ class NonLinearMagneticMomentBz:
         x_norm : array
             Normalized position vector.
         m_norm : array
-            Normalized dipole moment vector.
+            Normalized magnetic moment vector.
 
         Returns
         -------
@@ -225,7 +225,19 @@ class NonLinearMagneticMomentBz:
         Compute L2 norm misfit between base-corrected observed and predicted data.
 
         Misfit function: ||(d0 - b) - d(x, m)||^2
+
+        Parameters
+        ----------
+        params : ndarray
+            Flattened parameter vector
+            [x_norm, y_norm, z_norm, mx_norm, my_norm, mz_norm].
+
+        Returns
+        -------
+        misfit : float
+            Sum of squared residuals between observed and predicted Bz values.
         """
+
         x = params[:3]
         m = params[3:]
         x, m = self._denormalize(x, m)
@@ -245,11 +257,15 @@ class NonLinearMagneticMomentBz:
 
     def fit(self):
         """
-        Run the specified optimization method to jointly estimate x and m.
+        Estimate the dipole position and moment via nonlinear least-squares optimization.
+
+        Uses the selected optimization method to minimize the misfit between the
+        observed and predicted Bz values.
 
         Returns
         -------
-        self
+        self : NonLinearMagneticMomentBz
+            The instance, updated with the fitted `optimized_position_` and `optimized_moment_`.
         """
         x0_norm, m0_norm = self._normalize()
         initial_params = np.hstack((x0_norm, m0_norm))
