@@ -237,7 +237,6 @@ class NonLinearMagneticMomentBz:
         misfit : float
             Sum of squared residuals between observed and predicted Bz values.
         """
-
         x = params[:3]
         m = params[3:]
         x, m = self._denormalize(x, m)
