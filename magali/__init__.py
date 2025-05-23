@@ -7,7 +7,7 @@
 from ._constants import METER_TO_MICROMETER, MICROMETER_TO_METER, TESLA_TO_NANOTESLA
 from ._detection import detect_anomalies
 from ._input_output import read_qdm_harvard
-from ._inversion import MagneticMomentBz
+from ._inversion import MagneticMomentBz, NonLinearMagneticMomentBz
 from ._synthetic import dipole_bz, dipole_bz_grid, random_directions
 from ._utils import (
     gradients,
