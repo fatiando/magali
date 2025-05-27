@@ -39,10 +39,10 @@ check-style:
 	ruff format --check $(CHECK_STYLE)
 
 clean:
-	find . -name "*.pyc" -exec rm -v {} \;
-	find . -name "*.orig" -exec rm -v {} \;
-	find . -name ".coverage.*" -exec rm -v {} \;
-	find . -name "__pycache__" -exec rm -vr {} \;
-	find . -name "*.egg-info" -exec rm -v {} \;
-	find . -name "_version.py" -exec rm -v {} \;
+	find . -name "*.pyc" -exec rm -v "{}" \;
+	find . -name "*.orig" -exec rm -v "{}" \;
+	find . -name ".coverage.*" -exec rm -v "{}" \;
+	find . -name "_version.py" -exec rm -v "{}" \;
+	find . -name "*.egg-info" -type d -exec rm -vr "{}" \; -prune
+	find . -name "__pycache__" -type d -exec rm -vr "{}" \; -prune
 	rm -rvf build dist MANIFEST .coverage .cache .pytest_cache
