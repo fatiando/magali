@@ -4,7 +4,6 @@
 #
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
-from ._constants import METER_TO_MICROMETER, MICROMETER_TO_METER, TESLA_TO_NANOTESLA
 from ._detection import detect_anomalies
 from ._input_output import read_qdm_harvard
 from ._inversion import MagneticMomentBz
