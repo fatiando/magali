@@ -31,5 +31,6 @@ dependencies:
   - matplotlib
   # Style
   - ruff
+  - zizmor
   - pip:
     - burocrata
