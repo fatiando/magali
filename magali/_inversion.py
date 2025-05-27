@@ -10,9 +10,9 @@ Classes for inversions.
 
 import choclo
 import numpy as np
-import verde.base as vdb
 
 from ._constants import MICROMETER_TO_METER
+from ._validation import check_coordinates, check_fit_input
 
 
 class MagneticMomentBz:
@@ -65,7 +65,7 @@ class MagneticMomentBz:
         jacobian : 2d-array
             Jacobian matrix (n_observations x 3).
         """
-        x_c, y_c, z_c = vdb.n_1d_arrays(self.location, 3)
+        x_c, y_c, z_c = self.location
         factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
         x = x * MICROMETER_TO_METER
         y = y * MICROMETER_TO_METER
@@ -105,11 +105,9 @@ class MagneticMomentBz:
         self
             This estimator instance, updated with the estimated `dipole_moment_` vector.
         """
-        coordinates, data, _ = vdb.check_fit_input(coordinates, data, weights=None)
-        x, y, z = vdb.n_1d_arrays(coordinates, 3)
-        data = np.ravel(np.asarray(data * 1e-9))
-
-        jacobian = self._calculate_jacobian(x, y, z)
+        coordinates, data = check_fit_input(coordinates, data)
+        data = data * 1e-9
+        jacobian = self._calculate_jacobian(*coordinates)
         hessian = jacobian.T @ jacobian
         right_hand_system = jacobian.T @ data
         estimate = np.linalg.solve(hessian, right_hand_system)
