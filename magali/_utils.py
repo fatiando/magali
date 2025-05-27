@@ -8,25 +8,6 @@
 import harmonica as hm
 import numpy as np
 
-from ._constants import MICROMETER_TO_METER
-
-
-def _convert_micrometer_to_meter(coordinates):
-    """
-    Convert coordinates from micrometers to meters.
-
-    Parameters
-    ----------
-    coordinates : tuple of float
-        Coordinate values in micrometers (μm).
-
-    Returns
-    -------
-    coordinates_m : tuple of float
-        Coordinate values converted to meters (m).
-    """
-    return tuple(c * MICROMETER_TO_METER for c in coordinates)
-
 
 def _estimate_grid_spacing(data):
     """

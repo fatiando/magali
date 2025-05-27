@@ -12,7 +12,7 @@ import choclo
 import numpy as np
 import verde.base as vdb
 
-from ._constants import MICROMETER_TO_METER
+from ._units import coordinates_micrometers_to_meters, nanotesla_to_tesla
 
 
 class MagneticMomentBz:
@@ -65,14 +65,9 @@ class MagneticMomentBz:
         jacobian : 2d-array
             Jacobian matrix (n_observations x 3).
         """
-        x_c, y_c, z_c = vdb.n_1d_arrays(self.location, 3)
+        x_c, y_c, z_c = coordinates_micrometers_to_meters(vdb.n_1d_arrays(self.location, 3))
         factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
-        x = x * MICROMETER_TO_METER
-        y = y * MICROMETER_TO_METER
-        z = z * MICROMETER_TO_METER
-        x_c = x_c * MICROMETER_TO_METER
-        y_c = y_c * MICROMETER_TO_METER
-        z_c = z_c * MICROMETER_TO_METER
+        x, y, z = coordinates_micrometers_to_meters((x, y, z))
         n_data = x.size
         n_params = 3
         jacobian = [np.zeros(n_data) for _ in range(n_params)]
@@ -107,7 +102,7 @@ class MagneticMomentBz:
         """
         coordinates, data, _ = vdb.check_fit_input(coordinates, data, weights=None)
         x, y, z = vdb.n_1d_arrays(coordinates, 3)
-        data = np.ravel(np.asarray(data * 1e-9))
+        data = nanotesla_to_tesla(np.ravel(np.asarray(data)))
 
         jacobian = self._calculate_jacobian(x, y, z)
         hessian = jacobian.T @ jacobian

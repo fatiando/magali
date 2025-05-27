@@ -12,7 +12,7 @@ import numpy as np
 import scipy.io
 import verde as vd
 
-from ._constants import METER_TO_MICROMETER, TESLA_TO_NANOTESLA
+from ._units import meter_to_micrometer, tesla_to_nanotesla
 
 
 def read_qdm_harvard(path):
@@ -65,10 +65,10 @@ def _extract_data_qdm_harvard(contents):
     """
     # For some reason, the spacing is returned as an array with a single
     # value. That messes up operations below so get the only element out.
-    spacing = contents["step"].ravel()[0] * METER_TO_MICROMETER
-    bz = contents["Bz"] * TESLA_TO_NANOTESLA
+    spacing = meter_to_micrometer(contents["step"].ravel()[0])
+    bz = tesla_to_nanotesla(contents["Bz"])
     data_names = ["bz"]
-    sensor_sample_distance = contents["h"] * METER_TO_MICROMETER
+    sensor_sample_distance = meter_to_micrometer(contents["h"])
     shape = bz.shape
     x = np.arange(shape[1]) * spacing
     y = np.arange(shape[0]) * spacing
