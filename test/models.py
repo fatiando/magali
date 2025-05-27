@@ -12,7 +12,7 @@ import harmonica as hm
 import numpy as np
 import pytest
 
-from .._synthetic import dipole_bz_grid, random_directions
+from magali._synthetic import dipole_bz_grid, random_directions
 
 
 @pytest.fixture
