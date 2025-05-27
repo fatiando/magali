@@ -16,78 +16,33 @@ from ._constants import MICROMETER_TO_METER
 
 
 class MagneticMomentBz:
-    r"""
-    Estimate magnetic dipole moment vector from Bz measurements.
+    """
+    Estimate the magnetic dipole moment vector from Bz measurements.
 
-    Uses the Bz component of the magnetic field to fit a point dipole model,
-    returning the dipole moment vector that best fits the data in a
-    least-squares sense.
+    Uses the Bz component of the magnetic field to fit a point dipole model
+    through a linear inversion [Souza-Junior2024]_, returning the dipole moment
+    vector that best fits the data in a least-squares sense. Requires prior
+    knowledge of the dipole location.
 
     Parameters
     ----------
-    location : tuple of floats
+    location : tuple = (float, float, float)
         Coordinates (x, y, z) of the dipole location, in µm.
 
     Attributes
     ----------
     dipole_moment_ : 1d-array
-        Estimated dipole moment vector (mx, my, mz).
-    jacobian : 2d-array
-        Jacobian matrix evaluated at the data coordinates.
+        Estimated dipole moment vector (mx, my, mz) in A.m². Only available
+        after :meth:`~magali.MagneticMomentBz.fit` is called.
 
-    Methods
-    -------
-    fit(coordinates, data)
-        Fit the dipole model to the Bz component of the magnetic field.
-
-    Notes
-    -----
-    The input/output magnetic field is assumed to be Bz in nT, and all
-    coordinates should be provided in µm. Conversion to SI units is
-    handled internally.
+    References
+    ----------
+    [Souza-Junior2024]_
     """
 
     def __init__(self, location):
         self.location = location
         self.dipole_moment_ = None
-
-    def _calculate_jacobian(self, x, y, z):
-        """
-        Compute the Jacobian matrix for the point dipole model.
-
-        Parameters
-        ----------
-        x, y, z : 1d-arrays
-            Coordinates of the observations, in micrometers.
-
-        Returns
-        -------
-        jacobian : 2d-array
-            Jacobian matrix (n_observations x 3).
-        """
-        x_c, y_c, z_c = vdb.n_1d_arrays(self.location, 3)
-        factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
-        x = x * MICROMETER_TO_METER
-        y = y * MICROMETER_TO_METER
-        z = z * MICROMETER_TO_METER
-        x_c = x_c * MICROMETER_TO_METER
-        y_c = y_c * MICROMETER_TO_METER
-        z_c = z_c * MICROMETER_TO_METER
-        n_data = x.size
-        n_params = 3
-        jacobian = [np.zeros(n_data) for _ in range(n_params)]
-
-        for i in range(n_data):
-            r = choclo.utils.distance_cartesian(x[i], y[i], z[i], x_c, y_c, z_c)
-            kernel_eu = choclo.point.kernel_eu(x[i], y[i], z[i], x_c, y_c, z_c, r)
-            kernel_nu = choclo.point.kernel_nu(x[i], y[i], z[i], x_c, y_c, z_c, r)
-            kernel_uu = choclo.point.kernel_uu(x[i], y[i], z[i], x_c, y_c, z_c, r)
-
-            jacobian[0][i] = factor * kernel_eu
-            jacobian[1][i] = factor * kernel_nu
-            jacobian[2][i] = factor * kernel_uu
-
-        return np.stack(jacobian, axis=-1)
 
     def fit(self, coordinates, data):
         """
@@ -95,23 +50,63 @@ class MagneticMomentBz:
 
         Parameters
         ----------
-        coordinates : tuple of arrays
-            Coordinates (x, y, z) of the observations.
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observations points.
+            The arrays can have any shape as long as they all have the same
+            shape.
         data : array
-            Observed Bz component of the magnetic field (in nT).
+            Array with the observed Bz component of the magnetic field (in nT)
+            at the locations provided in *coordinates*. Must have the same
+            shape as the coordinate arrays.
 
         Returns
         -------
         self
-            This estimator instance, updated with the estimated `dipole_moment_` vector.
+            This estimator instance, updated with the estimated dipole moment
+            vector in the ``dipole_moment_`` attribute.
         """
         coordinates, data, _ = vdb.check_fit_input(coordinates, data, weights=None)
-        x, y, z = vdb.n_1d_arrays(coordinates, 3)
-        data = np.ravel(np.asarray(data * 1e-9))
-
-        jacobian = self._calculate_jacobian(x, y, z)
-        hessian = jacobian.T @ jacobian
-        right_hand_system = jacobian.T @ data
-        estimate = np.linalg.solve(hessian, right_hand_system)
-        self.dipole_moment_ = estimate
+        # Convert the data from nT to T
+        data = np.ravel(np.asarray(data)) * 1e-9
+        jacobian = self.jacobian(coordinates)
+        self.dipole_moment_ = np.linalg.solve(jacobian.T @ jacobian, jacobian.T @ data)
         return self
+
+    def jacobian(self, coordinates):
+        """
+        Compute the Jacobian matrix for the linear point dipole model.
+
+        The Jacobian is a matrix with derivatives of the forward modeling
+        function (the magnetic field of a dipole) with regard to the parameters
+        (the 3 dipole moment components) for each data point.
+
+        Parameters
+        ----------
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observations points.
+            The arrays can have any shape as long as they all have the same
+            shape.
+
+        Returns
+        -------
+        jacobian : 2d-array
+            The N x 3 Jacobian matrix, with N being the number of observations,
+            in SI units.
+        """
+        factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
+        xc, yc, zc = (
+            i * MICROMETER_TO_METER for i in vdb.n_1d_arrays(self.location, 3)
+        )
+        x, y, z = (i * MICROMETER_TO_METER for i in vdb.n_1d_arrays(coordinates, 3))
+        n_data = x.size
+        n_params = 3
+        jacobian = np.empty((n_data, n_params))
+        for i in range(n_data):
+            r = choclo.utils.distance_cartesian(x[i], y[i], z[i], xc, yc, zc)
+            kernel_eu = choclo.point.kernel_eu(x[i], y[i], z[i], xc, yc, zc, r)
+            kernel_nu = choclo.point.kernel_nu(x[i], y[i], z[i], xc, yc, zc, r)
+            kernel_uu = choclo.point.kernel_uu(x[i], y[i], z[i], xc, yc, zc, r)
+            jacobian[i, 0] = factor * kernel_eu
+            jacobian[i, 1] = factor * kernel_nu
+            jacobian[i, 2] = factor * kernel_uu
+        return jacobian

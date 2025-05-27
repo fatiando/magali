@@ -92,13 +92,6 @@ jobs:
       - name: Install the package
         run: pip install --no-deps dist/*.whl
 
-      - name: Cache the downloaded datasets
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.temp }}/.cache/pooch
-          # Use a constant key to reuse the datasets across all jobs
-          key: pooch
-
       - name: Build the documentation
         run: make -C doc clean all
 

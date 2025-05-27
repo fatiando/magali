@@ -1,5 +1,5 @@
 # Requirements for running the tests
-pooch
 pytest
 pytest-cov
 coverage
+ensaio>=0.7
