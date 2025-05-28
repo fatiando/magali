@@ -133,6 +133,11 @@ jobs:
 
       - name: Run the tests
         run: make test
+        env:
+          # Define directory where sample data will be stored
+          ENSAIO_DATA_DIR: ${{ runner.temp }}/cache/ensaio/
+          # Don't spam Zenodo from CI
+          ENSAIO_DATA_FROM_GITHUB: true
 
       - name: Rename the coverage artifact
         run: mv .coverage .coverage.${{ matrix.os }}_${{ matrix.python }}_${{ matrix.dependencies }}
