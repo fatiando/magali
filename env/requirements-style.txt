@@ -1,3 +1,4 @@
 # Requirements for checking code style and format
 ruff
 burocrata
+zizmor

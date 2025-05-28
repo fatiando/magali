@@ -12,7 +12,7 @@ import harmonica as hm
 import numpy as np
 import verde as vd
 
-from ._utils import coordinates_micrometers_to_meters
+from ._units import coordinates_micrometers_to_meters
 
 
 def random_directions(

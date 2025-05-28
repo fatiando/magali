@@ -26,7 +26,7 @@ def _estimate_grid_spacing(data):
     return np.mean([np.abs(data.x[1] - data.x[0]), np.abs(data.y[1] - data.y[0])])
 
 
-def gradients(data):
+def gradient(data):
     """
     Compute first-order spatial derivatives in the x, y, and z directions.
 
@@ -103,7 +103,7 @@ def total_gradient_amplitude_grid(data):
     tga : xr.DataArray
         Dataset containing the total gradient amplitude (TGA).
     """
-    dx, dy, dz = gradients(data)
+    dx, dy, dz = gradient(data)
     tga = total_gradient_amplitude(dx, dy, dz)
 
     # Assign attributes

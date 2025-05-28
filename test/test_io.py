@@ -11,7 +11,7 @@ Test the IO functions
 import ensaio
 import xarray as xr
 
-from .._input_output import read_qdm_harvard
+from magali._input_output import read_qdm_harvard
 
 
 def test_read_qdm_harvard():
