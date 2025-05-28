@@ -11,15 +11,15 @@ Test the _utils functions
 import numpy as np
 import verde as vd
 import xarray as xr
+from models import simple_model, souza_junior_model
 
-from .._utils import (
+from magali._utils import (
     _convert_micrometer_to_meter,
     _estimate_grid_spacing,
     gradient,
     total_gradient_amplitude,
     total_gradient_amplitude_grid,
 )
-from ._models import simple_model, souza_junior_model
 
 
 def test_convert_micrometer_to_meter():

@@ -12,8 +12,8 @@ import harmonica as hm
 import numpy as np
 import verde as vd
 
-from .._inversion import MagneticMomentBz
-from .._synthetic import dipole_bz_grid, random_directions
+from magali._inversion import MagneticMomentBz
+from magali._synthetic import dipole_bz_grid, random_directions
 
 
 def test_MagneticMomentBz():

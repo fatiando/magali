@@ -1,8 +1,8 @@
 # Build, package, test, and clean
 PROJECT=magali
-TESTDIR=tmp-test-dir-with-unique-name
-PYTEST_ARGS=--cov-config=../.coveragerc --cov-report=term-missing --cov=$(PROJECT) --doctest-modules -v --pyargs
-CHECK_STYLE=$(PROJECT) doc
+CHECK_STYLE=src/$(PROJECT) doc test
+
+.PHONY: help build install test format check check-format check-style clean
 
 help:
 	@echo "Commands:"
@@ -19,14 +19,10 @@ build:
 	python -m build .
 
 install:
-	python -m pip install --no-deps -e .
+	python -m pip install --no-deps --editable .
 
 test:
-	# Run a tmp folder to make sure the tests are run on the installed version
-	mkdir -p $(TESTDIR)
-	cd $(TESTDIR); pytest $(PYTEST_ARGS) $(PROJECT)
-	cp $(TESTDIR)/.coverage* .
-	rm -r $(TESTDIR)
+	pytest --cov-report=term-missing --cov --doctest-modules --verbose test src/$(PROJECT)
 
 format:
 	ruff check --select I --fix $(CHECK_STYLE) # fix isort errors
@@ -43,8 +39,10 @@ check-style:
 	ruff format --check $(CHECK_STYLE)
 
 clean:
-	find . -name "*.pyc" -exec rm -v {} \;
-	find . -name "*.orig" -exec rm -v {} \;
-	find . -name ".coverage.*" -exec rm -v {} \;
-	rm -rvf build dist MANIFEST *.egg-info __pycache__ .coverage .cache .pytest_cache $(PROJECT)/_version_generated.py
-	rm -rvf $(TESTDIR)
+	find . -name "*.pyc" -exec rm -v "{}" \;
+	find . -name "*.orig" -exec rm -v "{}" \;
+	find . -name ".coverage.*" -exec rm -v "{}" \;
+	find . -name "_version.py" -exec rm -v "{}" \;
+	find . -name "*.egg-info" -type d -exec rm -vr "{}" \; -prune
+	find . -name "__pycache__" -type d -exec rm -vr "{}" \; -prune
+	rm -rvf build dist MANIFEST .coverage .cache .pytest_cache
