@@ -12,10 +12,10 @@ import harmonica as hm
 import numpy as np
 import verde as vd
 import xarray as xr
+from models import simple_model, souza_junior_model
 
-from .._stats import variance
-from .._synthetic import dipole_bz, random_directions
-from ._models import simple_model, souza_junior_model
+from magali._stats import variance
+from magali._synthetic import dipole_bz, random_directions
 
 
 def test_random_directions():

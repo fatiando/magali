@@ -8,27 +8,27 @@ dependencies:
   # Run
   - numpy
   - scipy
-  - xarray
   - scikit-image
-  - choclo
-  - harmonica==0.7.0
+  - xarray
+  - harmonica
   - verde
-  - ensaio
+  - choclo
   # Build
   - python-build
   - twine
   # Test
-  - pooch
   - pytest
   - pytest-cov
   - coverage
   # Documentation
   - sphinx==7.2.*
+  - numpydoc==1.7.*
   - sphinx-book-theme==1.1.*
   - sphinx-copybutton==0.5.*
   - sphinx-design==0.5.*
   - jupyter-sphinx==0.5.*
   - matplotlib
+  - ensaio>=0.7
   # Style
   - ruff
   - zizmor

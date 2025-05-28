@@ -101,16 +101,6 @@ jobs:
       - name: Install the package
         run: pip install --no-deps dist/*.whl
 
-      - name: Get the version of ensaio
-        id: ensaio-version
-        run: echo "v=$(grep ensaio env/requirements-docs.txt)" >> $GITHUB_OUTPUT
-
-      - name: Setup caching of Ensaio datasets
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.temp }}/cache/ensaio
-          key: ensaio-data-${{ steps.ensaio-version.outputs.v }}
-
       - name: Build the documentation
         run: make -C doc clean all
 
