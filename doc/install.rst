@@ -42,18 +42,20 @@ There are different ways to install magali:
 Which Python?
 -------------
 
-You'll need **Python >= 3.7**.
+You'll need **Python >= 3.9**.
 See :ref:`python-versions` if you require support for older versions.
 
 Dependencies
 ------------
 
 These required dependencies should be installed automatically when you install
-magali with ``pip`` or ``conda``:
+Magali with ``pip`` or ``conda``:
 
-* `numpy <http://www.numpy.org/>`__
-* `xarray <https://xarray.dev/>`__
+* `numpy <https://www.numpy.org/>`__
+* `scipy <https://scipy.org/>`__
+* `numba <https://numba.pydata.org/>`__
 * `scikit-image <https://scikit-image.org/>`__
+* `xarray <https://xarray.dev/>`__
 * `harmonica <https://www.fatiando.org/harmonica/>`__
 * `verde <https://www.fatiando.org/verde/>`__
 * `choclo <https://www.fatiando.org/choclo/>`__

@@ -8,6 +8,7 @@ dependencies:
   # Run
   - numpy
   - scipy
+  - numba
   - scikit-image
   - xarray
   - harmonica
