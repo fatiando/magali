@@ -17,7 +17,6 @@ Part of the <a href="https://www.fatiando.org"><strong>Fatiando a Terra</strong>
 <p align="center">
 <a href="https://pypi.python.org/pypi/magali"><img src="http://img.shields.io/pypi/v/magali.svg?style=flat-square" alt="Latest version on PyPI"></a>
 <a href="https://github.com/conda-forge/magali-feedstock"><img src="https://img.shields.io/conda/vn/conda-forge/magali.svg?style=flat-square" alt="Latest version on conda-forge"></a>
-<a href="https://codecov.io/gh/fatiando/magali"><img src="https://img.shields.io/codecov/c/github/fatiando/magali/main.svg?style=flat-square" alt="Test coverage status"></a>
 <a href="https://pypi.python.org/pypi/magali"><img src="https://img.shields.io/pypi/pyversions/magali.svg?style=flat-square" alt="Compatible Python versions."></a>
 </p>
 
