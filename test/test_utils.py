@@ -11,15 +11,15 @@ Test the _utils functions
 import numpy as np
 import verde as vd
 import xarray as xr
+from models import simple_model, souza_junior_model
 
-from .._utils import (
+from magali._utils import (
     _convert_micrometer_to_meter,
     _estimate_grid_spacing,
-    gradients,
+    gradient,
     total_gradient_amplitude,
     total_gradient_amplitude_grid,
 )
-from ._models import simple_model, souza_junior_model
 
 
 def test_convert_micrometer_to_meter():
@@ -41,9 +41,9 @@ def test_estimate_grid_spacing(souza_junior_model):
     assert spacing == 2.0
 
 
-def test_gradients(souza_junior_model):
+def test_gradient(souza_junior_model):
     # Use model fixture from _models.py
-    dx, dy, dz = gradients(souza_junior_model)
+    dx, dy, dz = gradient(souza_junior_model)
 
     np.testing.assert_allclose(dx.min().values, -92762.44269656, rtol=1e2)
     np.testing.assert_allclose(dy.min().values, -88701.89017599083, rtol=1e2)
@@ -62,7 +62,7 @@ def test_total_gradient_amplitude(souza_junior_model):
     # Use model fixture from _models.py
     data = souza_junior_model
 
-    dx, dy, dz = gradients(data)
+    dx, dy, dz = gradient(data)
 
     tga = total_gradient_amplitude(dx, dy, dz)
 

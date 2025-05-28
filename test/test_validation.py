@@ -10,7 +10,7 @@ Test the input validation functions
 
 import pytest
 
-from .._validation import check_coordinates, check_fit_input
+from magali._validation import check_coordinates, check_fit_input
 
 
 @pytest.mark.parametrize(
