@@ -67,7 +67,7 @@ def test_check_coordinates_passes(coordinates):
         (([1, 2], [3, 4], [5, 6, 7]), "Invalid coordinate arrays"),
     ],
 )
-def test_check_coordinates(coordinates, message):
+def test_check_coordinates_fails(coordinates, message):
     "Make sure exceptions are raised for invalid inputs"
     with pytest.raises(ValueError, match=message):
         check_coordinates(coordinates)
