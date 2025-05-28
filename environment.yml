@@ -31,5 +31,6 @@ dependencies:
   - ensaio>=0.7
   # Style
   - ruff
+  - zizmor
   - pip:
     - burocrata

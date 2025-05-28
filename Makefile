@@ -1,6 +1,7 @@
 # Build, package, test, and clean
 PROJECT=magali
 CHECK_STYLE=src/$(PROJECT) doc test
+GITHUB_ACTIONS=.github/workflows
 
 .PHONY: help build install test format check check-format check-style clean
 
@@ -29,7 +30,7 @@ format:
 	ruff format $(CHECK_STYLE)
 	burocrata --extension=py $(CHECK_STYLE)
 
-check: check-format check-style
+check: check-format check-style check-actions
 
 check-format:
 	ruff format --check $(CHECK_STYLE)
@@ -37,6 +38,9 @@ check-format:
 
 check-style:
 	ruff format --check $(CHECK_STYLE)
+
+check-actions:
+	zizmor $(GITHUB_ACTIONS)
 
 clean:
 	find . -name "*.pyc" -exec rm -v "{}" \;
