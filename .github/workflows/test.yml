@@ -119,15 +119,9 @@ jobs:
       - name: List installed packages
         run: python -m pip freeze
 
-      - name: Build source and wheel distributions
-        run: |
-          make build
-          echo ""
-          echo "Generated files:"
-          ls -lh dist/
-
-      - name: Install the package
-        run: python -m pip install --no-deps dist/*.whl
+      # Needs to be editable for coverage reporting to work
+      - name: Install the package in editable mode
+        run: python -m pip install --no-deps --editable .
 
       - name: Run the tests
         run: make test
