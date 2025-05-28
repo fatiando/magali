@@ -1,6 +1,7 @@
 # Build, package, test, and clean
 PROJECT=magali
 CHECK_STYLE=src/$(PROJECT) doc test
+GITHUB_ACTIONS=.github/workflows
 
 .PHONY: help build install test format check check-format check-style clean
 
