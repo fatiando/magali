@@ -6,7 +6,7 @@
 *.egg-info
 **/__pycache__/
 .cache
-.pytest_cache/
+.*cache/
 .eggs
 .coverage
 .coverage.*

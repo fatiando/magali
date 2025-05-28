@@ -11,7 +11,7 @@ Classes for inversions.
 import choclo
 import numpy as np
 
-from ._constants import MICROMETER_TO_METER
+from ._units import coordinates_micrometer_to_meter, nanotesla_to_tesla
 from ._validation import check_fit_input
 
 
@@ -66,8 +66,7 @@ class MagneticMomentBz:
             vector in the ``dipole_moment_`` attribute.
         """
         coordinates, data = check_fit_input(coordinates, data)
-        # Convert the data from nT to T
-        data = data * 1e-9
+        data = nanotesla_to_tesla(data)
         jacobian = self.jacobian(coordinates)
         self.dipole_moment_ = np.linalg.solve(jacobian.T @ jacobian, jacobian.T @ data)
         return self
@@ -94,8 +93,8 @@ class MagneticMomentBz:
             in SI units.
         """
         factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
-        xc, yc, zc = (i * MICROMETER_TO_METER for i in self.location)
-        x, y, z = (i * MICROMETER_TO_METER for i in coordinates)
+        xc, yc, zc = coordinates_micrometer_to_meter(self.location)
+        x, y, z = coordinates_micrometer_to_meter(coordinates)
         n_data = x.size
         n_params = 3
         jacobian = np.empty((n_data, n_params))

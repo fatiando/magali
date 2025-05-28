@@ -12,7 +12,7 @@ import harmonica as hm
 import numpy as np
 import verde as vd
 
-from ._utils import _convert_micrometer_to_meter
+from ._units import coordinates_micrometer_to_meter
 
 
 def random_directions(
@@ -166,8 +166,8 @@ def dipole_bz(coordinates, dipole_coordinates, dipole_moments):
     bz : float
         The vertical component of the magnetic field (Bz) at the given observation point.
     """
-    coordinates_m = _convert_micrometer_to_meter(coordinates)
-    dipole_coordinates_m = _convert_micrometer_to_meter(dipole_coordinates)
+    coordinates_m = coordinates_micrometer_to_meter(coordinates)
+    dipole_coordinates_m = coordinates_micrometer_to_meter(dipole_coordinates)
     return hm.dipole_magnetic(
         coordinates_m, dipole_coordinates_m, dipole_moments, field="b_u"
     )
