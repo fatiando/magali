@@ -11,7 +11,7 @@ Classes for inversions.
 import choclo
 import numpy as np
 
-from ._units import coordinates_micrometers_to_meters, nanotesla_to_tesla
+from ._units import coordinates_micrometer_to_meter, nanotesla_to_tesla
 from ._validation import check_fit_input
 
 
@@ -93,8 +93,8 @@ class MagneticMomentBz:
             in SI units.
         """
         factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
-        xc, yc, zc = coordinates_micrometers_to_meter(self.location)
-        x, y, z = coordinates_micrometers_to_meters(coordinates)
+        xc, yc, zc = coordinates_micrometer_to_meter(self.location)
+        x, y, z = coordinates_micrometer_to_meter(coordinates)
         n_data = x.size
         n_params = 3
         jacobian = np.empty((n_data, n_params))

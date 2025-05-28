@@ -12,7 +12,7 @@ TESLA_TO_NANOTESLA = 1e9
 METER_TO_MICROMETER = 1e6
 
 
-def coordinates_micrometers_to_meters(coordinates):
+def coordinates_micrometer_to_meter(coordinates):
     """
     Convert coordinates from micrometers to meters.
 
