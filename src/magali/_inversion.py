@@ -9,9 +9,10 @@ Classes for inversions.
 """
 
 import choclo
+import numba
 import numpy as np
 
-from ._units import coordinates_micrometer_to_meter, nanotesla_to_tesla
+from ._units import coordinates_micrometer_to_meter, tesla_to_nanotesla
 from ._validation import check_fit_input
 
 
@@ -66,7 +67,6 @@ class MagneticMomentBz:
             vector in the ``dipole_moment_`` attribute.
         """
         coordinates, data = check_fit_input(coordinates, data)
-        data = nanotesla_to_tesla(data)
         jacobian = self.jacobian(coordinates)
         self.dipole_moment_ = np.linalg.solve(jacobian.T @ jacobian, jacobian.T @ data)
         return self
@@ -90,20 +90,34 @@ class MagneticMomentBz:
         -------
         jacobian : 2d-array
             The N x 3 Jacobian matrix, with N being the number of observations,
-            in SI units.
+            in nT/(A.m²) units.
         """
-        factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
         xc, yc, zc = coordinates_micrometer_to_meter(self.location)
-        x, y, z = coordinates_micrometer_to_meter(coordinates)
+        x, y, z = (c.ravel() for c in coordinates_micrometer_to_meter(coordinates))
         n_data = x.size
         n_params = 3
         jacobian = np.empty((n_data, n_params))
-        for i in range(n_data):
-            r = choclo.utils.distance_cartesian(x[i], y[i], z[i], xc, yc, zc)
-            kernel_eu = choclo.point.kernel_eu(x[i], y[i], z[i], xc, yc, zc, r)
-            kernel_nu = choclo.point.kernel_nu(x[i], y[i], z[i], xc, yc, zc, r)
-            kernel_uu = choclo.point.kernel_uu(x[i], y[i], z[i], xc, yc, zc, r)
-            jacobian[i, 0] = factor * kernel_eu
-            jacobian[i, 1] = factor * kernel_nu
-            jacobian[i, 2] = factor * kernel_uu
+        jacobian_jit(x, y, z, xc, yc, zc, jacobian)
+        jacobian = tesla_to_nanotesla(jacobian)
         return jacobian
+
+
+def _jacobian(x, y, z, xc, yc, zc, result):
+    """
+    Jit-compiled version of the Jacobian matrix calculation.
+    """
+    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
+    n_data = x.size
+    for i in numba.prange(n_data):
+        r = choclo.utils.distance_cartesian(x[i], y[i], z[i], xc, yc, zc)
+        kernel_eu = choclo.point.kernel_eu(x[i], y[i], z[i], xc, yc, zc, r)
+        kernel_nu = choclo.point.kernel_nu(x[i], y[i], z[i], xc, yc, zc, r)
+        kernel_uu = choclo.point.kernel_uu(x[i], y[i], z[i], xc, yc, zc, r)
+        result[i, 0] = factor * kernel_eu
+        result[i, 1] = factor * kernel_nu
+        result[i, 2] = factor * kernel_uu
+
+
+# Compile the Jacobian calculation. Doesn't use this as a decorator so that we
+# can test the pure Python function and get coverage information about it.
+jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
