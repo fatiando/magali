@@ -8,25 +8,6 @@
 import harmonica as hm
 import numpy as np
 
-from ._constants import MICROMETER_TO_METER
-
-
-def _convert_micrometer_to_meter(coordinates):
-    """
-    Convert coordinates from micrometers to meters.
-
-    Parameters
-    ----------
-    coordinates : tuple of float
-        Coordinate values in micrometers (μm).
-
-    Returns
-    -------
-    coordinates_m : tuple of float
-        Coordinate values converted to meters (m).
-    """
-    return tuple(c * MICROMETER_TO_METER for c in coordinates)
-
 
 def _estimate_grid_spacing(data):
     """
@@ -45,7 +26,7 @@ def _estimate_grid_spacing(data):
     return np.mean([np.abs(data.x[1] - data.x[0]), np.abs(data.y[1] - data.y[0])])
 
 
-def gradients(data):
+def gradient(data):
     """
     Compute first-order spatial derivatives in the x, y, and z directions.
 
@@ -122,7 +103,7 @@ def total_gradient_amplitude_grid(data):
     tga : xr.DataArray
         Dataset containing the total gradient amplitude (TGA).
     """
-    dx, dy, dz = gradients(data)
+    dx, dy, dz = gradient(data)
     tga = total_gradient_amplitude(dx, dy, dz)
 
     # Assign attributes
