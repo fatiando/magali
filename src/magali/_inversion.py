@@ -11,7 +11,6 @@ Classes for inversions.
 import choclo
 import numba
 import numpy as np
-import verde as vd
 from scipy.optimize import minimize
 
 from ._synthetic import dipole_bz
@@ -130,9 +129,9 @@ class NonLinearMagneticMomentBz:
     r"""
     Estimate dipole location and moment from Bz data using nonlinear optimization.
 
-    Fits a magnetic point dipole model to Bz measurements by simultaneously estimating
-    the dipole position and moment vector that minimize the squared misfit between
-    observed and predicted fields.
+    Fits a magnetic point dipole model to Bz measurements by simultaneously 
+    estimating the dipole position and moment vector that minimize the squared 
+    misfit between observed and predicted fields.
 
     Parameters
     ----------
@@ -145,8 +144,8 @@ class NonLinearMagneticMomentBz:
     background_field : array-like or None, optional
         Optional background field to subtract from the observed Bz values.
     optimization_method : str, optional
-        Optimization method to use (default is "Nelder-Mead"). Any method accepted
-        by `scipy.optimize.minimize` can be used.
+        Optimization method to use (default is "Nelder-Mead"). Any method 
+        accepted by `scipy.optimize.minimize` can be used.
 
     Attributes
     ----------
@@ -165,18 +164,10 @@ class NonLinearMagneticMomentBz:
 
     def __init__(
         self,
-        observed_data,
         initial_position,
         initial_moment,
-        background_field=None,
         optimization_method="Nelder-Mead",
     ):
-        self.observed_data = observed_data
-        self.background_field = (
-            np.ravel(np.asarray(background_field))
-            if background_field is not None
-            else None
-        )
         self.initial_position = np.asarray(initial_position)
         self.initial_moment = np.asarray(initial_moment)
         self.optimization_method = optimization_method
@@ -243,37 +234,46 @@ class NonLinearMagneticMomentBz:
         misfit : float
             Sum of squared residuals between observed and predicted Bz values.
         """
-        x = params[:3]
-        m = params[3:]
-        x, m = self._denormalize(x, m)
-        data = vd.grid_to_table(self.observed_data)
-        coordinates = (
-            data.x,
-            data.y,
-            data.z,
-        )
-        model = dipole_bz(coordinates, x, m)
-        if self.background_field is None:
-            corrected_data = data.bz
-        else:
-            corrected_data = data.bz - self.background_field
-        residuals = corrected_data - model
+        x_norm, m_norm = params[:3], params[3:]
+        position, moment = self._denormalize(x_norm, m_norm)
+        predicted = dipole_bz(self._coordinates, position, moment)
+        residuals = self._data - predicted
         return np.sum(residuals**2)
 
-    def fit(self):
+    def fit(self, coordinates, data):
         """
-        Estimate the dipole position and moment via nonlinear least-squares optimization.
+        Estimate dipole position and moment using nonlinear least-squares.
 
-        Uses the selected optimization method to minimize the misfit between the
-        observed and predicted Bz values.
+        Uses the selected optimization method to minimize the misfit between
+        the observed and predicted Bz values.
+
+        Note:
+            Any background field present in the system should be removed
+            from the data prior to use.
+
+        Parameters
+        ----------
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observations points.
+            The arrays can have any shape as long as they all have the same
+            shape.
+        data : array
+            Array with the observed Bz component of the magnetic field (in nT)
+            at the locations provided in *coordinates*. Must have the same
+            shape as the coordinate arrays.
 
         Returns
         -------
         self : NonLinearMagneticMomentBz
-            The instance, updated with the fitted `optimized_position_` and `optimized_moment_`.
+            The instance, updated with the fitted `optimized_position_` and
+            `optimized_moment_`.
         """
-        x0_norm, m0_norm = self._normalize()
-        initial_params = np.hstack((x0_norm, m0_norm))
+        coordinates, data = check_fit_input(coordinates, data)
+        self._coordinates = coordinates
+        self._data = data
+
+        x0, m0 = self._normalize()
+        initial_params = np.hstack((x0, m0))
 
         result = minimize(
             fun=self._misfit,
@@ -281,11 +281,9 @@ class NonLinearMagneticMomentBz:
             method=self.optimization_method,
             options={"maxiter": 1000, "disp": True},
         )
-
         self.result_ = result
-        x_norm_opt = result.x[:3]
-        m_norm_opt = result.x[3:]
+        x_opt, m_opt = result.x[:3], result.x[3:]
         self.optimized_position_, self.optimized_moment_ = self._denormalize(
-            x_norm_opt, m_norm_opt
+            x_opt, m_opt
         )
         return self
