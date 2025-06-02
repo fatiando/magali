@@ -73,6 +73,35 @@ class MagneticMomentBz:
         self.dipole_moment_ = np.linalg.solve(jacobian.T @ jacobian, jacobian.T @ data)
         return self
 
+    def predict(self, coordinates):
+        """
+        Predict Bz values at given coordinates using the fitted dipole moment.
+
+        Parameters
+        ----------
+        coordinates : tuple of array-like
+            Tuple of (x, y, z) coordinates in meters where Bz will be predicted.
+
+        Returns
+        -------
+        ndarray
+            Predicted Bz values at the specified coordinates.
+
+        Raises
+        ------
+        ValueError
+            If the model has not been fitted yet.
+        """
+        if self.dipole_moment_ is None:
+            msg = "Model has not been fitted. Call 'fit()' before prediction."
+            raise ValueError(msg)
+
+        return dipole_bz(
+            coordinates,
+            self.location,
+            self.dipole_moment_,
+        )
+
     def jacobian(self, coordinates):
         """
         Compute the Jacobian matrix for the linear point dipole model.
@@ -129,8 +158,8 @@ class NonLinearMagneticMomentBz:
     r"""
     Estimate dipole location and moment from Bz data using nonlinear optimization.
 
-    Fits a magnetic point dipole model to Bz measurements by simultaneously 
-    estimating the dipole position and moment vector that minimize the squared 
+    Fits a magnetic point dipole model to Bz measurements by simultaneously
+    estimating the dipole position and moment vector that minimize the squared
     misfit between observed and predicted fields.
 
     Parameters
@@ -144,7 +173,7 @@ class NonLinearMagneticMomentBz:
     background_field : array-like or None, optional
         Optional background field to subtract from the observed Bz values.
     optimization_method : str, optional
-        Optimization method to use (default is "Nelder-Mead"). Any method 
+        Optimization method to use (default is "Nelder-Mead"). Any method
         accepted by `scipy.optimize.minimize` can be used.
 
     Attributes
@@ -287,3 +316,32 @@ class NonLinearMagneticMomentBz:
             x_opt, m_opt
         )
         return self
+
+    def predict(self, coordinates):
+        """
+        Predict Bz values at given coordinates using the fitted dipole parameters.
+
+        Parameters
+        ----------
+        coordinates : tuple of array-like
+            Tuple of (x, y, z) coordinates in meters where Bz will be predicted.
+
+        Returns
+        -------
+        ndarray
+            Predicted Bz values at the specified coordinates.
+
+        Raises
+        ------
+        ValueError
+            If the model has not been fitted yet.
+        """
+        if self.optimized_position_ is None or self.optimized_moment_ is None:
+            msg = "Model has not been fitted. Call 'fit()' before prediction."
+            raise ValueError(msg)
+
+        return dipole_bz(
+            coordinates,
+            self.optimized_position_,
+            self.optimized_moment_,
+        )
