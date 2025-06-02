@@ -50,7 +50,7 @@ def test_linear_magnetic_moment_bz_inversion():
     # np.testing.assert_allclose(inclination, true_inclination)
 
 
-def test_linear_magnetic_moment_gz_jacobian():
+def test_linear_magnetic_moment_bz_jacobian():
     "Make sure the non-jitted Jacobian calculation is correct"
     dipole_coordinates = (500, 500, -15)
     true_inclination = 30
