@@ -11,6 +11,7 @@ List of functions and classes (API)
    :toctree: generated/
 
    MagneticMomentBz
+   NonlinearMagneticMomentBz
    read_qdm_harvard
    random_directions
    dipole_bz
