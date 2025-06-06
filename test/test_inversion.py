@@ -12,7 +12,7 @@ import harmonica as hm
 import numpy as np
 import verde as vd
 
-from magali._inversion import MagneticMomentBz, _jacobian
+from magali._inversion import MagneticMomentBz, _jacobian, NonLinearMagneticMomentBz
 from magali._synthetic import dipole_bz
 
 
@@ -74,3 +74,42 @@ def test_linear_magnetic_moment_bz_jacobian():
     _jacobian(*coordinates, *dipole_coordinates, jacobian)
     data_predicted = jacobian @ true_moment * 1e9
     np.testing.assert_allclose(data_predicted, data)
+
+
+def test_nonlinear_magnetic_moment_bz_inversion():
+    "Check that nonlinear inversion recovers a known position and moment."
+    dipole_coordinates = (500, 500, -15)
+    true_inclination = 30
+    true_declination = 40
+    true_intensity = 5e-11
+    true_moment = hm.magnetic_angles_to_vec(
+        inclination=true_inclination,
+        declination=true_declination,
+        intensity=true_intensity,
+    )
+    coordinates = vd.grid_coordinates(
+        region=[0, 100, 0, 100],
+        spacing=1,
+        extra_coords=5,
+    )
+    data = dipole_bz(coordinates, dipole_coordinates, true_moment)
+    
+    model = MagneticMomentBz(dipole_coordinates)
+    model.fit(coordinates, data)
+
+    nl_inv = NonLinearMagneticMomentBz(
+        initial_position=model.location,
+        initial_moment=model.dipole_moment_,
+    )
+
+    nl_inv.fit(coordinates, data)
+
+    # Check attributes were set
+    assert nl_inv.optimized_position_ is not None
+    assert nl_inv.optimized_moment_ is not None
+    assert nl_inv.result_ is not None
+
+    # Check if estimated values are close to true ones
+    np.testing.assert_allclose(nl_inv.optimized_position_, dipole_coordinates)
+    np.testing.assert_allclose(nl_inv.optimized_moment_, true_moment)
+
