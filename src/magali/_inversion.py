@@ -79,8 +79,10 @@ class MagneticMomentBz:
 
         Parameters
         ----------
-        coordinates : tuple of array-like
-            Tuple of (x, y, z) coordinates in meters where Bz will be predicted.
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observations points.
+            The arrays can have any shape as long as they all have the same
+            shape.
 
         Returns
         -------
@@ -160,7 +162,7 @@ class NonlinearMagneticMomentBz:
 
     Fits a magnetic point dipole model to Bz measurements by simultaneously
     estimating the dipole position and moment vector that minimize the squared
-    misfit between observed and predicted fields.
+    misfit between observed and predicted fields [Souza-Junior2024]_.
 
     Parameters
     ----------
@@ -185,10 +187,9 @@ class NonlinearMagneticMomentBz:
     result_ : OptimizeResult
         Full result object returned by `scipy.optimize.minimize`.
 
-    Methods
-    -------
-    fit()
-        Run non-linear optimization to simultaneously estimate position and moment.
+    References
+    ----------
+    [Souza-Junior2024]_
     """
 
     def __init__(
@@ -215,10 +216,9 @@ class NonlinearMagneticMomentBz:
         m0_norm : array
             Normalized moment vector.
         """
-        self._x_scale = np.maximum(
-            np.abs(self.initial_position), 1e-12
-        )  # 1e-12 is used to avoid division by zero
-        self._m_scale = np.linalg.norm(self.initial_moment) or 1e-12
+        self._x_scale = self.initial_position
+        
+        self._m_scale = np.linalg.norm(self.initial_moment)
 
         x0_norm = self.initial_position / self._x_scale
         m0_norm = self.initial_moment / self._m_scale
@@ -267,7 +267,7 @@ class NonlinearMagneticMomentBz:
         position, moment = self._denormalize(x_norm, m_norm)
         predicted = dipole_bz(self._coordinates, position, moment)
         residuals = self._data - predicted
-        return np.sum(residuals**2)
+        return np.linalg.norm(residuals)
 
     def fit(self, coordinates, data):
         """
@@ -308,11 +308,11 @@ class NonlinearMagneticMomentBz:
             fun=self._misfit,
             x0=initial_params,
             method=self.optimization_method,
-            options={"maxiter": 1000, "disp": True},
+            options={"maxiter": 1000, "disp": True, "fatol":1e-8},
         )
         self.result_ = result
         x_opt, m_opt = result.x[:3], result.x[3:]
-        self.optimized_position_, self.optimized_moment_ = self._denormalize(
+        self.position_, self.moment_ = self._denormalize(
             x_opt, m_opt
         )
         return self
@@ -323,8 +323,10 @@ class NonlinearMagneticMomentBz:
 
         Parameters
         ----------
-        coordinates : tuple of array-like
-            Tuple of (x, y, z) coordinates in meters where Bz will be predicted.
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observations points.
+            The arrays can have any shape as long as they all have the same
+            shape.
 
         Returns
         -------
@@ -336,12 +338,12 @@ class NonlinearMagneticMomentBz:
         ValueError
             If the model has not been fitted yet.
         """
-        if self.optimized_position_ is None or self.optimized_moment_ is None:
+        if self.position_ is None or self.moment_ is None:
             msg = "Model has not been fitted. Call 'fit()' before prediction."
             raise ValueError(msg)
 
         return dipole_bz(
             coordinates,
-            self.optimized_position_,
-            self.optimized_moment_,
+            self.position_,
+            self.moment_,
         )
