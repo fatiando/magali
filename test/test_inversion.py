@@ -10,9 +10,10 @@ Test the _synthetic functions
 
 import harmonica as hm
 import numpy as np
+import pytest
 import verde as vd
 
-from magali._inversion import MagneticMomentBz, _jacobian, NonlinearMagneticMomentBz
+from magali._inversion import MagneticMomentBz, NonlinearMagneticMomentBz, _jacobian
 from magali._synthetic import dipole_bz
 
 
@@ -93,7 +94,7 @@ def test_nonlinear_magnetic_moment_bz_inversion():
         extra_coords=5,
     )
     data = dipole_bz(coordinates, dipole_coordinates, true_moment)
-    
+
     model = MagneticMomentBz(dipole_coordinates)
     model.fit(coordinates, data)
 
@@ -113,3 +114,49 @@ def test_nonlinear_magnetic_moment_bz_inversion():
     np.testing.assert_allclose(nl_inv.optimized_position_, dipole_coordinates)
     np.testing.assert_allclose(nl_inv.optimized_moment_, true_moment)
 
+
+def test_nonlinear_magnetic_moment_bz_inversion_predict():
+    "Check that nonlinear inversion recovers a known position and moment."
+    dipole_coordinates = (500, 500, -15)
+    true_inclination = 30
+    true_declination = 40
+    true_intensity = 5e-11
+    true_moment = hm.magnetic_angles_to_vec(
+        inclination=true_inclination,
+        declination=true_declination,
+        intensity=true_intensity,
+    )
+    coordinates = vd.grid_coordinates(
+        region=[0, 100, 0, 100],
+        spacing=1,
+        extra_coords=5,
+    )
+    data = dipole_bz(coordinates, dipole_coordinates, true_moment)
+
+    model = MagneticMomentBz(dipole_coordinates)
+    model.fit(coordinates, data)
+
+    nl_inv = NonlinearMagneticMomentBz(
+        initial_position=model.location,
+        initial_moment=model.dipole_moment_,
+    )
+
+    nl_inv.fit(coordinates, data)
+
+    predicted = nl_inv.predict(coordinates)
+
+    np.testing.assert_allclose(predicted, data, rtol=0.2)
+
+def test_nonlinear_predict_without_fit_raises():
+    "Ensure ValueError is raised if predict is called before fit"
+    model = NonlinearMagneticMomentBz(
+        initial_position=(100, 100, -5),
+        initial_moment=[1e-11, 1e-11, 1e-11],
+    )
+    coordinates = vd.grid_coordinates(
+        region=[0, 100, 0, 100],
+        spacing=10,
+        extra_coords=5,
+    )
+    with pytest.raises(ValueError, match="Model has not been fitted"):
+        model.predict(coordinates)
