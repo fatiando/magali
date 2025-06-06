@@ -12,7 +12,7 @@ import harmonica as hm
 import numpy as np
 import verde as vd
 
-from magali._inversion import MagneticMomentBz, _jacobian, NonLinearMagneticMomentBz
+from magali._inversion import MagneticMomentBz, _jacobian, NonlinearMagneticMomentBz
 from magali._synthetic import dipole_bz
 
 
@@ -97,7 +97,7 @@ def test_nonlinear_magnetic_moment_bz_inversion():
     model = MagneticMomentBz(dipole_coordinates)
     model.fit(coordinates, data)
 
-    nl_inv = NonLinearMagneticMomentBz(
+    nl_inv = NonlinearMagneticMomentBz(
         initial_position=model.location,
         initial_moment=model.dipole_moment_,
     )

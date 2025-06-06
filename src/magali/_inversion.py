@@ -154,7 +154,7 @@ def _jacobian(x, y, z, xc, yc, zc, result):
 jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
 
 
-class NonLinearMagneticMomentBz:
+class NonlinearMagneticMomentBz:
     r"""
     Estimate dipole location and moment from Bz data using nonlinear optimization.
 
@@ -293,7 +293,7 @@ class NonLinearMagneticMomentBz:
 
         Returns
         -------
-        self : NonLinearMagneticMomentBz
+        self : NonlinearMagneticMomentBz
             The instance, updated with the fitted `optimized_position_` and
             `optimized_moment_`.
         """
