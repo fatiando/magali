@@ -18,7 +18,6 @@ from magali._detection import detect_anomalies
 from magali._synthetic import (
     dipole_bz_grid,
     random_directions,
-    
 )
 from magali._utils import total_gradient_amplitude_grid
 from magali._visualization import plot_detected_sources
