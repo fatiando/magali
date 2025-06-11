@@ -32,7 +32,7 @@ dependencies = [
     "scipy>=1.9",
     "numba>=0.58",
     "scikit-image>=0.20",
-    "xarray>=2022.6.0",
+    "xarray>=2022.6.0,!=2025.06.0",
     "harmonica>=0.7",
     "verde>=1.8.1",
     "choclo>=0.2.0",
