@@ -18,10 +18,7 @@ def test_detect_anomalies(simple_model):
     windows = detect_anomalies(
         simple_model,
         size_range=[25, 50],
-        size_multiplier=2,
-        num_scales=10,
         detection_threshold=0.01,
-        overlap_ratio=0.5,
         border_exclusion=1,
     )
 
