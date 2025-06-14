@@ -11,6 +11,7 @@ List of functions and classes (API)
    :toctree: generated/
 
    MagneticMomentBz
+   plot_bounding_boxes
    read_qdm_harvard
    random_directions
    dipole_bz
@@ -19,3 +20,4 @@ List of functions and classes (API)
    total_gradient_amplitude
    total_gradient_amplitude_grid
    detect_anomalies
+   plot_detected_sources

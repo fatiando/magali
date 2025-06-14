@@ -8,27 +8,15 @@
 Test the _detection functions
 """
 
-import numpy as np
-import skimage.exposure
-import xarray as xr
 from models import simple_model
 
 from magali._detection import detect_anomalies
-from magali._utils import total_gradient_amplitude_grid
 
 
 def test_detect_anomalies(simple_model):
     # Use model fixture from _models.py
-    data_tga = total_gradient_amplitude_grid(simple_model)
-    stretched = skimage.exposure.rescale_intensity(
-        data_tga,
-        in_range=tuple(np.percentile(data_tga, (1, 99))),
-    )
-    data_tga_stretched = xr.DataArray(stretched, coords=data_tga.coords)
-
-    # Detection
     windows = detect_anomalies(
-        data_tga_stretched,
+        simple_model,
         size_range=[25, 50],
         size_multiplier=2,
         num_scales=10,
