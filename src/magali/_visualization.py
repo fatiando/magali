@@ -13,35 +13,36 @@ import matplotlib.pyplot as plt
 
 
 def plot_detected_sources(
-    grid, bounding_boxes, cmap="seismic", title="Detected Magnetic Sources"
-):
+    bounding_boxes, **kwargs
+    ):
     """
     Plot a 2D grid and overlay rectangles for detected boxdows.
 
     Parameters
     ----------
-    grid : xr.DataArray
-        The 2D grid to be plotted.
     bounding_boxes : list of lists
         Bounding boxes of detected anomalies in data coordinates. Each
         bounding box corresponds to a detected blob, defined by the
         coordinates and size of the blob.
-    cmap : str
-        Colormap for the background grid.
     title : str
         Title of the plot.
+    **kwargs :
+        Additional keyword arguments passed to matplotlib.patches.Rectangle,
+        such as edgecolor, linewidth, linestyle, etc.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The matplotlib Axes object of the plot.
     """
     fig, ax = plt.subplots()
-    grid.plot.pcolormesh(ax=ax, cmap=cmap)
     for box in bounding_boxes:
         rect = mpatches.Rectangle(
             xy=[box[0], box[2]],
             width=box[1] - box[0],
             height=box[3] - box[2],
-            edgecolor="k",
             fill=False,
-            linewidth=2,
+            **kwargs,
         )
         ax.add_patch(rect)
-    ax.set_title(title)
-    plt.show()
+    return ax
