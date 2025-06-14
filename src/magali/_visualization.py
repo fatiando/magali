@@ -12,11 +12,9 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 
-def plot_detected_sources(
-    bounding_boxes, **kwargs
-    ):
+def plot_bounding_boxes(bounding_boxes, **kwargs):
     """
-    Plot a 2D grid and overlay rectangles for detected boxdows.
+    Plot the bounding boxes detected from :func:`magali._detection.detect_anomalies`.
 
     Parameters
     ----------
