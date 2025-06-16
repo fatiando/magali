@@ -5,7 +5,7 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 """
-Functions for plotting and visualization of data
+Functions for plotting and visualization of data.
 """
 
 import matplotlib.patches as mpatches
