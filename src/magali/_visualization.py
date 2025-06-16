@@ -25,7 +25,8 @@ def plot_bounding_boxes(bounding_boxes, ax=None, edgecolor="k", linewidth=2, **k
     title : str
         Title of the plot.
     **kwargs :
-        Additional keyword arguments passed to matplotlib.patches.Rectangle.
+        Additional keyword arguments passed to 
+        :class:`matplotlib.patches.Rectangle`.
 
     Returns
     -------
