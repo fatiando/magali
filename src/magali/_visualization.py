@@ -12,7 +12,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 
-def plot_bounding_boxes(bounding_boxes, **kwargs):
+def plot_bounding_boxes(bounding_boxes, ax=None, edgecolor="k", linewidth=2, **kwargs):
     """
     Plot the bounding boxes detected from :func:`magali._detection.detect_anomalies`.
 
@@ -25,21 +25,23 @@ def plot_bounding_boxes(bounding_boxes, **kwargs):
     title : str
         Title of the plot.
     **kwargs :
-        Additional keyword arguments passed to matplotlib.patches.Rectangle,
-        such as edgecolor, linewidth, linestyle, etc.
+        Additional keyword arguments passed to matplotlib.patches.Rectangle.
 
     Returns
     -------
     ax : matplotlib.axes.Axes
         The matplotlib Axes object of the plot.
     """
-    fig, ax = plt.subplots()
+    if ax is None:
+        ax = plt.gca()
     for box in bounding_boxes:
         rect = mpatches.Rectangle(
             xy=[box[0], box[2]],
             width=box[1] - box[0],
             height=box[3] - box[2],
             fill=False,
+            edgecolor=edgecolor,
+            linewidth=linewidth,
             **kwargs,
         )
         ax.add_patch(rect)
