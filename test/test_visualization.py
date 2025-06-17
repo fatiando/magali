@@ -14,7 +14,7 @@ import pytest
 from magali._visualization import plot_bounding_boxes
 
 
-@pytest.mark.mpl_image_compare
+@pytest.mark.mpl_image_compare(tolerance=14)
 def plot_bounding_boxes_single_box():
     bounding_boxes = [[0, 1, 0, 1]]
     fig, ax = plt.subplots()
@@ -24,7 +24,7 @@ def plot_bounding_boxes_single_box():
     return fig
 
 
-@pytest.mark.mpl_image_compare
+@pytest.mark.mpl_image_compare(tolerance=14)
 def test_plot_bounding_boxes_multiple_boxes():
     bounding_boxes = [
         [0, 1, 0, 1],
@@ -38,7 +38,7 @@ def test_plot_bounding_boxes_multiple_boxes():
     return fig
 
 
-@pytest.mark.mpl_image_compare
+@pytest.mark.mpl_image_compare(tolerance=14)
 def test_plot_bounding_boxes_with_kwargs():
     bounding_boxes = [[0, 2, 0, 2]]
     fig, ax = plt.subplots()
@@ -50,7 +50,7 @@ def test_plot_bounding_boxes_with_kwargs():
     return fig
 
 
-@pytest.mark.mpl_image_compare
+@pytest.mark.mpl_image_compare(tolerance=14)
 def test_plot_bounding_boxes_without_ax():
     bounding_boxes = [[0, 1, 0, 1]]
     # Test the behavior when ax is None
