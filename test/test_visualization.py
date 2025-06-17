@@ -8,64 +8,54 @@
 Test the visualization functions
 """
 
-import harmonica as hm
 import matplotlib.pyplot as plt
-import numpy as np
 import pytest
-import skimage.exposure
 
-from magali._detection import detect_anomalies
-from magali._synthetic import (
-    dipole_bz_grid,
-    random_directions,
-)
-from magali._utils import total_gradient_amplitude_grid
 from magali._visualization import plot_bounding_boxes
 
 
-@pytest.mark.filterwarnings("ignore::UserWarning")
-def test_plot_bounding_boxes(monkeypatch):
-    monkeypatch.setattr(plt, "show", lambda: None)
+@pytest.mark.mpl_image_compare
+def plot_bounding_boxes_single_box():
+    bounding_boxes = [[0, 1, 0, 1]]
+    fig, ax = plt.subplots()
+    plot_bounding_boxes(bounding_boxes, ax=ax)
+    ax.set_xlim(-1, 2)
+    ax.set_ylim(-1, 2)
+    return fig
 
-    sensor_sample_distance = 5.0  # µm
-    region = [0, 2000, 0, 2000]  # µm
-    spacing = 2  # µm
-    size = 100
 
-    inc, dec = random_directions(30, 40, 5, size=size, random_state=5)
-    amp = abs(np.random.normal(0, 100, size)) * 1.0e-14
-    coords = (
-        np.concatenate([np.random.randint(30, 1970, size), [1250, 1300, 500]]),
-        np.concatenate([np.random.randint(30, 1970, size), [500, 1750, 1000]]),
-        np.concatenate([np.random.randint(-20, -1, size), [-15, -15, -30]]),
-    )
-    moments = hm.magnetic_angles_to_vec(
-        inclination=np.concatenate([inc, [10, -10, -5]]),
-        declination=np.concatenate([dec, [10, 170, 190]]),
-        intensity=np.concatenate([amp, [5e-11, 5e-11, 5e-11]]),
-    )
-    data = dipole_bz_grid(region, spacing, sensor_sample_distance, coords, moments)
+@pytest.mark.mpl_image_compare
+def test_plot_bounding_boxes_multiple_boxes():
+    bounding_boxes = [
+        [0, 1, 0, 1],
+        [2, 3, 2, 3],
+        [-1, 0, -1, 0],
+    ]
+    fig, ax = plt.subplots()
+    plot_bounding_boxes(bounding_boxes, ax=ax, edgecolor="red", linewidth=1.5)
+    ax.set_xlim(-2, 4)
+    ax.set_ylim(-2, 4)
+    return fig
 
-    height_diff = 5
-    data_up = (
-        hm.upward_continuation(data, height_diff)
-        .assign_attrs(data.attrs)
-        .assign_coords(x=data.x, y=data.y)
-        .assign_coords(z=data.z + height_diff)
-    )
-    tga = total_gradient_amplitude_grid(data_up)
-    tga_stretched = skimage.exposure.rescale_intensity(
-        tga, in_range=tuple(np.percentile(tga, (1, 99)))
-    )
 
-    windows = detect_anomalies(
-        tga_stretched,
-        size_range=[25, 50],
-        size_multiplier=2,
-        num_scales=10,
-        detection_threshold=0.01,
-        overlap_ratio=0.5,
-        border_exclusion=1,
+@pytest.mark.mpl_image_compare
+def test_plot_bounding_boxes_with_kwargs():
+    bounding_boxes = [[0, 2, 0, 2]]
+    fig, ax = plt.subplots()
+    plot_bounding_boxes(
+        bounding_boxes, ax=ax, edgecolor="blue", linewidth=3, linestyle="--"
     )
+    ax.set_xlim(-1, 3)
+    ax.set_ylim(-1, 3)
+    return fig
 
-    plot_bounding_boxes(tga_stretched, windows, title="Test Anomalies Plot")
+
+@pytest.mark.mpl_image_compare
+def test_plot_bounding_boxes_without_ax():
+    bounding_boxes = [[0, 1, 0, 1]]
+    # Test the behavior when ax is None
+    plot_bounding_boxes(bounding_boxes)
+    plt.xlim(-1, 2)
+    plt.ylim(-1, 2)
+    fig = plt.gcf()
+    return fig
