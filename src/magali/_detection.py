@@ -4,11 +4,10 @@
 #
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
-import harmonica as hm
 import numpy as np
 import skimage.exposure
 
-from ._utils import _estimate_grid_spacing, total_gradient_amplitude_grid
+from ._utils import _estimate_grid_spacing
 
 
 def _calculate_blob_sizes(detected_scales, grid_spacing, size_multiplier):
@@ -64,10 +63,6 @@ def detect_anomalies(
     detection_threshold=0.5,
     overlap_ratio=0.5,
     border_exclusion=0,
-    upward_continued=False,
-    height_displacement=5,
-    tga_calculated=False,
-    stretched=False,
 ):
     """
     Detect anomalies using blob detection.
@@ -95,18 +90,6 @@ def detect_anomalies(
     border_exclusion : int, optional
         Border exclusion size in data units (default is 0). This parameter
         excludes blobs close to the border of the data array.
-    upward_continued : boolean
-        Indicate whether the data has already been upward continued or not.
-    height_displacement : float
-        The height displacement of upward continuation. For upward continuation,
-        the height displacement should be positive. Its units are the same units
-        of the grid coordinates.
-    tga_calculated : boolean
-        Indicate whether the total gradient amplitude has already been applied
-        to the data.
-    stretched : boolean
-        Indicate whether the contrast stretching algorithm has already been
-        applied to the data.
 
     Returns
     -------
@@ -115,24 +98,11 @@ def detect_anomalies(
         bounding box corresponds to a detected blob, defined by the
         coordinates and size of the blob.
     """
-    if not upward_continued:
-        data_up = (
-            hm.upward_continuation(data, height_displacement)
-            .assign_attrs(data.attrs)
-            .assign_coords(x=data.x, y=data.y)
-            .assign_coords(z=data.z + height_displacement)
-        )
-    if not tga_calculated:
-        tga = total_gradient_amplitude_grid(data_up)
-    if not stretched:
-        stretched_data = skimage.exposure.rescale_intensity(
-            tga, in_range=tuple(np.percentile(tga, (1, 99)))
-        )
-    grid_spacing = _estimate_grid_spacing(stretched_data)
+    grid_spacing = _estimate_grid_spacing(data)
     min_sigma, max_sigma = [0.5 * size for size in size_range]
 
     y_indices, x_indices, detected_scales = skimage.feature.blob_log(
-        stretched_data,
+        data,
         min_sigma=min_sigma,
         max_sigma=max_sigma,
         threshold=detection_threshold,
