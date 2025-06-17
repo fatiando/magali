@@ -20,11 +20,11 @@ from magali._synthetic import (
     random_directions,
 )
 from magali._utils import total_gradient_amplitude_grid
-from magali._visualization import plot_detected_sources
+from magali._visualization import plot_bounding_boxes
 
 
 @pytest.mark.filterwarnings("ignore::UserWarning")
-def test_plot_detected_sources(monkeypatch):
+def test_plot_bounding_boxes(monkeypatch):
     monkeypatch.setattr(plt, "show", lambda: None)
 
     sensor_sample_distance = 5.0  # µm
@@ -68,4 +68,4 @@ def test_plot_detected_sources(monkeypatch):
         border_exclusion=1,
     )
 
-    plot_detected_sources(tga_stretched, windows, title="Test Anomalies Plot")
+    plot_bounding_boxes(tga_stretched, windows, title="Test Anomalies Plot")
