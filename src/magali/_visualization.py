@@ -14,24 +14,31 @@ import matplotlib.pyplot as plt
 
 def plot_bounding_boxes(bounding_boxes, ax=None, edgecolor="k", linewidth=2, **kwargs):
     """
-    Plot the bounding boxes detected from :func:`magali._detection.detect_anomalies`.
+    Plot bounding boxes on a matplotlib Axes.
+
+    Used to visualize the bounding boxes of detected anomalies,
+    such as those produced by :func:`magali._detection.detect_anomalies`.
 
     Parameters
     ----------
-    bounding_boxes : list of lists
-        Bounding boxes of detected anomalies in data coordinates. Each
-        bounding box corresponds to a detected blob, defined by the
-        coordinates and size of the blob.
-    title : str
-        Title of the plot.
-    **kwargs :
+    bounding_boxes : list of list of float
+        List of bounding boxes in data coordinates. Each bounding box is a list
+        or array in the format [x_min, x_max, y_min, y_max].
+    ax : matplotlib.axes.Axes, optional
+        The matplotlib Axes on which to plot the bounding boxes. If None, uses
+        the current Axes.
+    edgecolor : str or tuple, default="k"
+        Color of the bounding box edges.
+    linewidth : float, default=2
+        Width of the bounding box edges.
+    **kwargs : dict, optional
         Additional keyword arguments passed to
-        :class:`matplotlib.patches.Rectangle`.
+        :class:`matplotlib.patches.Rectangle`, such as `linestyle` or `alpha`.
 
     Returns
     -------
     ax : matplotlib.axes.Axes
-        The matplotlib Axes object of the plot.
+        The matplotlib Axes object with the plotted bounding boxes.
     """
     if ax is None:
         ax = plt.gca()
