@@ -40,7 +40,7 @@ check-format:
 	burocrata --check --extension=py $(CHECK_STYLE)
 
 check-style:
-	ruff format --check $(CHECK_STYLE)
+	ruff check $(CHECK_STYLE)
 
 check-actions:
 	zizmor $(GITHUB_ACTIONS)
