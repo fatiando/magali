@@ -1,5 +1,6 @@
 # Requirements for running the tests
 pytest
+pytest-mpl
 pytest-cov
 coverage
 ensaio>=0.7

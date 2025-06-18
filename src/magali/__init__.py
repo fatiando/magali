@@ -14,6 +14,7 @@ from ._utils import (
     total_gradient_amplitude_grid,
 )
 from ._version import __version__
+from ._visualization import plot_bounding_boxes
 
 # Append a leading "v" to the generated version by setuptools_scm
 __version__ = f"v{__version__}"
