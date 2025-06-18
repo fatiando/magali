@@ -20,4 +20,3 @@ List of functions and classes (API)
    total_gradient_amplitude
    total_gradient_amplitude_grid
    detect_anomalies
-   plot_detected_sources
