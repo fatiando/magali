@@ -22,6 +22,9 @@ build:
 install:
 	python -m pip install --no-deps --editable .
 
+baseline:
+	pytest --mpl-generate-path=test/baseline
+
 test:
 	pytest --cov-report=term-missing --cov --doctest-modules --verbose --mpl test src/$(PROJECT)
 
