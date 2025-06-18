@@ -11,7 +11,6 @@ Test the _detection functions
 import numpy as np
 import skimage.exposure
 import xarray as xr
-from models import simple_model
 
 from magali._detection import detect_anomalies
 from magali._utils import total_gradient_amplitude_grid

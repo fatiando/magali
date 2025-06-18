@@ -11,7 +11,6 @@ Test the _utils functions
 import numpy as np
 import verde as vd
 import xarray as xr
-from models import simple_model, souza_junior_model
 
 from magali._utils import (
     _estimate_grid_spacing,
