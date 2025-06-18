@@ -9,7 +9,6 @@ Test the _utils functions
 """
 
 import numpy as np
-import verde as vd
 import xarray as xr
 
 from magali._utils import (
