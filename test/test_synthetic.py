@@ -81,17 +81,18 @@ def test_dipole_bz():
         size=size,
         random_state=5,
     )
+    rng = np.random.default_rng(seed=42)
 
-    amplitude = abs(np.random.normal(0, 100, size)) * 1.0e-14
+    amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
 
     dipole_moments = hm.magnetic_angles_to_vec(
         directions_inclination, directions_declination, amplitude
     )
 
     dipole_coordinates = (
-        np.random.randint(30, 1970, size),  # µm
-        np.random.randint(30, 1970, size),  # µm
-        np.random.randint(-20, -1, size),  # µm
+        rng.integers(30, 1970, size),  # µm
+        rng.integers(30, 1970, size),  # µm
+        rng.integers(-20, -1, size),  # µm
     )
 
     bz = dipole_bz(coordinates, dipole_coordinates, dipole_moments)
