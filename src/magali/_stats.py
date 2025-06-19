@@ -13,7 +13,7 @@ def _calculate_angular_distance(
     inclination_one, declination_one, inclination_two, declination_two
 ):
     r"""
-    Calculates the Angular distance between two vectors.
+    Calculate the Angular distance between two vectors.
 
     Parameters
     ----------
@@ -43,7 +43,7 @@ def _calculate_angular_distance(
 
 def variance(inclination, declination, inclination_mean, declination_mean):
     r"""
-    Calculates angular variance.
+    Calculate angular variance.
 
     Parameters
     ----------
@@ -61,7 +61,6 @@ def variance(inclination, declination, inclination_mean, declination_mean):
     angular_distance : np.float64
         Angular distance between two vectors in degrees.
     """
-
     distance = _calculate_angular_distance(
         inclination, declination, inclination_mean, declination_mean
     )

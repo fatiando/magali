@@ -5,7 +5,7 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 """
-Functions to read data from instrument files
+Functions to read data from instrument files.
 """
 
 import numpy as np
@@ -78,7 +78,7 @@ def _extract_data_qdm_harvard(contents):
 
 def _create_qdm_harvard_grid(coordinates, data_names, bz, path):
     """
-    Creates QDM microscopy data in the Harvard group format.
+    Create QDM microscopy data in the Harvard group format.
 
     This functions makes the xarray.Dataset and sets appropriate metadata.
 

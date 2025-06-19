@@ -4,6 +4,10 @@
 #
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
+"""
+Import functions/classes to make the public API.
+"""
+
 from ._detection import detect_anomalies
 from ._input_output import read_qdm_harvard
 from ._inversion import MagneticMomentBz

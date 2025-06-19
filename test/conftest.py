@@ -64,12 +64,13 @@ def souza_junior_model():
         random_state=5,
     )
 
-    dipoles_amplitude = abs(np.random.normal(0, 100, size)) * 1.0e-14
+    rng = np.random.default_rng(seed=42)
+    dipoles_amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
 
     dipole_coordinates = (
-        np.concatenate([np.random.randint(30, 1970, size), [1250, 1300, 500]]),  # µm
-        np.concatenate([np.random.randint(30, 1970, size), [500, 1750, 1000]]),  # µm
-        np.concatenate([np.random.randint(-20, -1, size), [-15, -15, -30]]),  # µm
+        np.concatenate([rng.integers(30, 1970, size), [1250, 1300, 500]]),  # µm
+        np.concatenate([rng.integers(30, 1970, size), [500, 1750, 1000]]),  # µm
+        np.concatenate([rng.integers(-20, -1, size), [-15, -15, -30]]),  # µm
     )
     dipole_moments = hm.magnetic_angles_to_vec(
         inclination=np.concatenate([directions_inclination, [10, -10, -5]]),
