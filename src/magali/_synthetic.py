@@ -5,7 +5,7 @@
 # This code is part of the Fatiando a Terra project (https://www.fatiando.org)
 #
 """
-Functions to generate synthetic data
+Functions to generate synthetic data.
 """
 
 import harmonica as hm
@@ -19,7 +19,7 @@ def random_directions(
     inclination, declination, dispersion_angle, size, random_state=None
 ):
     r"""
-    Creates random directions around a preferred direction.
+    Create random directions around a preferred direction.
 
     Parameters
     ----------
@@ -114,7 +114,7 @@ def random_directions(
 
 def _rotate_vector(x, y, z, inclination, declination):
     """
-    Rotates vectors using its cartesian coordinates towards specific direction
+    Rotate vectors using its cartesian coordinates towards specific direction.
 
     Parameters
     ----------
@@ -138,7 +138,6 @@ def _rotate_vector(x, y, z, inclination, declination):
     z_r : numpy.array
         z coordinates of rotated vectors.
     """
-
     theta = np.deg2rad(90 + inclination)
     phi = np.deg2rad(90 - declination)
     # R_z(phi)*R_y(theta)
@@ -150,7 +149,7 @@ def _rotate_vector(x, y, z, inclination, declination):
 
 def dipole_bz(coordinates, dipole_coordinates, dipole_moments):
     """
-    Computes the vertical component of the magnetic field (Bz) produced by a magnetic dipole.
+    Compute the vertical component of the magnetic field (Bz) produced by a magnetic dipole.
 
     Parameters
     ----------
