@@ -63,6 +63,7 @@ def souza_junior_model():
         size=size,
         random_state=5,
     )
+
     rng = np.random.default_rng(seed=42)
     dipoles_amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
 
