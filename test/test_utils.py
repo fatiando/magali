@@ -46,7 +46,6 @@ def test_gradient(souza_junior_model):
     np.testing.assert_allclose(tga.std().values, 2192.1091330575123, rtol=1e5)
 
 
-
 def test_total_gradient_amplitude_grid(souza_junior_model):
     # Use model fixture from _models.py
     data = souza_junior_model
