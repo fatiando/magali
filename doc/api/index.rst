@@ -17,6 +17,5 @@ List of functions and classes (API)
    dipole_bz
    dipole_bz_grid
    gradient
-   total_gradient_amplitude
    total_gradient_amplitude_grid
    detect_anomalies
