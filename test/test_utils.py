@@ -14,7 +14,6 @@ import xarray as xr
 from magali._utils import (
     _estimate_grid_spacing,
     gradient,
-    total_gradient_amplitude,
     total_gradient_amplitude_grid,
 )
 
@@ -28,7 +27,7 @@ def test_estimate_grid_spacing(souza_junior_model):
 
 def test_gradient(souza_junior_model):
     # Use model fixture from _models.py
-    dx, dy, dz = gradient(souza_junior_model)
+    dx, dy, dz, tga = gradient(souza_junior_model)
 
     np.testing.assert_allclose(dx.min().values, -92762.44269656, rtol=1e2)
     np.testing.assert_allclose(dy.min().values, -88701.89017599083, rtol=1e2)
@@ -42,18 +41,10 @@ def test_gradient(souza_junior_model):
     np.testing.assert_allclose(dy.std().values, 1164.8957138051455, rtol=1e2)
     np.testing.assert_allclose(dz.std().values, 1640.5332919277892, rtol=1e2)
 
-
-def test_total_gradient_amplitude(souza_junior_model):
-    # Use model fixture from _models.py
-    data = souza_junior_model
-
-    dx, dy, dz = gradient(data)
-
-    tga = total_gradient_amplitude(dx, dy, dz)
-
     np.testing.assert_allclose(tga.min().values, 0.0013865457298526999, rtol=1e5)
     np.testing.assert_allclose(tga.max().values, 356478.0516202345, rtol=1e5)
     np.testing.assert_allclose(tga.std().values, 2192.1091330575123, rtol=1e5)
+
 
 
 def test_total_gradient_amplitude_grid(souza_junior_model):
