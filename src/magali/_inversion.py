@@ -11,6 +11,7 @@ Classes for inversions.
 import choclo
 import numba
 import numpy as np
+from harmonica import dipole_magnetic
 
 from ._units import coordinates_micrometer_to_meter, tesla_to_nanotesla
 from ._validation import check_fit_input
@@ -121,3 +122,26 @@ def _jacobian(x, y, z, xc, yc, zc, result):
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
 jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
+
+
+class MagneticDipoleBz:
+    def __init__(self, initial):
+        self.initial = np.array(initial, dtype=float)
+        self.location_ = None
+        self.dipole_moment_ = None
+        self.parameters_ = None
+    
+    def forward(self, x, y, z, params):
+        xc, yc, zc = params[:3]
+        mx, my, mz = params[3:]
+
+        Bz = dipole_magnetic(
+            coordinates=(x, y, z),
+            dipoles=(np.array([xc]), np.array([yc]), np.array([zc])),
+            magnetic_moments=(np.array([mx]), np.array([my]), np.array([mz])),
+            field="b_u",
+            parallel=True,
+            disable_checks=True,
+        )
+
+        return Bz
