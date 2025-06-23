@@ -11,9 +11,14 @@ Classes for inversions.
 import choclo
 import numba
 import numpy as np
-from ._synthetic import dipole_bz
 
-from ._units import coordinates_micrometer_to_meter, tesla_to_nanotesla
+from ._synthetic import dipole_bz
+from ._units import (
+    meter_to_micrometer,
+    coordinates_micrometer_to_meter,
+    nanotesla_to_tesla,
+    tesla_to_nanotesla,
+)
 from ._validation import check_fit_input
 
 
@@ -101,7 +106,8 @@ class MagneticMomentBz:
         jacobian_jit(x, y, z, xc, yc, zc, jacobian)
         jacobian = tesla_to_nanotesla(jacobian)
         return jacobian
-
+    
+   
 
 def _jacobian(x, y, z, xc, yc, zc, result):
     """
@@ -118,10 +124,8 @@ def _jacobian(x, y, z, xc, yc, zc, result):
         result[i, 1] = factor * kernel_nu
         result[i, 2] = factor * kernel_uu
 
-@numba.njit(parallel=True)
 def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
-    mu0 = 4 * np.pi * 1e-7
-    factor = mu0 / (4 * np.pi) * 1e9
+    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi) 
 
     for i in numba.prange(x.size):
         dx = x[i] - xc
@@ -129,9 +133,6 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
         dz = z[i] - zc
         r2 = dx**2 + dy**2 + dz**2
         r5 = r2**2.5
-
-        if r5 == 0:
-            continue
 
         dBz_dx = factor * 3 * (
             (mx * (5 * dx**2 * dz - r2 * dz) +
@@ -162,9 +163,6 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
         result[i, 4] = dBz_dmy
         result[i, 5] = dBz_dmz
 
-# Compile the Jacobian calculation. Doesn't use this as a decorator so that we
-# can test the pure Python function and get coverage information about it.
-jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
 
 
 class MagneticDipoleBz:
@@ -173,6 +171,7 @@ class MagneticDipoleBz:
         self.location_ = None
         self.dipole_moment_ = None
         self.parameters_ = None
+        self.jacobian = None
     
     def forward(self, coordinates, parameters):
         """
@@ -190,7 +189,59 @@ class MagneticDipoleBz:
         Bz : array
             Predicted Bz in nT at the given coordinates.
         """
-        location = parameters[0:3]
-        moment = parameters[3:6]
+        location = parameters[:3]
+        moment = parameters[3:]
         return dipole_bz(coordinates, location, moment)
-        
+    
+    
+    def _jacobian(self, coordinates, parameters):
+        xc, yc, zc = parameters[:3]
+        mx, my, mz = parameters[3:]
+        x,y,z = coordinates
+        n_data = x.size
+        n_params = 6
+        jacobian = np.empty((n_data, n_params))
+        jacobian_kernel_jit(x, y, z, xc, yc, zc, mx, my, mz, jacobian)
+        return jacobian
+
+    def fit(self, coordinates, data, maxiter=100, damping=1e-3, tol=1e-10):
+        coordinates, data = check_fit_input(coordinates, data)
+        data = data.ravel()
+        coordinates = coordinates_micrometer_to_meter(coordinates) 
+        x0, y0, z0, mx0, my0, mz0 = self.initial
+        params = np.array(
+            [
+                *coordinates_micrometer_to_meter((x0, y0, z0)),
+                mx0,
+                my0,
+                mz0,
+            ],
+            dtype=float,
+        )
+
+        for _ in range(maxiter):
+            predicted = self.forward(coordinates, params)
+            residuals = data - predicted
+            jacobian = self._jacobian(coordinates, params)
+
+            hessian = jacobian.T @ jacobian
+            gradient = jacobian.T @ residuals
+            step = np.linalg.solve(hessian + damping * np.identity(6), gradient)
+
+            params += step
+
+            if np.linalg.norm(step) / np.linalg.norm(params) < tol:
+                break
+
+        self.location_ = params[:3]
+        self.dipole_moment_ = params[3:]
+        return self
+
+
+
+
+# Compile the Jacobian calculation. Doesn't use this as a decorator so that we
+# can test the pure Python function and get coverage information about it.
+jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
+
+jacobian_kernel_jit = numba.jit(_jacobian_kernel, nopython=True, parallel=True)
