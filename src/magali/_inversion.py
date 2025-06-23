@@ -11,7 +11,7 @@ Classes for inversions.
 import choclo
 import numba
 import numpy as np
-from harmonica import dipole_magnetic
+from ._synthetic import dipole_bz
 
 from ._units import coordinates_micrometer_to_meter, tesla_to_nanotesla
 from ._validation import check_fit_input
@@ -118,6 +118,49 @@ def _jacobian(x, y, z, xc, yc, zc, result):
         result[i, 1] = factor * kernel_nu
         result[i, 2] = factor * kernel_uu
 
+@numba.njit(parallel=True)
+def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
+    mu0 = 4 * np.pi * 1e-7
+    factor = mu0 / (4 * np.pi) * 1e9
+
+    for i in numba.prange(x.size):
+        dx = x[i] - xc
+        dy = y[i] - yc
+        dz = z[i] - zc
+        r2 = dx**2 + dy**2 + dz**2
+        r5 = r2**2.5
+
+        if r5 == 0:
+            continue
+
+        dBz_dx = factor * 3 * (
+            (mx * (5 * dx**2 * dz - r2 * dz) +
+            my * (5 * dx * dy * dz) +
+            mz * (5 * dx * dz**2 - r2 * dx))
+        ) / r5
+
+        dBz_dy = factor * 3 * (
+            (mx * (5 * dx * dy * dz) +
+            my * (5 * dy**2 * dz - r2 * dz) +
+            mz * (5 * dy * dz**2 - r2 * dy))
+        ) / r5
+
+        dBz_dz = factor * 3 * (
+            (mx * (5 * dx * dz**2 - r2 * dx) +
+            my * (5 * dy * dz**2 - r2 * dy) +
+            mz * (5 * dz**3 - 3 * r2 * dz))
+        ) / r5
+
+        dBz_dmx = factor * (3 * dx * dz) / r2**2.5
+        dBz_dmy = factor * (3 * dy * dz) / r2**2.5
+        dBz_dmz = factor * (3 * dz**2 - r2) / r2**2.5
+
+        result[i, 0] = dBz_dx
+        result[i, 1] = dBz_dy
+        result[i, 2] = dBz_dz
+        result[i, 3] = dBz_dmx
+        result[i, 4] = dBz_dmy
+        result[i, 5] = dBz_dmz
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
@@ -131,17 +174,23 @@ class MagneticDipoleBz:
         self.dipole_moment_ = None
         self.parameters_ = None
     
-    def forward(self, x, y, z, params):
-        xc, yc, zc = params[:3]
-        mx, my, mz = params[3:]
+    def forward(self, coordinates, parameters):
+        """
+        Compute the predicted Bz for a given dipole model.
 
-        Bz = dipole_magnetic(
-            coordinates=(x, y, z),
-            dipoles=(np.array([xc]), np.array([yc]), np.array([zc])),
-            magnetic_moments=(np.array([mx]), np.array([my]), np.array([mz])),
-            field="b_u",
-            parallel=True,
-            disable_checks=True,
-        )
+        Parameters
+        ----------
+        coordinates : tuple = (x, y, z)
+            Observation coordinates in µm.
+        parameters : tuple
+            Dipole parameters (x, y, z, mx, my, mz).
 
-        return Bz
+        Returns
+        -------
+        Bz : array
+            Predicted Bz in nT at the given coordinates.
+        """
+        location = parameters[0:3]
+        moment = parameters[3:6]
+        return dipole_bz(coordinates, location, moment)
+        
