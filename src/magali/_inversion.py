@@ -165,9 +165,9 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
             / r5
         )
 
-        dBz_dmx = factor * (3 * dx * dz) / r2**2.5
-        dBz_dmy = factor * (3 * dy * dz) / r2**2.5
-        dBz_dmz = factor * (3 * dz**2 - r2) / r2**2.5
+        dBz_dmx = factor * (3 * dx * dz) / r5
+        dBz_dmy = factor * (3 * dy * dz) / r5
+        dBz_dmz = factor * (3 * dz**2 - r2) / r5
 
         result[i, 0] = dBz_dx
         result[i, 1] = dBz_dy
