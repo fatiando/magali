@@ -185,7 +185,7 @@ class MagneticDipoleBz:
         self.parameters_ = None
         self.jacobian = None
 
-        self.scale_location = 1e-6  # posição: micrômetros → metros
+        self.scale_location = 1e-6
         self.scale_moment = 1e-10
 
     def forward(self, coordinates, parameters):
@@ -218,12 +218,11 @@ class MagneticDipoleBz:
         jacobian_kernel_jit(x, y, z, xc, yc, zc, mx, my, mz, jacobian)
         return jacobian
 
-    def fit(self, coordinates, data, maxiter=100, alpha=1.0, dalpha=10.0, tol=1e-10):
+    def fit(self, coordinates, data, maxiter=100, alpha=1e-4, dalpha=2.0, tol=1e-10):
         coordinates, data = check_fit_input(coordinates, data)
         data = data.ravel()
         coordinates = coordinates_micrometer_to_meter(coordinates)
 
-        # Normalize initial parameters
         x0, y0, z0, mx0, my0, mz0 = self.initial
         params = np.array([
             x0 * self.scale_location,
@@ -255,11 +254,7 @@ class MagneticDipoleBz:
 
             accepted = False
             for _ in range(50):
-                deltap = np.linalg.solve(H + alpha * np.identity(6), gradient)
-
-                if np.linalg.norm(deltap) > 1e3:
-                    break
-
+                deltap = np.linalg.solve(H + alpha * np.identity(len(params)), gradient)
                 trial_params = params + deltap
                 trial_residuals = data - self.forward(coordinates, denormalize(trial_params))
                 trial_misfit = np.linalg.norm(trial_residuals) ** 2
@@ -284,6 +279,7 @@ class MagneticDipoleBz:
         self.location_ = final_params[:3]
         self.dipole_moment_ = final_params[3:]
         self.misfit = misfit
+        self.jacobian = A
         return self
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
