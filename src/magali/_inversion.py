@@ -14,9 +14,7 @@ import numpy as np
 
 from ._synthetic import dipole_bz
 from ._units import (
-    meter_to_micrometer,
     coordinates_micrometer_to_meter,
-    nanotesla_to_tesla,
     tesla_to_nanotesla,
 )
 from ._validation import check_fit_input
@@ -106,8 +104,7 @@ class MagneticMomentBz:
         jacobian_jit(x, y, z, xc, yc, zc, jacobian)
         jacobian = tesla_to_nanotesla(jacobian)
         return jacobian
-    
-   
+
 
 def _jacobian(x, y, z, xc, yc, zc, result):
     """
@@ -124,8 +121,9 @@ def _jacobian(x, y, z, xc, yc, zc, result):
         result[i, 1] = factor * kernel_nu
         result[i, 2] = factor * kernel_uu
 
+
 def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
-    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi) 
+    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
 
     for i in numba.prange(x.size):
         dx = x[i] - xc
@@ -134,23 +132,38 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
         r2 = dx**2 + dy**2 + dz**2
         r5 = r2**2.5
 
-        dBz_dx = factor * 3 * (
-            (mx * (5 * dx**2 * dz - r2 * dz) +
-            my * (5 * dx * dy * dz) +
-            mz * (5 * dx * dz**2 - r2 * dx))
-        ) / r5
+        dBz_dx = (
+            factor
+            * 3
+            * (
+                mx * (5 * dx**2 * dz - r2 * dz)
+                + my * (5 * dx * dy * dz)
+                + mz * (5 * dx * dz**2 - r2 * dx)
+            )
+            / r5
+        )
 
-        dBz_dy = factor * 3 * (
-            (mx * (5 * dx * dy * dz) +
-            my * (5 * dy**2 * dz - r2 * dz) +
-            mz * (5 * dy * dz**2 - r2 * dy))
-        ) / r5
+        dBz_dy = (
+            factor
+            * 3
+            * (
+                mx * (5 * dx * dy * dz)
+                + my * (5 * dy**2 * dz - r2 * dz)
+                + mz * (5 * dy * dz**2 - r2 * dy)
+            )
+            / r5
+        )
 
-        dBz_dz = factor * 3 * (
-            (mx * (5 * dx * dz**2 - r2 * dx) +
-            my * (5 * dy * dz**2 - r2 * dy) +
-            mz * (5 * dz**3 - 3 * r2 * dz))
-        ) / r5
+        dBz_dz = (
+            factor
+            * 3
+            * (
+                mx * (5 * dx * dz**2 - r2 * dx)
+                + my * (5 * dy * dz**2 - r2 * dy)
+                + mz * (5 * dz**3 - 3 * r2 * dz)
+            )
+            / r5
+        )
 
         dBz_dmx = factor * (3 * dx * dz) / r2**2.5
         dBz_dmy = factor * (3 * dy * dz) / r2**2.5
@@ -164,7 +177,6 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
         result[i, 5] = dBz_dmz
 
 
-
 class MagneticDipoleBz:
     def __init__(self, initial):
         self.initial = np.array(initial, dtype=float)
@@ -172,7 +184,10 @@ class MagneticDipoleBz:
         self.dipole_moment_ = None
         self.parameters_ = None
         self.jacobian = None
-    
+
+        self.scale_location = 1e-6  # posição: micrômetros → metros
+        self.scale_moment = 1e-10
+
     def forward(self, coordinates, parameters):
         """
         Compute the predicted Bz for a given dipole model.
@@ -192,53 +207,84 @@ class MagneticDipoleBz:
         location = parameters[:3]
         moment = parameters[3:]
         return dipole_bz(coordinates, location, moment)
-    
-    
+
     def _jacobian(self, coordinates, parameters):
         xc, yc, zc = parameters[:3]
         mx, my, mz = parameters[3:]
-        x,y,z = coordinates
+        x, y, z = coordinates
         n_data = x.size
         n_params = 6
         jacobian = np.empty((n_data, n_params))
         jacobian_kernel_jit(x, y, z, xc, yc, zc, mx, my, mz, jacobian)
         return jacobian
 
-    def fit(self, coordinates, data, maxiter=100, damping=1e-3, tol=1e-10):
+    def fit(self, coordinates, data, maxiter=100, alpha=1.0, dalpha=10.0, tol=1e-10):
         coordinates, data = check_fit_input(coordinates, data)
         data = data.ravel()
-        coordinates = coordinates_micrometer_to_meter(coordinates) 
+        coordinates = coordinates_micrometer_to_meter(coordinates)
+
+        # Normalize initial parameters
         x0, y0, z0, mx0, my0, mz0 = self.initial
-        params = np.array(
-            [
-                *coordinates_micrometer_to_meter((x0, y0, z0)),
-                mx0,
-                my0,
-                mz0,
-            ],
-            dtype=float,
-        )
+        params = np.array([
+            x0 * self.scale_location,
+            y0 * self.scale_location,
+            z0 * self.scale_location,
+            mx0 / self.scale_moment,
+            my0 / self.scale_moment,
+            mz0 / self.scale_moment,
+        ], dtype=float)
+
+        def denormalize(p):
+            return np.array([
+                p[0] / self.scale_location,
+                p[1] / self.scale_location,
+                p[2] / self.scale_location,
+                p[3] * self.scale_moment,
+                p[4] * self.scale_moment,
+                p[5] * self.scale_moment,
+            ])
+
+        predicted = self.forward(coordinates, denormalize(params))
+        residuals = data - predicted
+        misfit = [np.linalg.norm(residuals) ** 2]
 
         for _ in range(maxiter):
-            predicted = self.forward(coordinates, params)
-            residuals = data - predicted
-            jacobian = self._jacobian(coordinates, params)
+            A = self._jacobian(coordinates, denormalize(params))
+            H = A.T @ A
+            gradient = A.T @ residuals
 
-            hessian = jacobian.T @ jacobian
-            gradient = jacobian.T @ residuals
-            step = np.linalg.solve(hessian + damping * np.identity(6), gradient)
+            accepted = False
+            for _ in range(50):
+                deltap = np.linalg.solve(H + alpha * np.identity(6), gradient)
 
-            params += step
+                if np.linalg.norm(deltap) > 1e3:
+                    break
 
-            if np.linalg.norm(step) / np.linalg.norm(params) < tol:
+                trial_params = params + deltap
+                trial_residuals = data - self.forward(coordinates, denormalize(trial_params))
+                trial_misfit = np.linalg.norm(trial_residuals) ** 2
+
+                if trial_misfit > misfit[-1]:
+                    alpha *= dalpha
+                else:
+                    alpha /= dalpha
+                    params = trial_params
+                    residuals = trial_residuals
+                    misfit.append(trial_misfit)
+                    accepted = True
+                    break
+
+            if not accepted:
                 break
 
-        self.location_ = params[:3]
-        self.dipole_moment_ = params[3:]
+            if abs(misfit[-1] - misfit[-2]) / misfit[-2] < tol:
+                break
+
+        final_params = denormalize(params)
+        self.location_ = final_params[:3]
+        self.dipole_moment_ = final_params[3:]
+        self.misfit = misfit
         return self
-
-
-
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
