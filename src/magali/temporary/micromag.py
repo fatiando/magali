@@ -1,23 +1,29 @@
+# Copyright (c) 2024 The Magali Developers.
+# Distributed under the terms of the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# This code is part of the Fatiando a Terra project (https://www.fatiando.org)
+#
 # Copyright (c) 2023 Gelson Ferreira de Souza-Junior, Leonardo Uieda.
 # Distributed under the terms of the MIT License.
 # SPDX-License-Identifier: MIT
 """
 Functions for performing the processing and inversion of the microscopy data.
 """
-import numpy as np
-import xarray as xr
-import matplotlib.pyplot as plt
-import scipy.linalg
-import scipy.io
-import skimage.feature
-import skimage.exposure
-import skimage.restoration
-import numba
-import harmonica as hm
-import verde as vd
-import choclo
 
-from scipy.fftpack import fftshift, ifft2, ifft
+import choclo
+import harmonica as hm
+import matplotlib.pyplot as plt
+import numba
+import numpy as np
+import scipy.io
+import scipy.linalg
+import skimage.exposure
+import skimage.feature
+import skimage.restoration
+import verde as vd
+import xarray as xr
+from scipy.fftpack import fftshift, ifft, ifft2
 
 TESLA_TO_NANOTESLA = 1e9
 MICROMETER_TO_METER = 1e-6
@@ -30,7 +36,8 @@ def enhance_image(image, percentile=(5, 95)):
     """
     enhanced = skimage.restoration.denoise_nl_means(
         skimage.exposure.rescale_intensity(
-            image, in_range=tuple(np.percentile(image, percentile)),
+            image,
+            in_range=tuple(np.percentile(image, percentile)),
         ),
     )
     return enhanced
@@ -46,8 +53,17 @@ def gaussian_noise(error, shape, seed=None):
 
 
 def nondipolar_source(
-    xc, yc, zc, position_std, inclination, declination, angle_std, 
-    amplitude, amplitude_std, n_particles=200, seed=None,
+    xc,
+    yc,
+    zc,
+    position_std,
+    inclination,
+    declination,
+    angle_std,
+    amplitude,
+    amplitude_std,
+    n_particles=200,
+    seed=None,
 ):
     """
     Generate a non-dipolar source as an ensemble of random dipoles
@@ -206,7 +222,7 @@ def _dipole_bu_fast(e, n, u, de, dn, du, dipole_moments, bu):
                 upward_q=du[j],
                 magnetic_moment_east=dipole_moments[j, 0],
                 magnetic_moment_north=dipole_moments[j, 1],
-                magnetic_moment_up=dipole_moments[j, 2]
+                magnetic_moment_up=dipole_moments[j, 2],
             )
             bu[i] += result
 
@@ -262,7 +278,7 @@ def dipole_moment_inversion(data, dipole_coordinates):
     # R² Coeficient of Determination (dimensionless)
     r2 = 1 - residuals_sum_sq / np.linalg.norm(d - d.mean()) ** 2
     # signal-to-noise ratio in decibels (dB)
-    SNR = 10 * np.log10(np.var(d, ddof=1) / np.var(residuals, ddof=1)) 
+    SNR = 10 * np.log10(np.var(d, ddof=1) / np.var(residuals, ddof=1))
     return dipole_moment, covariance, r2, SNR
 
 
@@ -356,7 +372,13 @@ def data_gradients(data):
 
 
 def detect_anomalies(
-    data, size_range, size_increment=2, nsizes=10, threshold=0.5, overlap=0.5, exclude_border=0
+    data,
+    size_range,
+    size_increment=2,
+    nsizes=10,
+    threshold=0.5,
+    overlap=0.5,
+    exclude_border=0,
 ):
     """
     Run the blob detection and produce bounding boxes in data coordinates
@@ -370,27 +392,27 @@ def detect_anomalies(
         threshold=threshold,
         num_sigma=nsizes,
         overlap=overlap,
-        exclude_border= int(exclude_border / spacing),
+        exclude_border=int(exclude_border / spacing),
     ).T
     blob_coords = (data.x.values[ix.astype("int")], data.y.values[iy.astype("int")])
     blob_sizes = sigma_pix * np.sqrt(2) * spacing * size_increment
-    
-## Experimentamos ordenar pelo tamanho das janelas, porém não deu muito certo!
-#    order_vector = np.argsort(blob_sizes)[::-1]
-    
-#    windows = [
-#        [blob_coords[0][i] - blob_sizes[i], blob_coords[0][i] + blob_sizes[i], 
-#         blob_coords[1][i] - blob_sizes[i], blob_coords[1][i] + blob_sizes[i]]
-#        for i in order_vector
-#    ]
-    
+
+    ## Experimentamos ordenar pelo tamanho das janelas, porém não deu muito certo!
+    #    order_vector = np.argsort(blob_sizes)[::-1]
+
+    #    windows = [
+    #        [blob_coords[0][i] - blob_sizes[i], blob_coords[0][i] + blob_sizes[i],
+    #         blob_coords[1][i] - blob_sizes[i], blob_coords[1][i] + blob_sizes[i]]
+    #        for i in order_vector
+    #    ]
+
     windows = [
         [x - size, x + size, y - size, y + size]
         for size, x, y in zip(blob_sizes, *blob_coords)
     ]
     return windows
 
-    
+
 def euler_deconvolution(data, x_deriv, y_deriv, z_deriv):
     """
     Estimate the (x, y, z) position and base level by Euler Deconvolution
@@ -426,17 +448,17 @@ def load_qdm(path):
     contents = scipy.io.loadmat(path)
     # For some reason, the spacing is returned as an array with a single
     # value. That messes up operations below so get the only element out.
-    spacing = contents['step'].ravel()[0] * METER_TO_MICROMETER
-    bz = contents['Bz'] * TESLA_TO_NANOTESLA
-    sensor_sample_distance = contents['h'] * METER_TO_MICROMETER
+    spacing = contents["step"].ravel()[0] * METER_TO_MICROMETER
+    bz = contents["Bz"] * TESLA_TO_NANOTESLA
+    sensor_sample_distance = contents["h"] * METER_TO_MICROMETER
     x = np.arange(bz.shape[1]) * spacing
     y = np.arange(bz.shape[0]) * spacing
     z = np.full(bz.shape, sensor_sample_distance)
     data = vd.make_xarray_grid(
-        (x, y, z), 
-        bz, 
-        data_names=["bz"], 
-        dims=("y", "x"), 
+        (x, y, z),
+        bz,
+        data_names=["bz"],
+        dims=("y", "x"),
         extra_coords_names="z",
     )
     data.x.attrs = {"units": "µm"}
@@ -448,106 +470,129 @@ def load_qdm(path):
 
 
 def plot_dipole_moment(
-    positions, dipole_moments, ax=None, vmin=None, vmax=None, cmap="plasma", cmap_norm=plt.Normalize, linewidth=1.5,
-    add_colorbar=True, add_key=True, key_coords=(0.1, -0.1), **kwargs,
+    positions,
+    dipole_moments,
+    ax=None,
+    vmin=None,
+    vmax=None,
+    cmap="plasma",
+    cmap_norm=plt.Normalize,
+    linewidth=1.5,
+    add_colorbar=True,
+    add_key=True,
+    key_coords=(0.1, -0.1),
+    **kwargs,
 ):
     """
     Plot the dipole moments on a map represented by vectors.
-    
+
     Each dipole moment is represented by:
-    
+
     * A vector with unit length, direction set by the declination, and color set by inclination.
     * A perpendicular line with the same color as the vector and with length set to the moment amplitude.
     """
     if ax is None:
         ax = plt.gca()
-      
+
     inclination, declination, amplitude = vector_to_angles(dipole_moments)
-    
+
     # Generate colors based on the amplitude values
     norm = cmap_norm(vmin=vmin, vmax=vmax)
     colors = plt.colormaps[cmap](norm(amplitude))
-    
+
     positive_inc = inclination > 0
     negative_inc = ~positive_inc
-    
+
     # Calculate the plot vector components
     scale = 90 - np.abs(inclination)
-    u, v = scale * np.sin(np.radians(declination)), scale * np.cos(np.radians(declination))
-    
+    u, v = (
+        scale * np.sin(np.radians(declination)),
+        scale * np.cos(np.radians(declination)),
+    )
+
     # Keyword arguments for the quiver plots
     args = dict(
         pivot="mid",
-        width=0.005, 
+        width=0.005,
         scale=15,
-        headlength=1.5, 
+        headlength=1.5,
         headaxislength=1.5,
         headwidth=2,
         minlength=1.5,
-    )    
+    )
     args.update(kwargs)
-    
+
     pos_quiver = ax.quiver(
-        positions[:2][0][positive_inc], 
-        positions[:2][1][positive_inc], 
-        u[positive_inc], 
-        v[positive_inc], 
-        color=colors[positive_inc], 
-        edgecolor='k', 
-        linewidth=0, 
+        positions[:2][0][positive_inc],
+        positions[:2][1][positive_inc],
+        u[positive_inc],
+        v[positive_inc],
+        color=colors[positive_inc],
+        edgecolor="k",
+        linewidth=0,
         **args,
-    )    
+    )
     neg_quiver = ax.quiver(
-        positions[:2][0][negative_inc], 
-        positions[:2][1][negative_inc], 
-        u[negative_inc], 
-        v[negative_inc], 
-        edgecolor=colors[negative_inc], 
-        color="#ffffff00", 
+        positions[:2][0][negative_inc],
+        positions[:2][1][negative_inc],
+        u[negative_inc],
+        v[negative_inc],
+        edgecolor=colors[negative_inc],
+        color="#ffffff00",
         linewidth=linewidth,
         **args,
     )
-    
-    mappable = plt.cm.ScalarMappable(norm, cmap=cmap)    
+
+    mappable = plt.cm.ScalarMappable(norm, cmap=cmap)
     if add_colorbar:
-        plt.colorbar(mappable, ax=ax, label="dipole moment (A.m²)")        
+        plt.colorbar(mappable, ax=ax, label="dipole moment (A.m²)")
     if add_key:
         ax.quiverkey(pos_quiver, *key_coords, 90, label="$I = 0^\circ$", labelpos="S")
-                     
+
     return mappable, pos_quiver, neg_quiver
 
 
-def plot_stereonet(dipole_moments, ax=None, cmap="plasma", cmap_norm=plt.Normalize, vmin=None, vmax=None, label="", add_ticks=True, **kwargs):
+def plot_stereonet(
+    dipole_moments,
+    ax=None,
+    cmap="plasma",
+    cmap_norm=plt.Normalize,
+    vmin=None,
+    vmax=None,
+    label="",
+    add_ticks=True,
+    **kwargs,
+):
     """
     Plot the dipole moments in a stereonet.
-    
-    The moment magnitude is set as the color. 
+
+    The moment magnitude is set as the color.
     Positive inclination symbols are solid, negative are just the outline.
     """
     if ax is None:
         fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1, projection='stereonet')
+        ax = fig.add_subplot(1, 1, 1, projection="stereonet")
 
-    ax.set_facecolor("#eeeeee") # color "#eeeeee"
+    ax.set_facecolor("#eeeeee")  # color "#eeeeee"
     ax.grid(linestyle="-", color="#cccccc", linewidth=1)
     ax.set_longitude_grid_ends(90)
     if add_ticks:
         # Add ticks manually because mplstereonet doesn't work with subplots
         ax.set_azimuth_ticks([])
-        ax.text(0.2, 1.65, '0°')
-        ax.text(0.2, -1.8, '180°')
-        ax.text(-2, -0.025, '270°')
-        ax.text(1.65, -0.025, '90°')
-    
+        ax.text(0.2, 1.65, "0°")
+        ax.text(0.2, -1.8, "180°")
+        ax.text(-2, -0.025, "270°")
+        ax.text(1.65, -0.025, "90°")
+
     if label and not label.endswith(" "):
         label = label + " "
-    
+
     inclination, declination, amplitude = vector_to_angles(dipole_moments)
-    
+
     # Generate colors based on the amplitude values
     norm = cmap_norm(vmin=vmin, vmax=vmax)
     colors = plt.colormaps[cmap](norm(amplitude))
-    
+
     positive_inc = inclination > 0
     ax.scatter(
         *mplstereonet.line(inclination[positive_inc], declination[positive_inc]),
@@ -574,15 +619,17 @@ def equal_area_projection(vectors):
     vectors = np.asarray(vectors)
     vectors_unitary = np.empty_like(vectors)
     for i in range(vectors.shape[0]):
-        vector = vectors[i]  
-        norm = np.sqrt(np.sum(vector ** 2))
+        vector = vectors[i]
+        norm = np.sqrt(np.sum(vector**2))
         vectors_unitary[i] = vector / norm
     inclinations, declinations, amplitudes = vector_to_angles(vectors)
 
     # XY_projected = np.zeros((len(vectors), 3))
     XY_projected = np.empty_like(vectors)
     for i, projected_vector in enumerate(vectors_unitary):
-        r = np.sqrt(1 - np.abs(vectors_unitary[i, 2])) / np.sqrt(vectors_unitary[i, 0]**2 + vectors_unitary[i, 1]**2)
+        r = np.sqrt(1 - np.abs(vectors_unitary[i, 2])) / np.sqrt(
+            vectors_unitary[i, 0] ** 2 + vectors_unitary[i, 1] ** 2
+        )
         XY_projected[i, 0] = r * vectors_unitary[i, 1]
         XY_projected[i, 1] = r * vectors_unitary[i, 0]
         XY_projected[i, 2] = amplitudes[i] if inclinations[i] >= 0 else -amplitudes[i]
@@ -594,12 +641,22 @@ class StereographicProjection:
     def __init__(self, vectors):
         self.vectors = vectors
 
-    def plot(self, ax=None, cmap="inferno", cmap_norm=plt.Normalize, vmin=None, vmax=None, 
-             label="", 
-             # s=50, 
-             add_ticks=True, draw_cross=True, add_radial_grid=True, 
-             facecolor="#ffffff00", add_legend=False,
-             **kwargs):
+    def plot(
+        self,
+        ax=None,
+        cmap="inferno",
+        cmap_norm=plt.Normalize,
+        vmin=None,
+        vmax=None,
+        label="",
+        # s=50,
+        add_ticks=True,
+        draw_cross=True,
+        add_radial_grid=True,
+        facecolor="#ffffff00",
+        add_legend=False,
+        **kwargs,
+    ):
         """
         Draw the stereographic projection
         """
@@ -612,28 +669,27 @@ class StereographicProjection:
         ax.add_artist(background_circle)
 
         # Draw the great circle
-        circle = plt.Circle((0, 0), 1, color='black', fill=False, zorder=3)
+        circle = plt.Circle((0, 0), 1, color="black", fill=False, zorder=3)
         ax.add_artist(circle)
 
         # Define the clipping area
         clip_path = plt.Circle((0, 0), 1, transform=ax.transData)
 
         if add_ticks:
-            # Add ticks 
-            ax.text(-0.025, 1.05, '0°')
-            ax.text(-0.05, -1.075, '180°')
-            ax.text(-1.15, -0.025, '270°')
-            ax.text(1.025, -0.025, '90°')
-        
+            # Add ticks
+            ax.text(-0.025, 1.05, "0°")
+            ax.text(-0.05, -1.075, "180°")
+            ax.text(-1.15, -0.025, "270°")
+            ax.text(1.025, -0.025, "90°")
+
         if label and not label.endswith(" "):
             label = label + " "
             # Draw the central cross if requested
             if draw_cross:
-                hline = ax.axhline(y=0, color='black', zorder=-1)
+                hline = ax.axhline(y=0, color="black", zorder=-1)
                 hline.set_clip_path(clip_path)
-                vline = ax.axvline(x=0, color='black', zorder=-1)
+                vline = ax.axvline(x=0, color="black", zorder=-1)
                 vline.set_clip_path(clip_path)
-
 
         # Draw the radial grid
         if add_radial_grid:
@@ -648,10 +704,20 @@ class StereographicProjection:
                 radial_projected = equal_area_projection(radial_vector)
 
                 # Plot each radial grid line
-                ax.plot(radial_projected[:, 1], radial_projected[:, 0], color='gray', zorder=-2, lw=0.5)
+                ax.plot(
+                    radial_projected[:, 1],
+                    radial_projected[:, 0],
+                    color="gray",
+                    zorder=-2,
+                    lw=0.5,
+                )
             for circ_inc in range(0, 90, 10):
-                circ_dec = np.linspace(0, 360, 1000)  # Inclinations from 0 to 90 degrees
-                circ_int = np.ones_like(circ_dec)  # Constant amplitude for the grid lines
+                circ_dec = np.linspace(
+                    0, 360, 1000
+                )  # Inclinations from 0 to 90 degrees
+                circ_int = np.ones_like(
+                    circ_dec
+                )  # Constant amplitude for the grid lines
 
                 # Generate the radial vectors
                 circle_vector = angles_to_vector(circ_inc, circ_dec, circ_int)
@@ -659,8 +725,14 @@ class StereographicProjection:
                 circle_projected = equal_area_projection(circle_vector)
 
                 # Plot each radial grid line
-                ax.plot(circle_projected[:, 1], circle_projected[:, 0], color='gray', zorder=-2, lw=0.5)
-        
+                ax.plot(
+                    circle_projected[:, 1],
+                    circle_projected[:, 0],
+                    color="gray",
+                    zorder=-2,
+                    lw=0.5,
+                )
+
         # Calculate the equal area projection
         XY_projected = equal_area_projection(self.vectors)
 
@@ -670,18 +742,28 @@ class StereographicProjection:
 
         # Plotting the data
         positive_inc = XY_projected[:, 2] > 0
-        scatter_pos = ax.scatter(XY_projected[:, 1][positive_inc], XY_projected[:, 0][positive_inc], 
-                                 c=colors[positive_inc], edgecolors="#ffffff00", label=f"{label}$I > 0$",
-                                **kwargs)
+        scatter_pos = ax.scatter(
+            XY_projected[:, 1][positive_inc],
+            XY_projected[:, 0][positive_inc],
+            c=colors[positive_inc],
+            edgecolors="#ffffff00",
+            label=f"{label}$I > 0$",
+            **kwargs,
+        )
         scatter_pos.set_clip_path(clip_path)
 
-        scatter_neg = ax.scatter(XY_projected[:, 1][~positive_inc], XY_projected[:, 0][~positive_inc],
-                                 c="#ffffff00", edgecolors=colors[~positive_inc], label=rf"{label}$I \leq 0$",
-                                **kwargs)
+        scatter_neg = ax.scatter(
+            XY_projected[:, 1][~positive_inc],
+            XY_projected[:, 0][~positive_inc],
+            c="#ffffff00",
+            edgecolors=colors[~positive_inc],
+            label=rf"{label}$I \leq 0$",
+            **kwargs,
+        )
         scatter_neg.set_clip_path(clip_path)
 
         # Configure the axis
-        ax.set_aspect('equal')
+        ax.set_aspect("equal")
         ax.set_xticks([])
         ax.set_yticks([])
         if add_legend:
@@ -718,7 +800,7 @@ def generate_fourier_intensity(x, y, fit4a, fit4b):
     transecta = np.exp(fit4a[0] * (x ** fit4a[1]) + fit4a[2], dtype=np.float64)
     transectb = fit4b[0] * (x ** fit4b[1]) + fit4b[2]
 
-    return transecta * (y ** transectb) + 0
+    return transecta * (y**transectb) + 0
 
 
 def qdm_noise(shape, std_dev=50, seed=None):
@@ -737,12 +819,11 @@ def qdm_noise(shape, std_dev=50, seed=None):
     Bz : array-like
         Generated noise map.
     """
-    
+
     rng = np.random.default_rng(seed)
 
     realmap = np.zeros((shape[0] * 2, shape[1] * 2))
-    outdimensions = (shape[0]+1, shape[1]+1)
-
+    outdimensions = (shape[0] + 1, shape[1] + 1)
 
     # Best-fit spectral power parameters
     cvalsa = [4.5666, -0.8939, -21.2259]
@@ -752,14 +833,16 @@ def qdm_noise(shape, std_dev=50, seed=None):
     realmapout1 = np.zeros((realmap.shape[0] // 2, realmap.shape[1] // 2))
     realmapout2 = np.zeros((realmap.shape[0] // 2, realmap.shape[1] // 2))
 
-    end_j = realmapout1.shape[1]-1
+    end_j = realmapout1.shape[1] - 1
     # Fill real part of Fourier map
     for i in range(realmapout1.shape[0]):
         for j in range(realmapout1.shape[1]):
             if i == 0 or j == 0:
                 continue
-            sigma = np.sqrt(generate_fourier_intensity(j, i, cvalsa, cvalsb),  dtype=np.float64)  # Shift index
-            realmapout1[i, end_j -j + 1] = rng.normal(0, sigma)
+            sigma = np.sqrt(
+                generate_fourier_intensity(j, i, cvalsa, cvalsb), dtype=np.float64
+            )  # Shift index
+            realmapout1[i, end_j - j + 1] = rng.normal(0, sigma)
             realmapout2[i, j] = rng.normal(0, sigma)
 
     realmapout = np.hstack((realmapout1, realmapout2))
@@ -772,8 +855,10 @@ def qdm_noise(shape, std_dev=50, seed=None):
         for j in range(imagmapout1.shape[1]):
             if i == 0 or j == 0:
                 continue
-            sigma = np.sqrt(generate_fourier_intensity(j, i, cvalsa, cvalsb),  dtype=np.float64)  # Shift index
-            imagmapout1[i, end_j -j + 1] = rng.normal(0, sigma)
+            sigma = np.sqrt(
+                generate_fourier_intensity(j, i, cvalsa, cvalsb), dtype=np.float64
+            )  # Shift index
+            imagmapout1[i, end_j - j + 1] = rng.normal(0, sigma)
             imagmapout2[i, j] = rng.normal(0, sigma)
 
     imagmapout = np.hstack((imagmapout1, imagmapout2))
@@ -783,26 +868,22 @@ def qdm_noise(shape, std_dev=50, seed=None):
 
     # Construct full Fourier map with symmetry
     fullmapout = np.zeros((halfmapout.shape[0] * 2, halfmapout.shape[1]), dtype=complex)
-    fullmapout[-halfmapout.shape[0]:, :] = halfmapout
-    fullmapout[:-halfmapout.shape[0], :] = np.rot90(halfmapout, 2)
-
+    fullmapout[-halfmapout.shape[0] :, :] = halfmapout
+    fullmapout[: -halfmapout.shape[0], :] = np.rot90(halfmapout, 2)
 
     # Apply inverse Fourier transform
     temp2 = ifft(fftshift(np.sqrt(fullmapout)))
 
-
     # Extract final noise map
     rows = [
         round(temp2.shape[0] / 2 - outdimensions[0] / 2),
-        round(temp2.shape[0] / 2 - outdimensions[0] / 2 + outdimensions[0] - 1)
+        round(temp2.shape[0] / 2 - outdimensions[0] / 2 + outdimensions[0] - 1),
     ]
     cols = [
         round(temp2.shape[1] / 2 - outdimensions[1] / 2),
-        round(temp2.shape[1] / 2 - outdimensions[1] / 2 + outdimensions[1] - 1)
+        round(temp2.shape[1] / 2 - outdimensions[1] / 2 + outdimensions[1] - 1),
     ]
 
-    outBz = np.real(temp2[rows[0]:rows[1], cols[0]:cols[1]])
+    outBz = np.real(temp2[rows[0] : rows[1], cols[0] : cols[1]])
 
-    return (outBz/outBz.max())*3*std_dev
-
-
+    return (outBz / outBz.max()) * 3 * std_dev

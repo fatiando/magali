@@ -165,16 +165,9 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
             / r5
         )
 
-        dBz_dmx = factor * (3 * dx * dz) / r5
-        dBz_dmy = factor * (3 * dy * dz) / r5
-        dBz_dmz = factor * (3 * dz**2 - r2) / r5
-
         result[i, 0] = dBz_dx
         result[i, 1] = dBz_dy
         result[i, 2] = dBz_dz
-        result[i, 3] = dBz_dmx
-        result[i, 4] = dBz_dmy
-        result[i, 5] = dBz_dmz
 
 
 class MagneticDipoleBz:
@@ -206,14 +199,15 @@ class MagneticDipoleBz:
         """
         location = parameters[:3]
         moment = parameters[3:]
+        print(moment)
         return dipole_bz(coordinates, location, moment)
 
-    def _jacobian(self, coordinates, parameters):
+    def _jacobian(self, coordinates, moment, parameters):
         xc, yc, zc = parameters[:3]
-        mx, my, mz = parameters[3:]
+        mx, my, mz = moment
         x, y, z = coordinates
         n_data = x.size
-        n_params = 6
+        n_params = 3
         jacobian = np.empty((n_data, n_params))
         jacobian_kernel_jit(x, y, z, xc, yc, zc, mx, my, mz, jacobian)
         return jacobian
@@ -221,34 +215,23 @@ class MagneticDipoleBz:
     def fit(self, coordinates, data, maxiter=100, alpha=1e-4, dalpha=2.0, tol=1e-10):
         coordinates, data = check_fit_input(coordinates, data)
         data = data.ravel()
-        coordinates = coordinates_micrometer_to_meter(coordinates)
 
         x0, y0, z0, mx0, my0, mz0 = self.initial
-        params = np.array([
-            x0 * self.scale_location,
-            y0 * self.scale_location,
-            z0 * self.scale_location,
-            mx0 / self.scale_moment,
-            my0 / self.scale_moment,
-            mz0 / self.scale_moment,
-        ], dtype=float)
-
-        def denormalize(p):
-            return np.array([
-                p[0] / self.scale_location,
-                p[1] / self.scale_location,
-                p[2] / self.scale_location,
-                p[3] * self.scale_moment,
-                p[4] * self.scale_moment,
-                p[5] * self.scale_moment,
-            ])
-
-        predicted = self.forward(coordinates, denormalize(params))
+        params = (x0, y0, z0)
+        moment = (mx0, my0, mz0)
+        print(moment)
+        print(params)
+        print(params + moment)
+        predicted = self.forward(coordinates, params + moment)
         residuals = data - predicted
         misfit = [np.linalg.norm(residuals) ** 2]
 
         for _ in range(maxiter):
-            A = self._jacobian(coordinates, denormalize(params))
+            linear_model = MagneticMomentBz(params)
+            linear_model.fit(coordinates, data)
+            moment = linear_model.dipole_moment_
+            print(moment)
+            A = self._jacobian(coordinates, moment, params)
             H = A.T @ A
             gradient = A.T @ residuals
 
@@ -256,7 +239,9 @@ class MagneticDipoleBz:
             for _ in range(50):
                 deltap = np.linalg.solve(H + alpha * np.identity(len(params)), gradient)
                 trial_params = params + deltap
-                trial_residuals = data - self.forward(coordinates, denormalize(trial_params))
+                trial_residuals = data - self.forward(
+                    coordinates, trial_params + moment
+                )
                 trial_misfit = np.linalg.norm(trial_residuals) ** 2
 
                 if trial_misfit > misfit[-1]:
@@ -275,12 +260,13 @@ class MagneticDipoleBz:
             if abs(misfit[-1] - misfit[-2]) / misfit[-2] < tol:
                 break
 
-        final_params = denormalize(params)
+        final_params = params
         self.location_ = final_params[:3]
         self.dipole_moment_ = final_params[3:]
         self.misfit = misfit
         self.jacobian = A
         return self
+
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
