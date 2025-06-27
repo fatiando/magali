@@ -12,7 +12,11 @@ import choclo
 import numba
 import numpy as np
 
-from ._units import coordinates_micrometer_to_meter, tesla_to_nanotesla
+from ._synthetic import dipole_bz
+from ._units import (
+    coordinates_micrometer_to_meter,
+    tesla_to_nanotesla,
+)
 from ._validation import check_fit_input
 
 
@@ -118,6 +122,154 @@ def _jacobian(x, y, z, xc, yc, zc, result):
         result[i, 2] = factor * kernel_uu
 
 
+def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
+    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
+
+    for i in numba.prange(x.size):
+        dx = x[i] - xc
+        dy = y[i] - yc
+        dz = z[i] - zc
+        r2 = dx**2 + dy**2 + dz**2
+        r5 = r2**2.5
+
+        dBz_dx = (
+            factor
+            * 3
+            * (
+                mx * (5 * dx**2 * dz - r2 * dz)
+                + my * (5 * dx * dy * dz)
+                + mz * (5 * dx * dz**2 - r2 * dx)
+            )
+            / r5
+        )
+
+        dBz_dy = (
+            factor
+            * 3
+            * (
+                mx * (5 * dx * dy * dz)
+                + my * (5 * dy**2 * dz - r2 * dz)
+                + mz * (5 * dy * dz**2 - r2 * dy)
+            )
+            / r5
+        )
+
+        dBz_dz = (
+            factor
+            * 3
+            * (
+                mx * (5 * dx * dz**2 - r2 * dx)
+                + my * (5 * dy * dz**2 - r2 * dy)
+                + mz * (5 * dz**3 - 3 * r2 * dz)
+            )
+            / r5
+        )
+
+        result[i, 0] = dBz_dx
+        result[i, 1] = dBz_dy
+        result[i, 2] = dBz_dz
+
+
+class MagneticDipoleBz:
+    def __init__(self, initial):
+        self.initial = np.array(initial, dtype=float)
+        self.location_ = None
+        self.dipole_moment_ = None
+        self.parameters_ = None
+        self.jacobian = None
+
+        self.scale_location = 1e-6
+        self.scale_moment = 1e-10
+
+    def forward(self, coordinates, parameters):
+        """
+        Compute the predicted Bz for a given dipole model.
+
+        Parameters
+        ----------
+        coordinates : tuple = (x, y, z)
+            Observation coordinates in µm.
+        parameters : tuple
+            Dipole parameters (x, y, z, mx, my, mz).
+
+        Returns
+        -------
+        Bz : array
+            Predicted Bz in nT at the given coordinates.
+        """
+        location = parameters[:3]
+        moment = parameters[3:]
+        print(moment)
+        return dipole_bz(coordinates, location, moment)
+
+    def _jacobian(self, coordinates, moment, parameters):
+        xc, yc, zc = parameters[:3]
+        mx, my, mz = moment
+        x, y, z = coordinates
+        n_data = x.size
+        n_params = 3
+        jacobian = np.empty((n_data, n_params))
+        jacobian_kernel_jit(x, y, z, xc, yc, zc, mx, my, mz, jacobian)
+        return jacobian
+
+    def fit(self, coordinates, data, maxiter=100, alpha=1e-4, dalpha=2.0, tol=1e-10):
+        coordinates, data = check_fit_input(coordinates, data)
+        data = data.ravel()
+
+        x0, y0, z0, mx0, my0, mz0 = self.initial
+        params = (x0, y0, z0)
+        moment = (mx0, my0, mz0)
+        print(moment)
+        print(params)
+        print(params + moment)
+        predicted = self.forward(coordinates, params + moment)
+        residuals = data - predicted
+        misfit = [np.linalg.norm(residuals) ** 2]
+
+        for _ in range(maxiter):
+            linear_model = MagneticMomentBz(params)
+            linear_model.fit(coordinates, data)
+            moment = linear_model.dipole_moment_
+            print(moment)
+            A = self._jacobian(coordinates, moment, params)
+            H = A.T @ A
+            gradient = A.T @ residuals
+
+            accepted = False
+            for _ in range(50):
+                deltap = np.linalg.solve(H + alpha * np.identity(len(params)), gradient)
+                trial_params = params + deltap
+                trial_residuals = data - self.forward(
+                    coordinates, trial_params + moment
+                )
+                trial_misfit = np.linalg.norm(trial_residuals) ** 2
+
+                if trial_misfit > misfit[-1]:
+                    alpha *= dalpha
+                else:
+                    alpha /= dalpha
+                    params = trial_params
+                    residuals = trial_residuals
+                    misfit.append(trial_misfit)
+                    accepted = True
+                    break
+
+            if not accepted:
+                break
+
+            if abs(misfit[-1] - misfit[-2]) / misfit[-2] < tol:
+                break
+
+        final_params = params
+        self.location_ = final_params[:3]
+        self.dipole_moment_ = final_params[3:]
+        self.misfit = misfit
+        self.jacobian = A
+        return self
+
+
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
 jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
+
+jacobian_kernel_jit = numba.jit(_jacobian_kernel, nopython=True, parallel=True)
