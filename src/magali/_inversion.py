@@ -125,8 +125,8 @@ def _jacobian_linear(x, y, z, xc, yc, zc, result):
 class NonlinearMagneticDipoleBz:
     def __init__(self, initial_location, 
         max_iter=100,
-        tol=1e-10,
-        alpha_init=1e-2,
+        tol=1e-4,
+        alpha_init=1,
         alpha_scale=10.0,
     ):
         self.initial_location = initial_location
@@ -156,99 +156,56 @@ class NonlinearMagneticDipoleBz:
         jacobian = np.empty((data.size, 3))
         identity = np.identity(3)
         for _ in range(self.max_iter):
-            xc, yc, zc = coordinates_micrometer_to_meter(location)
-            jacobian_nonlinear_jit(
-                coordinates_m[0],
-                coordinates_m[1],
-                coordinates_m[2],
-                xc,
-                yc,
-                zc,
-                moment[0],
-                moment[1],
-                moment[2],
-                jacobian,
-            )
-            hessian = jacobian.T @ jacobian
-            gradient = jacobian.T @ residual
-            took_a_step = False
-            for _ in range(50):
-                delta = np.linalg.solve(hessian + alpha * identity, gradient)
-                trial_location = location + delta
-                linear_model = MagneticMomentBz(trial_location)
-                linear_model.fit(coordinates, data)
-                trial_moment = linear_model.dipole_moment_
-                trial_predicted = dipole_bz(
-                    coordinates, trial_location, trial_moment,
+            location_misfit = [misfit[-1]]   
+            for _ in range(self.max_iter):
+                xc, yc, zc = coordinates_micrometer_to_meter(location)
+                jacobian_nonlinear_jit(
+                    coordinates_m[0],
+                    coordinates_m[1],
+                    coordinates_m[2],
+                    xc,
+                    yc,
+                    zc,
+                    moment[0],
+                    moment[1],
+                    moment[2],
+                    jacobian,
                 )
-                trial_residual = data - trial_predicted
-                trial_misfit = np.linalg.norm(trial_residual)
-                if trial_misfit < misfit[-1]:
-                    location = trial_location
-                    moment = trial_moment
-                    residual = trial_residual
-                    alpha /= self.alpha_scale
-                    misfit.append(trial_misfit)
-                    took_a_step = True
+                hessian = jacobian.T @ jacobian
+                gradient = jacobian.T @ residual
+                took_a_step = False
+                for _ in range(50):
+                    delta = np.linalg.solve(hessian + alpha * identity, gradient)
+                    trial_location = location + delta
+                    trial_predicted = dipole_bz(
+                        coordinates, trial_location, moment,
+                    )
+                    trial_residual = data - trial_predicted
+                    trial_misfit = np.linalg.norm(trial_residual)
+                    if trial_misfit < location_misfit[-1]:
+                        location = trial_location
+                        residual = trial_residual
+                        alpha /= self.alpha_scale
+                        location_misfit.append(trial_misfit)
+                        took_a_step = True
+                        break
+                    else:
+                        alpha *= self.alpha_scale
+                if not took_a_step:
                     break
-                else:
-                    alpha *= self.alpha_scale
-            if not took_a_step:
-                break
+                if abs(location_misfit[-1] - location_misfit[-2]) / location_misfit[-2] < self.tol:
+                    break
+            linear_model = MagneticMomentBz(location).fit(coordinates, data)
+            moment = linear_model.dipole_moment_
+            residual = data - dipole_bz(coordinates, location, moment)
+            misfit.append(np.linalg.norm(residual))
             if abs(misfit[-1] - misfit[-2]) / misfit[-2] < self.tol:
                 break
         self.location_ = location
         self.dipole_moment_ = moment
         self.misfit_ = misfit
         return self
-
-# for _ in range(self.max_iter):
-#             location_misfit = [misfit[-1]]
-#             for _ in range(self.max_iter):
-#                 xc, yc, zc = coordinates_micrometer_to_meter(location)
-#                 jacobian_nonlinear_jit(
-#                     coordinates_m[0],
-#                     coordinates_m[1],
-#                     coordinates_m[2],
-#                     xc,
-#                     yc,
-#                     zc,
-#                     moment[0],
-#                     moment[1],
-#                     moment[2],
-#                     jacobian,
-#                 )
-#                 hessian = jacobian.T @ jacobian
-#                 gradient = jacobian.T @ residual
-#                 took_a_step = False
-#                 for _ in range(50):
-#                     delta = np.linalg.solve(hessian + alpha * identity, gradient)
-#                     trial_location = location + delta
-#                     trial_predicted = dipole_bz(
-#                         coordinates, trial_location, moment,
-#                     )
-#                     trial_residual = data - trial_predicted
-#                     trial_misfit = np.linalg.norm(trial_residual)
-#                     if trial_misfit < misfit[-1]:
-#                         location = trial_location
-#                         alpha /= self.alpha_scale
-#                         location_misfit.append(trial_misfit)
-#                         took_a_step = True
-#                         break
-#                     else:
-#                         alpha *= self.alpha_scale
-#                 if not took_a_step:
-#                     break
-#                 misfit_change = (
-#                     abs(location_misfit[-1] - location_misfit[-2]) 
-#                     / location_misfit[-2]
-#                 )
-#                 if misfit_change < self.tol:
-#                     break
-#             linear_model = MagneticMomentBz(location)
-#             linear_model.fit(coordinates, data)
-#             moment = linear_model.dipole_moment_
-#             residual
+    
 
 def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
     factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
