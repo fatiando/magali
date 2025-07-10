@@ -101,12 +101,12 @@ class MagneticMomentBz:
         n_data = x.size
         n_params = 3
         jacobian = np.empty((n_data, n_params))
-        jacobian_jit(x, y, z, xc, yc, zc, jacobian)
+        jacobian_linear_jit(x, y, z, xc, yc, zc, jacobian)
         jacobian = tesla_to_nanotesla(jacobian)
         return jacobian
 
 
-def _jacobian(x, y, z, xc, yc, zc, result):
+def _jacobian_linear(x, y, z, xc, yc, zc, result):
     """
     Jit-compiled version of the Jacobian matrix calculation.
     """
@@ -122,18 +122,143 @@ def _jacobian(x, y, z, xc, yc, zc, result):
         result[i, 2] = factor * kernel_uu
 
 
-def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
-    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
+class NonlinearMagneticDipoleBz:
+    def __init__(self, initial_location, 
+        max_iter=100,
+        tol=1e-10,
+        alpha_init=1e-2,
+        alpha_scale=10.0,
+    ):
+        self.initial_location = initial_location
+        self.location_ = None
+        self.moment_ = None
+        self.max_iter = max_iter
+        self.tol=tol
+        self.alpha_init=alpha_init
+        self.alpha_scale=alpha_scale
 
+    def fit(
+        self,
+        coordinates,
+        data,
+    ):
+        coordinates, data = check_fit_input(coordinates, data)
+        coordinates_m = tuple(
+            c.ravel() for c in coordinates_micrometer_to_meter(coordinates)
+        )
+        location = np.asarray(self.initial_location)
+        linear_model = MagneticMomentBz(location)
+        linear_model.fit(coordinates, data)
+        moment = linear_model.dipole_moment_
+        residual = data - dipole_bz(coordinates, location, moment)
+        misfit = [np.linalg.norm(residual)]
+        alpha = self.alpha_init
+        jacobian = np.empty((data.size, 3))
+        identity = np.identity(3)
+        for _ in range(self.max_iter):
+            xc, yc, zc = coordinates_micrometer_to_meter(location)
+            jacobian_nonlinear_jit(
+                coordinates_m[0],
+                coordinates_m[1],
+                coordinates_m[2],
+                xc,
+                yc,
+                zc,
+                moment[0],
+                moment[1],
+                moment[2],
+                jacobian,
+            )
+            hessian = jacobian.T @ jacobian
+            gradient = jacobian.T @ residual
+            took_a_step = False
+            for _ in range(50):
+                delta = np.linalg.solve(hessian + alpha * identity, gradient)
+                trial_location = location + delta
+                linear_model = MagneticMomentBz(trial_location)
+                linear_model.fit(coordinates, data)
+                trial_moment = linear_model.dipole_moment_
+                trial_predicted = dipole_bz(
+                    coordinates, trial_location, trial_moment,
+                )
+                trial_residual = data - trial_predicted
+                trial_misfit = np.linalg.norm(trial_residual)
+                if trial_misfit < misfit[-1]:
+                    location = trial_location
+                    moment = trial_moment
+                    residual = trial_residual
+                    alpha /= self.alpha_scale
+                    misfit.append(trial_misfit)
+                    took_a_step = True
+                    break
+                else:
+                    alpha *= self.alpha_scale
+            if not took_a_step:
+                break
+            if abs(misfit[-1] - misfit[-2]) / misfit[-2] < self.tol:
+                break
+        self.location_ = location
+        self.dipole_moment_ = moment
+        self.misfit_ = misfit
+        return self
+
+# for _ in range(self.max_iter):
+#             location_misfit = [misfit[-1]]
+#             for _ in range(self.max_iter):
+#                 xc, yc, zc = coordinates_micrometer_to_meter(location)
+#                 jacobian_nonlinear_jit(
+#                     coordinates_m[0],
+#                     coordinates_m[1],
+#                     coordinates_m[2],
+#                     xc,
+#                     yc,
+#                     zc,
+#                     moment[0],
+#                     moment[1],
+#                     moment[2],
+#                     jacobian,
+#                 )
+#                 hessian = jacobian.T @ jacobian
+#                 gradient = jacobian.T @ residual
+#                 took_a_step = False
+#                 for _ in range(50):
+#                     delta = np.linalg.solve(hessian + alpha * identity, gradient)
+#                     trial_location = location + delta
+#                     trial_predicted = dipole_bz(
+#                         coordinates, trial_location, moment,
+#                     )
+#                     trial_residual = data - trial_predicted
+#                     trial_misfit = np.linalg.norm(trial_residual)
+#                     if trial_misfit < misfit[-1]:
+#                         location = trial_location
+#                         alpha /= self.alpha_scale
+#                         location_misfit.append(trial_misfit)
+#                         took_a_step = True
+#                         break
+#                     else:
+#                         alpha *= self.alpha_scale
+#                 if not took_a_step:
+#                     break
+#                 misfit_change = (
+#                     abs(location_misfit[-1] - location_misfit[-2]) 
+#                     / location_misfit[-2]
+#                 )
+#                 if misfit_change < self.tol:
+#                     break
+#             linear_model = MagneticMomentBz(location)
+#             linear_model.fit(coordinates, data)
+#             moment = linear_model.dipole_moment_
+#             residual
+
+def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
+    factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
     for i in numba.prange(x.size):
         dx = x[i] - xc
         dy = y[i] - yc
         dz = z[i] - zc
-
         r2 = dx**2 + dy**2 + dz**2
         r5 = r2 ** (5 / 2)
         r7 = r2 ** (7 / 2)
-
         # ∂bz / ∂xc
         dBz_dxc = factor * (
             (15 * my * dy * dz * dx) / r7
@@ -141,7 +266,6 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
             + (15 * mx * dz * dx**2) / r7
             - (3 * mx * dz) / r5
         )
-
         # ∂bz / ∂yc
         dBz_dyc = factor * (
             (15 * mx * dx * dz * dy) / r7
@@ -149,7 +273,6 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
             + (15 * my * dz * dy**2) / r7
             - (3 * my * dz) / r5
         )
-
         # ∂bz / ∂zc
         dBz_dzc = factor * (
             mz * ((15 * dz**3) / r7 - (9 * dz) / r5)
@@ -158,108 +281,14 @@ def _jacobian_kernel(x, y, z, xc, yc, zc, mx, my, mz, result):
             + (15 * mx * dx * dz**2) / r7
             - (3 * mx * dx) / r5
         )
-
         result[i, 0] = dBz_dxc
         result[i, 1] = dBz_dyc
         result[i, 2] = dBz_dzc
 
 
-jacobian_kernel_jit = numba.jit(_jacobian_kernel, nopython=True, parallel=True)
-
-
-class NonlinearMagneticDipoleBz:
-    def __init__(self, location, dipole_moment):
-        self.location = location
-        self.dipole_moment = dipole_moment
-        self.location_ = None
-        self.moment_ = None
-        self.parameters_ = None
-        self.jacobian = None
-
-        self.scale_location = 1e-6
-        self.scale_moment = 1e-10
-
-    def fit(
-        self,
-        coordinates,
-        data,
-        max_iter=100,
-        tol=1e-10,
-        lambda_init=1e-2,
-        lambda_scale=10.0,
-    ):
-        coordinates, data = check_fit_input(coordinates, data)
-        misfit = []
-
-        lambda_ = lambda_init
-        position = self.location
-        for _ in range(max_iter):
-            linear_model = MagneticMomentBz(position)
-            linear_model.fit(coordinates, data)
-            moment = linear_model.dipole_moment_
-
-            predicted_data = dipole_bz(coordinates, position, moment)
-            residual = data - predicted_data
-            current_misfit = np.linalg.norm(residual) ** 2
-            misfit.append(current_misfit)
-
-            A = np.empty((data.size, 3))
-
-            x, y, z = coordinates_micrometer_to_meter(coordinates)
-            x = x.ravel()
-            y = y.ravel()
-            z = z.ravel()
-
-            xc, yc, zc = coordinates_micrometer_to_meter(self.location)
-
-            jacobian_kernel_jit(
-                x,
-                y,
-                z,
-                xc,
-                yc,
-                zc,
-                moment[0],
-                moment[1],
-                moment[2],
-                A,
-            )
-
-            JTJ = A.T @ A
-            JTr = A.T @ (residual)
-
-            accepted = False
-
-            for _ in range(50):
-                delta = np.linalg.solve(JTJ + lambda_ * np.eye(3), JTr)
-                trial_position = position + delta
-
-                linear_model = MagneticMomentBz(trial_position)
-                linear_model.fit(coordinates, data)
-                trial_moment = linear_model.dipole_moment_
-                trial_pred = dipole_bz(coordinates, trial_position, trial_moment)
-                trial_residual = data - trial_pred
-                trial_misfit = np.linalg.norm(trial_residual) ** 2
-
-                if trial_misfit < current_misfit:
-                    position = trial_position
-                    lambda_ /= lambda_scale
-                    misfit.append(trial_misfit)
-                    accepted = True
-                    break
-                lambda_ *= lambda_scale
-
-            if not accepted:
-                break
-
-            if abs(misfit[-1] - misfit[-2]) / misfit[-2] < tol:
-                break
-
-        self.location_ = position
-        self.moment_ = moment
-        return position, moment
+jacobian_nonlinear_jit = numba.jit(_jacobian_nonlinear, nopython=True, parallel=True)
 
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
-jacobian_jit = numba.jit(_jacobian, nopython=True, parallel=True)
+jacobian_linear_jit = numba.jit(_jacobian_linear, nopython=True, parallel=True)
