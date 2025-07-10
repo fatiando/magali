@@ -176,7 +176,8 @@ class NonlinearMagneticDipoleBz:
                 took_a_step = False
                 for _ in range(50):
                     delta = np.linalg.solve(hessian + alpha * identity, gradient)
-                    trial_location = location + delta
+                    # Convert delta from m to micrometer
+                    trial_location = location + delta * 1e6
                     trial_predicted = dipole_bz(
                         coordinates, trial_location, moment,
                     )
@@ -238,14 +239,13 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
             + (15 * mx * dx * dz**2) / r7
             - (3 * mx * dx) / r5
         )
-        result[i, 0] = dBz_dxc
-        result[i, 1] = dBz_dyc
-        result[i, 2] = dBz_dzc
-
-
-jacobian_nonlinear_jit = numba.jit(_jacobian_nonlinear, nopython=True, parallel=True)
+        # Convert to nT
+        result[i, 0] = dBz_dxc * 1e9
+        result[i, 1] = dBz_dyc * 1e9
+        result[i, 2] = dBz_dzc * 1e9
 
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
 jacobian_linear_jit = numba.jit(_jacobian_linear, nopython=True, parallel=True)
+jacobian_nonlinear_jit = numba.jit(_jacobian_nonlinear, nopython=True, parallel=True)
