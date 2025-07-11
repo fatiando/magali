@@ -108,7 +108,7 @@ class MagneticMomentBz:
 
 def _jacobian_linear(x, y, z, xc, yc, zc, result):
     """
-    Jit-compiled version of the Jacobian matrix calculation.
+    Jit-compiled version of the Jacobian matrix calculation for the linear inversion.
     """
     factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
     n_data = x.size
@@ -123,25 +123,112 @@ def _jacobian_linear(x, y, z, xc, yc, zc, result):
 
 
 class NonlinearMagneticDipoleBz:
-    def __init__(self, initial_location, 
+    """
+    Estimate the position and magnetic dipole moment vector from Bz measurements.
+
+    Uses the Bz component of the magnetic field to estimate both the position
+    and the moment of a magnetic dipole through a nonlinear inversion based on
+    the Levenberg–Marquardt algorithm. Returns the location and dipole moment
+    vector that best fit the data in a least-squares sense. Requires an initial
+    guess for the dipole location.
+
+    Parameters
+    ----------
+    initial_location : tuple of float
+        Initial guess for the coordinates (x, y, z) of the dipole location, in µm.
+    max_iter : int
+        Maximum number of iterations for both the outer and inner loops of the
+        nonlinear inversion.
+    tol : float
+        Convergence tolerance for the relative change in misfit between iterations.
+    alpha_init : float
+        Initial damping parameter for the Levenberg–Marquardt algorithm.
+    alpha_scale : float
+        Multiplicative factor used to increase or decrease the damping parameter
+        during the optimization.
+
+    Attributes
+    ----------
+    location_ : 1d-array
+        Estimated location (x, y, z) of the dipole, in µm.
+    dipole_moment_ : 1d-array
+        Estimated dipole moment vector (mx, my, mz), in A.m².
+    misfit_ : list of float
+        Norm of the residual vector at each outer iteration of the inversion.
+
+    References
+    ----------
+    [Souza-Junior2024]_
+    """
+
+    def __init__(
+        self,
+        initial_location,
         max_iter=100,
         tol=1e-4,
         alpha_init=1,
         alpha_scale=10.0,
     ):
         self.initial_location = initial_location
-        self.location_ = None
-        self.moment_ = None
         self.max_iter = max_iter
-        self.tol=tol
-        self.alpha_init=alpha_init
-        self.alpha_scale=alpha_scale
+        self.tol = tol
+        self.alpha_init = alpha_init
+        self.alpha_scale = alpha_scale
 
-    def fit(
-        self,
-        coordinates,
-        data,
-    ):
+    def fit(self, coordinates, data):
+        r"""
+        Fit the nonlinear magnetic dipole model to Bz data.
+
+        Performs nonlinear inversion using the Levenberg–Marquardt method to
+        estimate both the dipole location and its magnetic moment. The method
+        alternates between a nonlinear update of the dipole location (inner loop)
+        and a linear least-squares estimate of the dipole moment (outer loop).
+        The Jacobian matrix with respect to the location is computed numerically
+        using JIT-accelerated code.
+
+        The Jacobian matrix used in the nonlinear step contains partial
+        derivatives of the Bz field with respect to the dipole location:
+        :math:`\frac{\partial B_z}{\partial x_0}`, :math:`\frac{\partial B_z}{\partial y_0}`,
+        and :math:`\frac{\partial B_z}{\partial z_0}`. These are computed assuming a fixed
+        moment vector.
+
+        At each inner iteration:
+
+        - The forward field is computed using the trial location and fixed moment.
+        - A trial update is accepted if it reduces the data misfit.
+        - The damping parameter (alpha) is adapted based on success/failure.
+
+        At each outer iteration:
+
+        - A new linear estimate of the dipole moment is computed for the current location.
+        - Convergence is assessed based on relative reduction in residual norm.
+
+        Parameters
+        ----------
+        coordinates : tuple of array-like
+            Arrays with the x, y, and z coordinates of the observation points.
+            The arrays can have any shape as long as they all have the same shape.
+        data : array-like
+            Observed Bz component of the magnetic field (in nT) at the observation
+            points. Must have the same shape as the coordinate arrays.
+
+        Returns
+        -------
+        self : object
+            This estimator instance, updated with the estimated dipole location
+            and moment in the ``location_`` and ``dipole_moment_`` attributes.
+
+        Notes
+        -----
+        Internally uses:
+
+        - :func:`jacobian_nonlinear_jit`: JIT-compiled function that fills the
+          Jacobian matrix :math:`\frac{\partial B_z}{\partial (x_0, y_0, z_0)}`  for a fixed moment.
+        - :func:`dipole_bz`: forward model for the Bz field of a dipole at given
+          coordinates.
+        - :class:`MagneticMomentBz`: linear inversion for estimating moment given a
+          fixed location.
+        """
         coordinates, data = check_fit_input(coordinates, data)
         coordinates_m = tuple(
             c.ravel() for c in coordinates_micrometer_to_meter(coordinates)
@@ -156,7 +243,7 @@ class NonlinearMagneticDipoleBz:
         jacobian = np.empty((data.size, 3))
         identity = np.identity(3)
         for _ in range(self.max_iter):
-            location_misfit = [misfit[-1]]   
+            location_misfit = [misfit[-1]]
             for _ in range(self.max_iter):
                 xc, yc, zc = coordinates_micrometer_to_meter(location)
                 jacobian_nonlinear_jit(
@@ -179,7 +266,9 @@ class NonlinearMagneticDipoleBz:
                     # Convert delta from m to micrometer
                     trial_location = location + delta * 1e6
                     trial_predicted = dipole_bz(
-                        coordinates, trial_location, moment,
+                        coordinates,
+                        trial_location,
+                        moment,
                     )
                     trial_residual = data - trial_predicted
                     trial_misfit = np.linalg.norm(trial_residual)
@@ -194,7 +283,10 @@ class NonlinearMagneticDipoleBz:
                         alpha *= self.alpha_scale
                 if not took_a_step:
                     break
-                if abs(location_misfit[-1] - location_misfit[-2]) / location_misfit[-2] < self.tol:
+                if (
+                    abs(location_misfit[-1] - location_misfit[-2]) / location_misfit[-2]
+                    < self.tol
+                ):
                     break
             linear_model = MagneticMomentBz(location).fit(coordinates, data)
             moment = linear_model.dipole_moment_
@@ -206,9 +298,12 @@ class NonlinearMagneticDipoleBz:
         self.dipole_moment_ = moment
         self.misfit_ = misfit
         return self
-    
+
 
 def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
+    """
+    Jit-compiled version of the Jacobian matrix calculation for the nonlinear inversion.
+    """
     factor = choclo.constants.VACUUM_MAGNETIC_PERMEABILITY / (4 * np.pi)
     for i in numba.prange(x.size):
         dx = x[i] - xc
