@@ -175,6 +175,41 @@ class NonlinearMagneticDipoleBz:
         self.alpha_init = alpha_init
         self.alpha_scale = alpha_scale
 
+    def predict(self, coordinates):
+        """
+        Predict the Bz magnetic field from the estimated dipole parameters.
+
+        Uses the estimated dipole location and moment vector to compute the
+        Bz component of the magnetic field at the given observation points.
+
+        Parameters
+        ----------
+        coordinates : tuple of array-like
+            Arrays with the x, y, z coordinates of the observation points,
+            in µm. The arrays must have the same shape.
+
+        Returns
+        -------
+        predicted : array
+            Array with the predicted Bz values (in nT) at the observation points.
+            Has the same shape as the input coordinate arrays.
+
+        Raises
+        ------
+        AttributeError
+            If :meth:`~NonlinearMagneticDipoleBz.fit` has not been called yet,
+            and ``location_`` or ``dipole_moment_`` are not set.
+
+        See Also
+        --------
+        fit : Estimate the dipole location and moment from Bz measurements.
+        """
+        if self.location_ is None or self.dipole_moment_ is None:
+            raise AttributeError(
+                "Model has not been fitted yet. Call 'fit' before 'predict'."
+            )
+        return dipole_bz(coordinates, self.location_, self.dipole_moment_)
+
     def fit(self, coordinates, data):
         r"""
         Fit the nonlinear magnetic dipole model to Bz data.
@@ -206,7 +241,7 @@ class NonlinearMagneticDipoleBz:
         Parameters
         ----------
         coordinates : tuple of array-like
-            Arrays with the x, y, and z coordinates of the observation points.
+            Arrays with the x, y, z coordinates of the observation points.
             The arrays can have any shape as long as they all have the same shape.
         data : array-like
             Observed Bz component of the magnetic field (in nT) at the observation
@@ -215,8 +250,7 @@ class NonlinearMagneticDipoleBz:
         Returns
         -------
         self : object
-            This estimator instance, updated with the estimated dipole location
-            and moment in the ``location_`` and ``dipole_moment_`` attributes.
+            This instance with updated ``location_`` and ``dipole_moment_``.
 
         Notes
         -----
