@@ -209,7 +209,7 @@ class NonlinearMagneticDipoleBz:
                 "Model has not been fitted yet. Call 'fit' before 'predict'."
             )
         return dipole_bz(coordinates, self.location_, self.dipole_moment_)
-    
+
     def jacobian(self, coordinates, location, moment):
         """
         Compute the Jacobian matrix for the linear point dipole model.
@@ -238,8 +238,15 @@ class NonlinearMagneticDipoleBz:
         xc, yc, zc = coordinates_micrometer_to_meter(location)
         jacobian = np.empty((x.size, 3))
         jacobian_nonlinear_jit(
-            x, y, z, xc, yc, zc,
-            moment[0], moment[1], moment[2],
+            x,
+            y,
+            z,
+            xc,
+            yc,
+            zc,
+            moment[0],
+            moment[1],
+            moment[2],
             jacobian,
         )
         return jacobian
