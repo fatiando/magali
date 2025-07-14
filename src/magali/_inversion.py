@@ -185,7 +185,7 @@ class NonlinearMagneticDipoleBz:
         Parameters
         ----------
         coordinates : tuple of array-like
-            Arrays with the x, y, z coordinates of the observation points,
+            Arrays with the x, y,    z coordinates of the observation points,
             in µm. The arrays must have the same shape.
 
         Returns
@@ -209,6 +209,40 @@ class NonlinearMagneticDipoleBz:
                 "Model has not been fitted yet. Call 'fit' before 'predict'."
             )
         return dipole_bz(coordinates, self.location_, self.dipole_moment_)
+    
+    def jacobian(self, coordinates, location, moment):
+        """
+        Compute the Jacobian matrix for the linear point dipole model.
+
+        The Jacobian is a matrix with derivatives of the forward modeling
+        function (the magnetic field of a dipole) with regard to the parameters
+        (the 3 dipole moment components) for each data point.
+
+        Parameters
+        ----------
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observations points.
+            The arrays can have any shape as long as they all have the same
+            shape.
+        location : array-like
+            Dipole location (x, y, z), in µm.
+        moment : array-like
+            Dipole moment vector (mx, my, mz), in A.m².
+
+        Returns
+        -------
+        jacobian : 2d-array
+            Jacobian matrix (n_data x 3), in nT/m.
+        """
+        x, y, z = coordinates
+        xc, yc, zc = coordinates_micrometer_to_meter(location)
+        jacobian = np.empty((x.size, 3))
+        jacobian_nonlinear_jit(
+            x, y, z, xc, yc, zc,
+            moment[0], moment[1], moment[2],
+            jacobian,
+        )
+        return jacobian
 
     def fit(self, coordinates, data):
         r"""
@@ -279,19 +313,7 @@ class NonlinearMagneticDipoleBz:
         for _ in range(self.max_iter):
             location_misfit = [misfit[-1]]
             for _ in range(self.max_iter):
-                xc, yc, zc = coordinates_micrometer_to_meter(location)
-                jacobian_nonlinear_jit(
-                    coordinates_m[0],
-                    coordinates_m[1],
-                    coordinates_m[2],
-                    xc,
-                    yc,
-                    zc,
-                    moment[0],
-                    moment[1],
-                    moment[2],
-                    jacobian,
-                )
+                jacobian = self.jacobian(coordinates_m, location, moment)
                 hessian = jacobian.T @ jacobian
                 gradient = jacobian.T @ residual
                 took_a_step = False
