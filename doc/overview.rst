@@ -32,7 +32,8 @@ Magali adopts the following conventions across its API:
   - **Magnetic fields** are expressed in **nanoTesla (nT)**.
   - **Magnetic moments** are expressed in **Ampere square meters (A·m²)**.
 
-- A **right-handed Cartesian coordinate system** is used throughout, defined as:
+- All coordinates are expressed in **micrometers (µm)** and
+  are represented in **right-handed Cartesian coordinate system**, defined as:
 
   - The **x-axis** runs horizontally across the image and is analogous to
     **easting**.
@@ -41,9 +42,10 @@ Magali adopts the following conventions across its API:
   - The **z-axis** points **upward**, away from the sample surface (i.e., out of
     the image plane).
 
-This orientation follows the right-hand rule: if you point your right-hand 
-fingers along the x-axis and curl them toward the y-axis, your thumb will point 
-in the direction of the z-axis.
+This orientation follows the
+`right-hand rule <https://en.wikipedia.org/wiki/Right-hand_rule>`__: if you 
+point your right-hand fingers along the x-axis and curl them toward the y-axis,
+your thumb will point in the direction of the z-axis.
 
 .. note::
 
