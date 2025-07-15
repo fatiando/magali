@@ -3,6 +3,23 @@
 Overview
 ========
 
+**Magali** is a Python library for the forward modeling, inversion, and analysis
+of magnetic microscopy data,with a particular focus on paleomagnetism and rock
+magnetism applications. It provides tools to infer the magnetic properties of
+individual mineral grains from high-resolution magnetic microscopy images, such 
+as those acquired by quantum diamond microscopes (QDMs).
+
+Its main goals are:
+
+- Offer robust and efficient implementations of dipole modeling and inversion 
+  methods tailored for magnetic microscopy data.
+- Enable the semi-automatic detection, localization, and characterization of
+  hundreds to thousands of magnetic sources in a single microscopy image.
+- Support reproducible research and community-driven development by providing
+  well-documented, open-source code.
+- Facilitate methodological innovation by offering a modular and extensible
+  platform for the development and testing of new techniques.
+
 The library
 -----------
 All functionality in magali is available from the base namespace of the 
@@ -14,27 +31,8 @@ single import:
     # magali is usually imported as mg
     import magali as mg
 
-    import ensaio
-    import matplotlib.pyplot as plt
 
+.. seealso::
 
-Load some data:
-
-.. jupyter-execute::
-
-
-    fname = ensaio.fetch_morroco_speleothem_qdm(version=1, file_format="matlab")
-    print(fname)
-
-.. jupyter-execute::
-
-    data = mg.read_qdm_harvard(fname)
-    data
-
-.. jupyter-execute::
-
-    fig, ax = plt.subplots(1, 1, figsize=(9, 4.8), layout="constrained")
-    scale = 2500
-    data.plot.imshow(ax=ax, cmap="RdBu_r", vmin=-scale, vmax=scale)
-    ax.set_aspect("equal")
-    plt.show()
+    Checkout the :ref:`api` for a comprehensive list of the available functions
+    and classes in Magali.
