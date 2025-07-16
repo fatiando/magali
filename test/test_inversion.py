@@ -10,14 +10,13 @@ Test the _synthetic functions
 
 import harmonica as hm
 import numpy as np
+import pytest
 import verde as vd
-from pytest import raises
 
 from magali._inversion import (
     MagneticMomentBz,
     NonlinearMagneticDipoleBz,
     _jacobian_linear,
-    _jacobian_nonlinear,
 )
 from magali._synthetic import dipole_bz
 
@@ -177,5 +176,5 @@ def test_nonlinear_magnetic_dipole_predict():
 
     # Check error if predict is called before fit
     model_unfit = NonlinearMagneticDipoleBz(initial_location=(450, 450, -10))
-    with raises(AttributeError):
+    with pytest.raises(AttributeError):
         model_unfit.predict(coordinates)

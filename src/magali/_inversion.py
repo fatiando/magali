@@ -128,7 +128,7 @@ class NonlinearMagneticDipoleBz:
 
     Uses the Bz component of the magnetic field to estimate both the position
     and the moment of a magnetic dipole through a nonlinear inversion based on
-    the Levenberg–Marquardt algorithm. Returns the location and dipole moment
+    the Levenberg-Marquardt algorithm. Returns the location and dipole moment
     vector that best fit the data in a least-squares sense. Requires an initial
     guess for the dipole location.
 
@@ -142,7 +142,7 @@ class NonlinearMagneticDipoleBz:
     tol : float
         Convergence tolerance for the relative change in misfit between iterations.
     alpha_init : float
-        Initial damping parameter for the Levenberg–Marquardt algorithm.
+        Initial damping parameter for the Levenberg-Marquardt algorithm.
     alpha_scale : float
         Multiplicative factor used to increase or decrease the damping parameter
         during the optimization.
@@ -205,9 +205,8 @@ class NonlinearMagneticDipoleBz:
         fit : Estimate the dipole location and moment from Bz measurements.
         """
         if self.location_ is None or self.dipole_moment_ is None:
-            raise AttributeError(
-                "Model has not been fitted yet. Call 'fit' before 'predict'."
-            )
+            msg = "Model has not been fitted yet. Call 'fit' before 'predict'."
+            raise AttributeError(msg)
         return dipole_bz(coordinates, self.location_, self.dipole_moment_)
 
     def jacobian(self, coordinates, location, moment):
@@ -255,7 +254,7 @@ class NonlinearMagneticDipoleBz:
         r"""
         Fit the nonlinear magnetic dipole model to Bz data.
 
-        Performs nonlinear inversion using the Levenberg–Marquardt method to
+        Performs nonlinear inversion using the Levenberg-Marquardt method to
         estimate both the dipole location and its magnetic moment. The method
         alternates between a nonlinear update of the dipole location (inner loop)
         and a linear least-squares estimate of the dipole moment (outer loop).
@@ -342,8 +341,7 @@ class NonlinearMagneticDipoleBz:
                         location_misfit.append(trial_misfit)
                         took_a_step = True
                         break
-                    else:
-                        alpha *= self.alpha_scale
+                    alpha *= self.alpha_scale
                 if not took_a_step:
                     break
                 if (
