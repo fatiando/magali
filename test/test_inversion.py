@@ -11,10 +11,16 @@ Test the _synthetic functions
 import harmonica as hm
 import numpy as np
 import verde as vd
-
-from magali._inversion import MagneticMomentBz,NonlinearMagneticDipoleBz, _jacobian_linear, _jacobian_nonlinear
-from magali._synthetic import dipole_bz
 from pytest import raises
+
+from magali._inversion import (
+    MagneticMomentBz,
+    NonlinearMagneticDipoleBz,
+    _jacobian_linear,
+    _jacobian_nonlinear,
+)
+from magali._synthetic import dipole_bz
+
 
 def test_linear_magnetic_moment_bz_inversion():
     "Check that the inversion recovers a known direction."
@@ -75,6 +81,7 @@ def test_linear_magnetic_moment_gz_jacobian():
     data_predicted = jacobian @ true_moment * 1e9
     np.testing.assert_allclose(data_predicted, data)
 
+
 def test_nonlinear_magnetic_dipole_bz_inversion():
     "Check that the nonlinear inversion recovers a known dipole location and moment."
     coordinates = vd.grid_coordinates(
@@ -93,7 +100,7 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     )
     data = dipole_bz(coordinates, true_location, true_moment)
 
-    initial_guess = (0.04041674, 20.27141785,  3.27582947)
+    initial_guess = (0.04041674, 20.27141785, 3.27582947)
     model = NonlinearMagneticDipoleBz(initial_location=initial_guess)
     # Check uninitialized attributes
     assert not hasattr(model, "location_")
@@ -109,6 +116,7 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     # Assert that results are close to the truth
     np.testing.assert_allclose(model.location_, true_location, atol=1.0)
     np.testing.assert_allclose(model.dipole_moment_, true_moment, rtol=0.05)
+
 
 def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():
     "Ensure the first LM step using the Jacobian decreases the residual norm."
@@ -128,7 +136,7 @@ def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():
     )
     data = dipole_bz(coordinates, true_location, true_moment)
 
-    initial_guess = (0.04041674, 20.27141785,  3.27582947)
+    initial_guess = (0.04041674, 20.27141785, 3.27582947)
     model = NonlinearMagneticDipoleBz(initial_location=initial_guess, max_iter=1)
 
     model.fit(coordinates, data)
@@ -136,6 +144,7 @@ def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():
     # Should have completed 1 outer iteration, hence 2 misfit values
     assert len(model.misfit_) == 2
     assert model.misfit_[1] < model.misfit_[0]
+
 
 def test_nonlinear_magnetic_dipole_predict():
     "Check that predict returns accurate Bz values after fitting."
@@ -156,7 +165,9 @@ def test_nonlinear_magnetic_dipole_predict():
     data = dipole_bz(coordinates, true_location, true_moment)
 
     # Fit the model
-    model = NonlinearMagneticDipoleBz(initial_location=(0.04041674, 20.27141785,  3.27582947))
+    model = NonlinearMagneticDipoleBz(
+        initial_location=(0.04041674, 20.27141785, 3.27582947)
+    )
     model.fit(coordinates, data)
 
     # Predict and compare
