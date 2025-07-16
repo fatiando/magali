@@ -28,7 +28,7 @@ def _estimate_grid_spacing(data):
 
 def gradient(data):
     """
-    Compute first-order spatial derivatives in the x, y, and z directions.
+    Compute first-order spatial derivatives and total gradient amplitude.
 
     Parameters
     ----------
@@ -43,6 +43,8 @@ def gradient(data):
         First derivative along the y-direction.
     dz : xr.DataArray
         First derivative along the z-direction.
+    tga : xr.DataArray
+        Total gradient amplitude.
 
     Notes
     -----
@@ -61,29 +63,8 @@ def gradient(data):
     data_up = hm.upward_continuation(data, spacing).assign_coords(x=data.x, y=data.y)
     data_down = hm.upward_continuation(data, -spacing).assign_coords(x=data.x, y=data.y)
     dz = (data_up - data_down) / (2 * spacing)
-
-    return dx, dy, dz
-
-
-def total_gradient_amplitude(dx, dy, dz):
-    """
-    Compute the total gradient amplitude from spatial derivatives.
-
-    Parameters
-    ----------
-    dx : xr.DataArray
-        First derivative along the x-direction.
-    dy : xr.DataArray
-        First derivative along the y-direction.
-    dz : xr.DataArray
-        First derivative along the z-direction.
-
-    Returns
-    -------
-    tga : xr.DataArray
-        Total gradient amplitude.
-    """
-    return np.sqrt(dx**2 + dy**2 + dz**2)
+    tga = np.sqrt(dx**2 + dy**2 + dz**2)
+    return dx, dy, dz, tga
 
 
 def total_gradient_amplitude_grid(data):
@@ -103,8 +84,7 @@ def total_gradient_amplitude_grid(data):
     tga : xr.DataArray
         Dataset containing the total gradient amplitude (TGA).
     """
-    dx, dy, dz = gradient(data)
-    tga = total_gradient_amplitude(dx, dy, dz)
+    dx, dy, dz, tga = gradient(data)
 
     # Assign attributes
     tga.attrs = {"long_name": "Total Gradient Amplitude", "units": "nT/µm"}
