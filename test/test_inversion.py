@@ -13,6 +13,11 @@ import numpy as np
 import pytest
 import verde as vd
 
+
+from magali._units import (
+    coordinates_micrometer_to_meter,
+    tesla_to_nanotesla,
+)
 from magali._inversion import (
     MagneticMomentBz,
     NonlinearMagneticDipoleBz,
@@ -72,12 +77,11 @@ def test_linear_magnetic_moment_gz_jacobian():
         extra_coords=5,
     )
     data = dipole_bz(coordinates, dipole_coordinates, true_moment).ravel()
-    # Convert to meters for the Jacobian calculation
-    coordinates = tuple(c.ravel() * 1e-6 for c in coordinates)
-    dipole_coordinates = tuple(c * 1e-6 for c in dipole_coordinates)
+    coordinates = tuple(c.ravel() for c in coordinates_micrometer_to_meter(coordinates))
+    dipole_coordinates = tuple(c for c in coordinates_micrometer_to_meter(dipole_coordinates))
     jacobian = np.empty((coordinates[0].size, 3))
     _jacobian_linear(*coordinates, *dipole_coordinates, jacobian)
-    data_predicted = jacobian @ true_moment * 1e9
+    data_predicted = tesla_to_nanotesla(jacobian @ true_moment)
     np.testing.assert_allclose(data_predicted, data)
 
 

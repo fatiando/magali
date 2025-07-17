@@ -17,6 +17,7 @@ from ._synthetic import dipole_bz
 from ._units import (
     coordinates_micrometer_to_meter,
     tesla_to_nanotesla,
+    meter_to_micrometer
 )
 from ._validation import check_fit_input
 
@@ -331,8 +332,7 @@ class NonlinearMagneticDipoleBz:
                 took_a_step = False
                 for _ in range(50):
                     delta = np.linalg.solve(hessian + alpha * identity, gradient)
-                    # Convert delta from m to micrometer
-                    trial_location = location + delta * 1e6
+                    trial_location = location + meter_to_micrometer(delta)
                     trial_predicted = dipole_bz(
                         coordinates,
                         trial_location,
