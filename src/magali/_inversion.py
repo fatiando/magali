@@ -16,8 +16,8 @@ from scipy.linalg import solve
 from ._synthetic import dipole_bz
 from ._units import (
     coordinates_micrometer_to_meter,
+    meter_to_micrometer,
     tesla_to_nanotesla,
-    meter_to_micrometer
 )
 from ._validation import check_fit_input
 
@@ -206,7 +206,7 @@ class NonlinearMagneticDipoleBz:
         --------
         fit : Estimate the dipole location and moment from Bz measurements.
         """
-        if self.location_ is None or self.dipole_moment_ is None:
+        if not hasattr(self, "location_") or not hasattr(self, "dipole_moment_"):
             msg = "Model has not been fitted yet. Call 'fit' before 'predict'."
             raise AttributeError(msg)
         return dipole_bz(coordinates, self.location_, self.dipole_moment_)
