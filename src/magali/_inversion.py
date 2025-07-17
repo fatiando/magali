@@ -11,7 +11,6 @@ Classes for inversions.
 import choclo
 import numba
 import numpy as np
-from scipy.linalg import solve
 
 from ._synthetic import dipole_bz
 from ._units import (
