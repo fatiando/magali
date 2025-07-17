@@ -11,6 +11,7 @@ Classes for inversions.
 import choclo
 import numba
 import numpy as np
+from scipy.linalg import solve
 
 from ._synthetic import dipole_bz
 from ._units import (
@@ -209,7 +210,7 @@ class NonlinearMagneticDipoleBz:
             raise AttributeError(msg)
         return dipole_bz(coordinates, self.location_, self.dipole_moment_)
 
-    def jacobian(self, coordinates, location, moment):
+    def jacobian(self, coordinates, location, moment, jacobian):
         """
         Compute the Jacobian matrix for the linear point dipole model.
 
@@ -227,15 +228,20 @@ class NonlinearMagneticDipoleBz:
             Dipole location (x, y, z), in µm.
         moment : array-like
             Dipole moment vector (mx, my, mz), in A.m².
+        jacobian : (n, 3) ndarray
+            Preallocated array to store the resulting Jacobian matrix,
+            where n is the number of observation points.
 
         Returns
         -------
-        jacobian : 2d-array
-            Jacobian matrix (n_data x 3), in nT/m.
+        jacobian : (n, 3) ndarray
+            The Jacobian matrix of Bz with respect to the dipole moment,
+            in nT/(A·m²). Each row corresponds to an observation point, and
+            each column to the partial derivative with respect to mx, my,
+            and mz, respectively.
         """
         x, y, z = coordinates
         xc, yc, zc = coordinates_micrometer_to_meter(location)
-        jacobian = np.empty((x.size, 3))
         jacobian_nonlinear_jit(
             x,
             y,
@@ -319,7 +325,7 @@ class NonlinearMagneticDipoleBz:
         for _ in range(self.max_iter):
             location_misfit = [misfit[-1]]
             for _ in range(self.max_iter):
-                jacobian = self.jacobian(coordinates_m, location, moment)
+                jacobian = self.jacobian(coordinates_m, location, moment, jacobian)
                 hessian = jacobian.T @ jacobian
                 gradient = jacobian.T @ residual
                 took_a_step = False
