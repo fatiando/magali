@@ -16,6 +16,7 @@ from ._utils import (
     gradient,
     total_gradient_amplitude_grid,
 )
+from ._validation import check_coordinates, check_fit_input
 from ._version import __version__
 from ._visualization import plot_bounding_boxes
 
