@@ -17,12 +17,15 @@ from magali._inversion import (
     MagneticMomentBz,
     NonlinearMagneticDipoleBz,
     _jacobian_linear,
+    _jacobian_nonlinear,
 )
 from magali._synthetic import dipole_bz
 from magali._units import (
     coordinates_micrometer_to_meter,
+    meter_to_micrometer,
     tesla_to_nanotesla,
 )
+from magali._validation import check_fit_input
 
 
 def test_linear_magnetic_moment_bz_inversion():
@@ -183,3 +186,51 @@ def test_nonlinear_magnetic_dipole_predict():
     model_unfit = NonlinearMagneticDipoleBz(initial_location=(450, 450, -10))
     with pytest.raises(AttributeError):
         model_unfit.predict(coordinates)
+
+
+def test_nonlinear_magnetic_moment_gz_jacobian():
+    "Make sure the non-jitted nonlinear Jacobian calculation is correct"
+    coordinates = vd.grid_coordinates(
+        region=[-20, 15, 0, 40],
+        spacing=1,
+        extra_coords=5,
+    )
+    dipole_coordinates = (0, 20, -5)
+    true_inclination = 45
+    true_declination = -15
+    true_intensity = 1e-15
+    true_moment = hm.magnetic_angles_to_vec(
+        inclination=true_inclination,
+        declination=true_declination,
+        intensity=true_intensity,
+    )
+    data = dipole_bz(coordinates, dipole_coordinates, true_moment)
+
+    coordinates, data = check_fit_input(coordinates, data)
+    dipole_coordinates = tuple(
+        c.ravel() for c in coordinates_micrometer_to_meter(coordinates)
+    )
+    location = np.asarray((0.04041674, 20.27141785, 3.27582947))
+    linear_model = MagneticMomentBz(location)
+    linear_model.fit(coordinates, data)
+    moment = linear_model.dipole_moment_
+    residual = data - dipole_bz(coordinates, location, moment)
+    jacobian = np.empty((data.size, 3))
+    _jacobian_nonlinear(*coordinates, *location, *moment, jacobian)
+    hessian = jacobian.T @ jacobian
+    gradient = jacobian.T @ residual
+    alpha = 1
+    identity = np.identity(3)
+
+    delta = np.linalg.solve(hessian + alpha * identity, gradient)
+    trial_location = location + meter_to_micrometer(delta)
+    predicted = dipole_bz(
+        coordinates,
+        trial_location,
+        moment,
+    )
+    residual = data - predicted
+    np.testing.assert_allclose(max(residual), 80.94042377738671, atol=1e-3)
+    np.testing.assert_allclose(min(residual), -149.98554665789848, atol=1e-3)
+    np.testing.assert_allclose(np.mean(residual), -10.092100833939794, atol=1e-3)
+    np.testing.assert_allclose(np.std(residual), 31.744971328845484, atol=1e-3)
