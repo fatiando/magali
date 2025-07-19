@@ -12,10 +12,17 @@ from ._detection import detect_anomalies
 from ._input_output import read_qdm_harvard
 from ._inversion import MagneticMomentBz, NonlinearMagneticDipoleBz
 from ._synthetic import dipole_bz, dipole_bz_grid, random_directions
+from ._units import (
+    coordinates_micrometer_to_meter,
+    meter_to_micrometer,
+    nanotesla_to_tesla,
+    tesla_to_nanotesla,
+)
 from ._utils import (
     gradient,
     total_gradient_amplitude_grid,
 )
+from ._validation import check_coordinates, check_fit_input
 from ._version import __version__
 from ._visualization import plot_bounding_boxes
 
