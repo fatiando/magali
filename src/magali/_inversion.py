@@ -57,9 +57,9 @@ class MagneticMomentBz:
         Parameters
         ----------
         coordinates : tuple = (x, y, z)
-            Arrays with the x, y, and z coordinates of the observations points.
-            The arrays can have any shape as long as they all have the same
-            shape.
+            Arrays with the x, y, and z coordinates of the observations points
+            in micrometers (μm). The arrays can have any shape as long as they
+            all have the same shape.
         data : array
             Array with the observed Bz component of the magnetic field (in nT)
             at the locations provided in *coordinates*. Must have the same
@@ -87,9 +87,9 @@ class MagneticMomentBz:
         Parameters
         ----------
         coordinates : tuple = (x, y, z)
-            Arrays with the x, y, and z coordinates of the observations points.
-            The arrays can have any shape as long as they all have the same
-            shape.
+            Arrays with the x, y, and z coordinates of the observations points
+            in micrometers (μm). The arrays can have any shape as long as they
+            all have the same shape.
 
         Returns
         -------
@@ -185,9 +185,10 @@ class NonlinearMagneticDipoleBz:
 
         Parameters
         ----------
-        coordinates : tuple of array-like
-            Arrays with the x, y,    z coordinates of the observation points,
-            in µm. The arrays must have the same shape.
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the computation points
+            in micrometers (μm). The arrays can have any shape as long as they
+            all have the same shape.
 
         Returns
         -------
@@ -221,9 +222,9 @@ class NonlinearMagneticDipoleBz:
         Parameters
         ----------
         coordinates : tuple = (x, y, z)
-            Arrays with the x, y, and z coordinates of the observations points.
-            The arrays can have any shape as long as they all have the same
-            shape.
+            Arrays with the x, y, and z coordinates of the observation points
+            in micrometers (μm). The arrays can have any shape as long as they
+            all have the same shape.
         location : array-like
             Dipole location (x, y, z), in µm.
         moment : array-like
@@ -286,9 +287,10 @@ class NonlinearMagneticDipoleBz:
 
         Parameters
         ----------
-        coordinates : tuple of array-like
-            Arrays with the x, y, z coordinates of the observation points.
-            The arrays can have any shape as long as they all have the same shape.
+        coordinates : tuple = (x, y, z)
+            Arrays with the x, y, and z coordinates of the observation points
+            in micrometers (μm). The arrays can have any shape as long as they
+            all have the same shape.
         data : array-like
             Observed Bz component of the magnetic field (in nT) at the observation
             points. Must have the same shape as the coordinate arrays.
