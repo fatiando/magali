@@ -11,21 +11,69 @@ Test the _synthetic functions
 import harmonica as hm
 import numpy as np
 import pytest
+import skimage.exposure
 import verde as vd
+import xarray as xr
 
+from magali._detection import detect_anomalies
 from magali._inversion import (
     MagneticMomentBz,
     NonlinearMagneticDipoleBz,
     _jacobian_linear,
     _jacobian_nonlinear,
+    iterative_nonlinear_inversion,
 )
-from magali._synthetic import dipole_bz
+from magali._synthetic import dipole_bz, dipole_bz_grid, random_directions
 from magali._units import (
     coordinates_micrometer_to_meter,
     meter_to_micrometer,
     tesla_to_nanotesla,
 )
+from magali._utils import gradient
 from magali._validation import check_fit_input
+
+
+@pytest.fixture
+def synthetic_data():
+    SEED = 42
+    rng = np.random.default_rng(SEED)
+
+    sensor_sample_distance = 5.0
+    region = [0, 2000, 0, 2000]
+    spacing = 2.0
+    true_inclination = 30
+    true_declination = 40
+    true_dispersion_angle = 5
+    size = 5
+
+    directions_inclination, directions_declination = random_directions(
+        true_inclination,
+        true_declination,
+        true_dispersion_angle,
+        size=size,
+        random_state=SEED,
+    )
+
+    dipoles_amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
+    dipole_coordinates = (
+        rng.integers(30, 1970, size),
+        rng.integers(30, 1970, size),
+        rng.integers(-20, -1, size),
+    )
+
+    dipole_moments = hm.magnetic_angles_to_vec(
+        inclination=directions_inclination,
+        declination=directions_declination,
+        intensity=dipoles_amplitude,
+    )
+
+    data = dipole_bz_grid(
+        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+    )
+    noise_std_dev = 100
+    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
+
+    return data
 
 
 def test_linear_magnetic_moment_bz_inversion():
@@ -237,3 +285,40 @@ def test_nonlinear_magnetic_moment_gz_jacobian():
     np.testing.assert_allclose(min(residual), -149.98554665789848, atol=1e-3)
     np.testing.assert_allclose(np.mean(residual), -10.092100833939794, atol=1e-3)
     np.testing.assert_allclose(np.std(residual), 31.744971328845484, atol=1e-3)
+
+
+def test_iterative_nonlinear_inversion(synthetic_data):
+    height_difference = 5.0
+    data_up = (
+        hm.upward_continuation(synthetic_data, height_difference)
+        .assign_attrs(synthetic_data.attrs)
+        .assign_coords(x=synthetic_data.x, y=synthetic_data.y)
+        .assign_coords(z=synthetic_data.z + height_difference)
+        .rename("bz")
+    )
+    dx, dy, dz, tga = gradient(data_up)
+    data_up["dx"], data_up["dy"], data_up["dz"], data_up["tga"] = dx, dy, dz, tga
+    stretched = skimage.exposure.rescale_intensity(
+        tga, in_range=tuple(np.percentile(tga, (1, 99)))
+    )
+    data_tga_stretched = xr.DataArray(stretched, coords=data_up.coords)
+    bounding_boxes = detect_anomalies(
+        data_tga_stretched,
+        size_range=[30, 50],
+        detection_threshold=0.03,
+        border_exclusion=2,
+        size_multiplier=1,
+    )
+    data_updated, locations_, dipole_moments_, r2_values = iterative_nonlinear_inversion(
+        data_up,
+        bounding_boxes,
+        height_difference=height_difference,
+        copy_data=True,
+    )
+    assert isinstance(data_updated, xr.DataArray)
+    assert isinstance(locations_, list)
+    assert isinstance(dipole_moments_, list)
+    assert isinstance(r2_values, list)
+    assert len(locations_) == len(dipole_moments_) == len(r2_values)
+    np.testing.assert_allclose(locations_[0][0], 1506.00100449, atol=1e-3)
+    np.testing.assert_allclose(dipole_moments_[0][0], 5.22732937e-13, atol=1e-12)

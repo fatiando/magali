@@ -9,8 +9,12 @@ Classes for inversions.
 """
 
 import choclo
+import harmonica as hm
 import numba
 import numpy as np
+import verde as vd
+
+import magali as mg
 
 from ._synthetic import dipole_bz
 from ._units import (
@@ -412,6 +416,102 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
         result[i, 0] = dBz_dxc * 1e9
         result[i, 1] = dBz_dyc * 1e9
         result[i, 2] = dBz_dzc * 1e9
+
+
+def iterative_nonlinear_inversion(
+    data_up,
+    bounding_boxes,
+    height_difference=5.0,
+    copy_data=True,
+):
+    """
+    Perform iterative Euler and nonlinear dipole inversion over bounding boxes.
+
+    Parameters
+    ----------
+    data_up : xarray.DataArray
+        Upward-continued magnetic data with coordinates "x", "y", and "z".
+        This is typically obtained after upward continuation of observed
+        magnetic data.
+
+    bounding_boxes : list of lists or arrays
+        Bounding boxes of detected anomalies in data coordinates.
+        Each bounding box is defined as [x_min, x_max, y_min, y_max].
+
+    height_difference : float, optional
+        Height increment (in µm) used for upward continuation after each
+        iteration (default is 5.0). Increasing this value smooths the field
+        more rapidly between iterations.
+
+    copy_data : bool, optional
+        If True (default), operates on a deep copy of the input data to avoid
+        modifying the original array. If False, modifications will be applied
+        directly to the provided data array.
+
+    Returns
+    -------
+    data_updated : xarray.DataArray
+        Magnetic data after iterative dipole removal and upward continuation.
+
+    locations_ : list of tuples
+        Estimated (x, y, z) coordinates of the dipole sources identified during
+        the inversion.
+
+    dipole_moments_ : list of arrays
+        Estimated magnetic dipole moments (in A·m²) corresponding to each
+        bounding box.
+
+    r2_values : list of floats
+        Coefficient of determination (R²) for each nonlinear inversion fit,
+        indicating model quality.
+    """
+    locations_ = []
+    dipole_moments_ = []
+    r2_values = []
+
+    data_updated = data_up.copy(deep=True) if copy_data else data_up
+
+    for box in bounding_boxes:
+        anomaly = data_updated.sel(x=slice(*box[:2]), y=slice(*box[2:]))
+
+        dx, dy, dz, tga = mg.gradient(anomaly)
+        anomaly["dx"], anomaly["dy"], anomaly["dz"], anomaly["tga"] = dx, dy, dz, tga
+
+        table = vd.grid_to_table(anomaly)
+
+        euler = hm.EulerDeconvolution(3)
+        euler.fit((table.x, table.y, table.z), (table.bz, table.dx, table.dy, table.dz))
+
+        bz_corrected = table.bz.values - euler.base_level_
+        coordinates = (table.x.values, table.y.values, table.z.values)
+
+        model_nl = mg.NonlinearMagneticDipoleBz(initial_location=euler.location_)
+        model_nl.fit(coordinates, bz_corrected)
+
+        locations_.append(model_nl.location_)
+        dipole_moments_.append(model_nl.dipole_moment_)
+        r2_values.append(model_nl.r2_)
+
+        modeled_bz = mg.dipole_bz(
+            coordinates, model_nl.location_, model_nl.dipole_moment_
+        )
+        for x_val, y_val, bz_val in zip(table.x.values, table.y.values, modeled_bz):
+            data_updated.loc[{"x": x_val, "y": y_val}] -= bz_val
+
+        data_updated = (
+            hm.upward_continuation(data_updated, height_difference)
+            .assign_attrs(data_updated.attrs)
+            .assign_coords(x=data_updated.x, y=data_updated.y)
+            .assign_coords(z=data_updated.z + height_difference)
+            .rename("bz")
+        )
+        dx, dy, dz, tga = mg.gradient(data_updated)
+        data_updated["dx"] = dx
+        data_updated["dy"] = dy
+        data_updated["dz"] = dz
+        data_updated["tga"] = tga
+
+    return data_updated, locations_, dipole_moments_, r2_values
 
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
