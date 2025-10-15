@@ -12,6 +12,7 @@ List of functions and classes (API)
 
    MagneticMomentBz
    NonlinearMagneticDipoleBz
+   iterative_nonlinear_inversion
    plot_bounding_boxes
    read_qdm_harvard
    random_directions
