@@ -58,7 +58,7 @@ def _generate_bounding_boxes(blob_sizes, blob_x_coords, blob_y_coords):
 def detect_anomalies(
     data,
     size_range,
-    size_multiplier=2,
+    size_multiplier=1,
     num_scales=10,
     detection_threshold=0.5,
     overlap_ratio=0.5,
