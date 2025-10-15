@@ -296,7 +296,8 @@ class NonlinearMagneticDipoleBz:
         Returns
         -------
         self : object
-            This instance with updated ``location_`` and ``dipole_moment_``.
+            This instance with updated ``location_``,  ``dipole_moment_`` and
+            ``r2_``.
 
         Notes
         -----
@@ -363,6 +364,13 @@ class NonlinearMagneticDipoleBz:
         self.location_ = location
         self.dipole_moment_ = moment
         self.misfit_ = misfit
+
+        # Calculate R²
+        predicted_data = dipole_bz(coordinates, self.location_, self.dipole_moment_)
+        residual_sum_squares = np.sum((data - predicted_data) ** 2)
+        total_sum_squares = np.sum((data - np.mean(data)) ** 2)
+
+        self.r2_ = 1 - residual_sum_squares / total_sum_squares
         return self
 
 

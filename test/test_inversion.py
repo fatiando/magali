@@ -112,6 +112,7 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     # Check uninitialized attributes
     assert not hasattr(model, "location_")
     assert not hasattr(model, "dipole_moment_")
+    assert not hasattr(model, "r2")
 
     # Run the inversion
     model.fit(coordinates, data)
@@ -119,10 +120,12 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     # Check that attributes are now set
     assert model.location_ is not None
     assert model.dipole_moment_ is not None
+    assert model.r2_ is not None
 
     # Assert that results are close to the truth
     np.testing.assert_allclose(model.location_, true_location, atol=1.0)
     np.testing.assert_allclose(model.dipole_moment_, true_moment, rtol=0.05)
+    np.testing.assert_allclose(model.r2_, 1, rtol=0.05)
 
 
 def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():

@@ -84,7 +84,7 @@ def total_gradient_amplitude_grid(data):
     tga : xr.DataArray
         Dataset containing the total gradient amplitude (TGA).
     """
-    dx, dy, dz, tga = gradient(data)
+    _, _, _, tga = gradient(data)
 
     # Assign attributes
     tga.attrs = {"long_name": "Total Gradient Amplitude", "units": "nT/µm"}
