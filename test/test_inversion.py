@@ -122,7 +122,6 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     assert model.dipole_moment_ is not None
     assert model.r2_ is not None
 
-
     # Assert that results are close to the truth
     np.testing.assert_allclose(model.location_, true_location, atol=1.0)
     np.testing.assert_allclose(model.dipole_moment_, true_moment, rtol=0.05)
