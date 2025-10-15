@@ -361,6 +361,9 @@ class NonlinearMagneticDipoleBz:
             misfit.append(np.linalg.norm(residual))
             if abs(misfit[-1] - misfit[-2]) / misfit[-2] < self.tol:
                 break
+        self.location_ = location
+        self.dipole_moment_ = moment
+        self.misfit_ = misfit
         
         # Calculate R²
         predicted_data = dipole_bz(coordinates, self.location_, self.dipole_moment_)
@@ -368,9 +371,6 @@ class NonlinearMagneticDipoleBz:
         total_sum_squares = np.sum((data - np.mean(data)) ** 2)
 
         self.r2_ = 1 - residual_sum_squares / total_sum_squares
-        self.location_ = location
-        self.dipole_moment_ = moment
-        self.misfit_ = misfit
         return self
 
 
