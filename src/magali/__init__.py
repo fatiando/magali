@@ -10,7 +10,11 @@ Import functions/classes to make the public API.
 
 from ._detection import detect_anomalies
 from ._input_output import read_qdm_harvard
-from ._inversion import MagneticMomentBz, NonlinearMagneticDipoleBz
+from ._inversion import (
+    MagneticMomentBz,
+    NonlinearMagneticDipoleBz,
+    iterative_nonlinear_inversion,
+)
 from ._synthetic import dipole_bz, dipole_bz_grid, random_directions
 from ._units import (
     coordinates_micrometer_to_meter,
