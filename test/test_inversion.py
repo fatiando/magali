@@ -309,11 +309,13 @@ def test_iterative_nonlinear_inversion(synthetic_data):
         border_exclusion=2,
         size_multiplier=1,
     )
-    data_updated, locations_, dipole_moments_, r2_values = iterative_nonlinear_inversion(
-        data_up,
-        bounding_boxes,
-        height_difference=height_difference,
-        copy_data=True,
+    data_updated, locations_, dipole_moments_, r2_values = (
+        iterative_nonlinear_inversion(
+            data_up,
+            bounding_boxes,
+            height_difference=height_difference,
+            copy_data=True,
+        )
     )
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
