@@ -74,7 +74,7 @@ def detect_anomalies(
     size_range : tuple
         Minimum and maximum size of detected anomalies in µm.
     size_multiplier : int, optional
-        Scaling factor for the detected blob sizes (default is 2).
+        Scaling factor for the detected blob sizes (default is 1).
     num_scales : int, optional
         Number of sigma values for the blob detection (default is 10). A sigma
         value represents the scale or size of the blobs that the algorithm
