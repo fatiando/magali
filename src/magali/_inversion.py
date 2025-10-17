@@ -469,6 +469,9 @@ def iterative_nonlinear_inversion(
     dipole_moments_ = []
     r2_values = []
 
+    table = vd.grid_to_table(data_up)
+    global_coordinates = (table.x.values, table.y.values, table.z.values)
+
     data_updated = data_up.copy(deep=True) if copy_data else data_up
 
     for box in bounding_boxes:
@@ -485,15 +488,17 @@ def iterative_nonlinear_inversion(
         bz_corrected = table.bz.values - euler.base_level_
         coordinates = (table.x.values, table.y.values, table.z.values)
 
-        model_nl = mg.NonlinearMagneticDipoleBz(initial_location=euler.location_)
+        model_nl = mg.NonlinearMagneticDipoleBz(
+            initial_location=euler.location_, max_iter=1000
+        )
         model_nl.fit(coordinates, bz_corrected)
 
-        locations_.append(model_nl.location_)
+        locations_.append(euler.location_)
         dipole_moments_.append(model_nl.dipole_moment_)
         r2_values.append(model_nl.r2_)
 
         modeled_bz = mg.dipole_bz(
-            coordinates, model_nl.location_, model_nl.dipole_moment_
+            global_coordinates, model_nl.location_, model_nl.dipole_moment_
         )
         for x_val, y_val, bz_val in zip(table.x.values, table.y.values, modeled_bz):
             data_updated.loc[{"x": x_val, "y": y_val}] -= bz_val
