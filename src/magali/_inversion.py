@@ -387,6 +387,8 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
         dy = y[i] - yc
         dz = z[i] - zc
         r2 = dx**2 + dy**2 + dz**2
+        # prevent huge derivatives if (xc,yc,zc) gets very near an observation
+        r2 = max(r2, 1e-18)
         r5 = r2 ** (5 / 2)
         r7 = r2 ** (7 / 2)
         # ∂bz / ∂xc
