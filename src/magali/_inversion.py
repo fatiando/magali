@@ -331,10 +331,23 @@ class NonlinearMagneticDipoleBz:
             for _ in range(self.max_iter):
                 jacobian = self.jacobian(coordinates_m, location, moment, jacobian)
                 hessian = jacobian.T @ jacobian
+                # Make alpha proportional to the curvature scale
+                scaling_factor = 1e-3
+                alpha = scaling_factor * max(np.median(np.diag(hessian)), 1e-30)
                 gradient = jacobian.T @ residual
                 took_a_step = False
                 for _ in range(50):
-                    delta = np.linalg.solve(hessian + alpha * identity, gradient)
+                    # build damping matrix proportional to diag(H)
+                    diagH = np.diag(np.diag(hessian))
+                    damping = alpha * diagH
+                    # small floor to avoid zero diagonal
+                    damping += 1e-20 * np.eye(3)
+                    delta = np.linalg.solve(hessian + damping, gradient)
+                    max_step_m = 1e-6  # 10 µm
+                    step_norm = np.linalg.norm(delta)
+                    if step_norm > max_step_m:
+                        delta = delta * (max_step_m / step_norm)
+
                     trial_location = location + meter_to_micrometer(delta)
                     trial_predicted = dipole_bz(
                         coordinates,
