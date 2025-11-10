@@ -307,7 +307,7 @@ class NonlinearMagneticDipoleBz:
         Internally uses:
 
         - :func:`jacobian_nonlinear_jit`: JIT-compiled function that fills the
-          Jacobian matrix :math:`\frac{\partial B_z}{\partial (x_0, y_0, z_0)}`  for a fixed moment.
+          Jacobian matrix :math:`\frac{\partial B_z}{\partial (x_0, y_0, z_0)}` for a fixed moment.
         - :func:`dipole_bz`: forward model for the Bz field of a dipole at given
           coordinates.
         - :class:`MagneticMomentBz`: linear inversion for estimating moment given a
@@ -323,7 +323,6 @@ class NonlinearMagneticDipoleBz:
         moment = linear_model.dipole_moment_
         residual = data - dipole_bz(coordinates, location, moment)
         misfit = [np.linalg.norm(residual)]
-        alpha = self.alpha_init
         jacobian = np.empty((data.size, 3))
         identity = np.identity(3)
         for _ in range(self.max_iter):
@@ -331,9 +330,9 @@ class NonlinearMagneticDipoleBz:
             for _ in range(self.max_iter):
                 jacobian = self.jacobian(coordinates_m, location, moment, jacobian)
                 hessian = jacobian.T @ jacobian
-                # Make alpha proportional to the curvature scale
-                scaling_factor = 1e-3
-                alpha = scaling_factor * max(np.median(np.diag(hessian)), 1e-30)
+                # Make alpha proportional to the curvature scale 
+                scaling_factor = 1e-20
+                alpha = scaling_factor * max(np.median(np.diag(hessian)), 1e-30) 
                 gradient = jacobian.T @ residual
                 took_a_step = False
                 for _ in range(50):
@@ -343,10 +342,11 @@ class NonlinearMagneticDipoleBz:
                     # small floor to avoid zero diagonal
                     damping += 1e-20 * np.eye(3)
                     delta = np.linalg.solve(hessian + damping, gradient)
-                    max_step_m = 1e-6  # 10 µm
+                    max_step_m = 1e-6 # 10 µm
                     step_norm = np.linalg.norm(delta)
                     if step_norm > max_step_m:
                         delta = delta * (max_step_m / step_norm)
+
 
                     trial_location = location + meter_to_micrometer(delta)
                     trial_predicted = dipole_bz(
@@ -531,7 +531,6 @@ def iterative_nonlinear_inversion(
         data_updated["tga"] = tga
 
     return data_updated, locations_, dipole_moments_, r2_values
-
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
