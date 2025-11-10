@@ -169,7 +169,7 @@ class NonlinearMagneticDipoleBz:
         self,
         initial_location,
         max_iter=100,
-        tol=1e-4,
+        tol=1e-2,
         alpha_init=1,
         alpha_scale=10.0,
     ):
@@ -324,15 +324,14 @@ class NonlinearMagneticDipoleBz:
         residual = data - dipole_bz(coordinates, location, moment)
         misfit = [np.linalg.norm(residual)]
         jacobian = np.empty((data.size, 3))
-        identity = np.identity(3)
         for _ in range(self.max_iter):
             location_misfit = [misfit[-1]]
             for _ in range(self.max_iter):
                 jacobian = self.jacobian(coordinates_m, location, moment, jacobian)
                 hessian = jacobian.T @ jacobian
-                # Make alpha proportional to the curvature scale 
+                # Make alpha proportional to the curvature scale
                 scaling_factor = 1e-20
-                alpha = scaling_factor * max(np.median(np.diag(hessian)), 1e-30) 
+                alpha = scaling_factor * max(np.median(np.diag(hessian)), 1e-30)
                 gradient = jacobian.T @ residual
                 took_a_step = False
                 for _ in range(50):
@@ -342,11 +341,10 @@ class NonlinearMagneticDipoleBz:
                     # small floor to avoid zero diagonal
                     damping += 1e-20 * np.eye(3)
                     delta = np.linalg.solve(hessian + damping, gradient)
-                    max_step_m = 1e-6 # 10 µm
+                    max_step_m = 1e-6  # 10 µm
                     step_norm = np.linalg.norm(delta)
                     if step_norm > max_step_m:
                         delta = delta * (max_step_m / step_norm)
-
 
                     trial_location = location + meter_to_micrometer(delta)
                     trial_predicted = dipole_bz(
@@ -531,6 +529,7 @@ def iterative_nonlinear_inversion(
         data_updated["tga"] = tga
 
     return data_updated, locations_, dipole_moments_, r2_values
+
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we
 # can test the pure Python function and get coverage information about it.
