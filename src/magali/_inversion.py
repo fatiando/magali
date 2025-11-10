@@ -14,14 +14,13 @@ import numba
 import numpy as np
 import verde as vd
 
-import magali as mg
-
 from ._synthetic import dipole_bz
 from ._units import (
     coordinates_micrometer_to_meter,
     meter_to_micrometer,
     tesla_to_nanotesla,
 )
+from ._utils import gradient
 from ._validation import check_fit_input
 
 
@@ -477,7 +476,7 @@ def iterative_nonlinear_inversion(
     for box in bounding_boxes:
         anomaly = data_updated.sel(x=slice(*box[:2]), y=slice(*box[2:]))
 
-        dx, dy, dz, tga = mg.gradient(anomaly)
+        dx, dy, dz, tga = gradient(anomaly)
         anomaly["dx"], anomaly["dy"], anomaly["dz"], anomaly["tga"] = dx, dy, dz, tga
 
         table = vd.grid_to_table(anomaly)
@@ -488,16 +487,16 @@ def iterative_nonlinear_inversion(
         bz_corrected = table.bz.values - euler.base_level_
         coordinates = (table.x.values, table.y.values, table.z.values)
 
-        model_nl = mg.NonlinearMagneticDipoleBz(
+        model_nl = NonlinearMagneticDipoleBz(
             initial_location=euler.location_, max_iter=1000
         )
         model_nl.fit(coordinates, bz_corrected)
 
-        locations_.append(euler.location_)
+        locations_.append(model_nl.location_)
         dipole_moments_.append(model_nl.dipole_moment_)
         r2_values.append(model_nl.r2_)
 
-        modeled_bz = mg.dipole_bz(
+        modeled_bz = dipole_bz(
             global_coordinates, model_nl.location_, model_nl.dipole_moment_
         )
         for x_val, y_val, bz_val in zip(table.x.values, table.y.values, modeled_bz):
@@ -510,7 +509,7 @@ def iterative_nonlinear_inversion(
             .assign_coords(z=data_updated.z + height_difference)
             .rename("bz")
         )
-        dx, dy, dz, tga = mg.gradient(data_updated)
+        dx, dy, dz, tga = gradient(data_updated)
         data_updated["dx"] = dx
         data_updated["dy"] = dy
         data_updated["dz"] = dz
