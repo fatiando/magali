@@ -1,0 +1,993 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>magali._inversion | magali v0.0.post100</title>
+    
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/thebelab-helper.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/magali/_inversion';</script>
+    <link rel="icon" href="../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <!-- Plausible analytics for anonymous usage statistics -->
+    <script defer data-domain="compgeolab.org" src="https://plausible.io/js/plausible.js"></script>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">magali <span class="project-version">v0.0.post100</span></p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorial</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/loading_dataset.html">Loading a Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/creating_synthetic_data.html">Creating Synthetic Magnetic Microscopy Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/detecting_sources.html">Detecting Magnetic Sources</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/index.html">List of functions and classes (API)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.MagneticMomentBz.html">magali.MagneticMomentBz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.NonlinearMagneticDipoleBz.html">magali.NonlinearMagneticDipoleBz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.iterative_nonlinear_inversion.html">magali.iterative_nonlinear_inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.plot_bounding_boxes.html">magali.plot_bounding_boxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.read_qdm_harvard.html">magali.read_qdm_harvard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.random_directions.html">magali.random_directions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.dipole_bz.html">magali.dipole_bz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.dipole_bz_grid.html">magali.dipole_bz_grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.gradient.html">magali.gradient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.total_gradient_amplitude_grid.html">magali.total_gradient_amplitude_grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/generated/magali.detect_anomalies.html">magali.detect_anomalies</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compatibility.html">Version compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../versions.html">Documentation for other versions</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://www.fatiando.org/contact/">Join the community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fatiando/magali/blob/master/CONTRIBUTING.md">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fatiando/magali/blob/master/CODE_OF_CONDUCT.md">Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fatiando/magali">Source code on GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.fatiando.org">The Fatiando a Terra project</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fatiando/magali" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fatiando/magali/issues/new?title=Issue%20on%20page%20%2F_modules/magali/_inversion.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for magali._inversion</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2024 The Magali Developers.</span>
+<span class="c1"># Distributed under the terms of the BSD 3-Clause License.</span>
+<span class="c1"># SPDX-License-Identifier: BSD-3-Clause</span>
+<span class="c1">#</span>
+<span class="c1"># This code is part of the Fatiando a Terra project (https://www.fatiando.org)</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classes for inversions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">choclo</span>
+<span class="kn">import</span> <span class="nn">harmonica</span> <span class="k">as</span> <span class="nn">hm</span>
+<span class="kn">import</span> <span class="nn">numba</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">verde</span> <span class="k">as</span> <span class="nn">vd</span>
+
+<span class="kn">from</span> <span class="nn">._synthetic</span> <span class="kn">import</span> <span class="n">dipole_bz</span>
+<span class="kn">from</span> <span class="nn">._units</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">coordinates_micrometer_to_meter</span><span class="p">,</span>
+    <span class="n">meter_to_micrometer</span><span class="p">,</span>
+    <span class="n">tesla_to_nanotesla</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">gradient</span>
+<span class="kn">from</span> <span class="nn">._validation</span> <span class="kn">import</span> <span class="n">check_fit_input</span>
+
+
+<div class="viewcode-block" id="MagneticMomentBz">
+<a class="viewcode-back" href="../../api/generated/magali.MagneticMomentBz.html#magali.MagneticMomentBz">[docs]</a>
+<span class="k">class</span> <span class="nc">MagneticMomentBz</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimate the magnetic dipole moment vector from Bz measurements.</span>
+
+<span class="sd">    Uses the Bz component of the magnetic field to fit a point dipole model</span>
+<span class="sd">    through a linear inversion [Souza-Junior2024]_, returning the dipole moment</span>
+<span class="sd">    vector that best fits the data in a least-squares sense. Requires prior</span>
+<span class="sd">    knowledge of the dipole location.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    location : tuple = (float, float, float)</span>
+<span class="sd">        Coordinates (x, y, z) of the dipole location, in µm.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dipole_moment_ : 1d-array</span>
+<span class="sd">        Estimated dipole moment vector (mx, my, mz) in A.m². Only available</span>
+<span class="sd">        after :meth:`~magali.MagneticMomentBz.fit` is called.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [Souza-Junior2024]_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dipole_moment_</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MagneticMomentBz.fit">
+<a class="viewcode-back" href="../../api/generated/magali.MagneticMomentBz.html#magali.MagneticMomentBz.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the magnetic dipole model to Bz data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordinates : tuple = (x, y, z)</span>
+<span class="sd">            Arrays with the x, y, and z coordinates of the observations points.</span>
+<span class="sd">            The arrays can have any shape as long as they all have the same</span>
+<span class="sd">            shape.</span>
+<span class="sd">        data : array</span>
+<span class="sd">            Array with the observed Bz component of the magnetic field (in nT)</span>
+<span class="sd">            at the locations provided in *coordinates*. Must have the same</span>
+<span class="sd">            shape as the coordinate arrays.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self</span>
+<span class="sd">            This estimator instance, updated with the estimated dipole moment</span>
+<span class="sd">            vector in the ``dipole_moment_`` attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">check_fit_input</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">jacobian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dipole_moment_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">jacobian</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">jacobian</span><span class="p">,</span> <span class="n">jacobian</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="MagneticMomentBz.jacobian">
+<a class="viewcode-back" href="../../api/generated/magali.MagneticMomentBz.html#magali.MagneticMomentBz.jacobian">[docs]</a>
+    <span class="k">def</span> <span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the Jacobian matrix for the linear point dipole model.</span>
+
+<span class="sd">        The Jacobian is a matrix with derivatives of the forward modeling</span>
+<span class="sd">        function (the magnetic field of a dipole) with regard to the parameters</span>
+<span class="sd">        (the 3 dipole moment components) for each data point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordinates : tuple = (x, y, z)</span>
+<span class="sd">            Arrays with the x, y, and z coordinates of the observations points.</span>
+<span class="sd">            The arrays can have any shape as long as they all have the same</span>
+<span class="sd">            shape.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        jacobian : 2d-array</span>
+<span class="sd">            The N x 3 Jacobian matrix, with N being the number of observations,</span>
+<span class="sd">            in nT/(A.m²) units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span> <span class="o">=</span> <span class="n">coordinates_micrometer_to_meter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coordinates_micrometer_to_meter</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
+        <span class="n">n_data</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">n_params</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">jacobian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_data</span><span class="p">,</span> <span class="n">n_params</span><span class="p">))</span>
+        <span class="n">jacobian_linear_jit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">,</span> <span class="n">jacobian</span><span class="p">)</span>
+        <span class="n">jacobian</span> <span class="o">=</span> <span class="n">tesla_to_nanotesla</span><span class="p">(</span><span class="n">jacobian</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jacobian</span></div>
+</div>
+
+
+
+<span class="k">def</span> <span class="nf">_jacobian_linear</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    JIT-compiled Jacobian calculation for linear inversion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">choclo</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">VACUUM_MAGNETIC_PERMEABILITY</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">n_data</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_data</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">choclo</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">distance_cartesian</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">)</span>
+        <span class="n">kernel_eu</span> <span class="o">=</span> <span class="n">choclo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">kernel_eu</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">kernel_nu</span> <span class="o">=</span> <span class="n">choclo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">kernel_nu</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">kernel_uu</span> <span class="o">=</span> <span class="n">choclo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">kernel_uu</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">kernel_eu</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">kernel_nu</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">kernel_uu</span>
+
+
+<div class="viewcode-block" id="NonlinearMagneticDipoleBz">
+<a class="viewcode-back" href="../../api/generated/magali.NonlinearMagneticDipoleBz.html#magali.NonlinearMagneticDipoleBz">[docs]</a>
+<span class="k">class</span> <span class="nc">NonlinearMagneticDipoleBz</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimate dipole position and moment from Bz data.</span>
+
+<span class="sd">    Uses the Bz component of the magnetic field to estimate both the position</span>
+<span class="sd">    and the moment of a magnetic dipole through a nonlinear inversion based on</span>
+<span class="sd">    the Levenberg-Marquardt algorithm. Returns the location and dipole moment</span>
+<span class="sd">    vector that best fit the data in a least-squares sense. Requires an initial</span>
+<span class="sd">    guess for the dipole location.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial_location : tuple of float</span>
+<span class="sd">        Initial guess for the coordinates (x, y, z) of the dipole location, in</span>
+<span class="sd">        µm.</span>
+<span class="sd">    max_iter : int</span>
+<span class="sd">        Maximum number of iterations for both the outer and inner loops of the</span>
+<span class="sd">        nonlinear inversion.</span>
+<span class="sd">    tol : float</span>
+<span class="sd">        Convergence tolerance for the relative change in misfit between</span>
+<span class="sd">        iterations.</span>
+<span class="sd">    alpha_init : float</span>
+<span class="sd">        Initial damping parameter for the Levenberg-Marquardt algorithm.</span>
+<span class="sd">    alpha_scale : float</span>
+<span class="sd">        Multiplicative factor used to increase or decrease the damping</span>
+<span class="sd">        parameter during the optimization.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    location_ : 1d-array</span>
+<span class="sd">        Estimated location (x, y, z) of the dipole, in µm.</span>
+<span class="sd">    dipole_moment_ : 1d-array</span>
+<span class="sd">        Estimated dipole moment vector (mx, my, mz), in A.m².</span>
+<span class="sd">    misfit_ : list of float</span>
+<span class="sd">        Norm of the residual vector at each outer iteration of the inversion.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    [Souza-Junior2024]_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">initial_location</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+        <span class="n">alpha_init</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">alpha_scale</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_location</span> <span class="o">=</span> <span class="n">initial_location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_init</span> <span class="o">=</span> <span class="n">alpha_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_scale</span> <span class="o">=</span> <span class="n">alpha_scale</span>
+
+<div class="viewcode-block" id="NonlinearMagneticDipoleBz.predict">
+<a class="viewcode-back" href="../../api/generated/magali.NonlinearMagneticDipoleBz.html#magali.NonlinearMagneticDipoleBz.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict the Bz magnetic field from the estimated dipole parameters.</span>
+
+<span class="sd">        Uses the estimated dipole location and moment vector to compute the</span>
+<span class="sd">        Bz component of the magnetic field at the given observation points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordinates : tuple of array-like</span>
+<span class="sd">            Arrays with the x, y,    z coordinates of the observation points,</span>
+<span class="sd">            in µm. The arrays must have the same shape.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        predicted : array</span>
+<span class="sd">            Array with the predicted Bz values (in nT) at the observation</span>
+<span class="sd">            points. Has the same shape as the input coordinate arrays.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If :meth:`~NonlinearMagneticDipoleBz.fit` has not been called yet,</span>
+<span class="sd">            and ``location_`` or ``dipole_moment_`` are not set.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        fit : Estimate the dipole location and moment from Bz measurements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;location_&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dipole_moment_&quot;</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Model has not been fitted yet. Call &#39;fit&#39; before &#39;predict&#39;.&quot;</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dipole_bz</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dipole_moment_</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NonlinearMagneticDipoleBz.jacobian">
+<a class="viewcode-back" href="../../api/generated/magali.NonlinearMagneticDipoleBz.html#magali.NonlinearMagneticDipoleBz.jacobian">[docs]</a>
+    <span class="k">def</span> <span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">moment</span><span class="p">,</span> <span class="n">jacobian</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the Jacobian matrix for the linear point dipole model.</span>
+
+<span class="sd">        The Jacobian is a matrix with derivatives of the forward modeling</span>
+<span class="sd">        function (the magnetic field of a dipole) with regard to the parameters</span>
+<span class="sd">        (the 3 dipole moment components) for each data point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordinates : tuple = (x, y, z)</span>
+<span class="sd">            Arrays with the x, y, and z coordinates of the observations points.</span>
+<span class="sd">            The arrays can have any shape as long as they all have the same</span>
+<span class="sd">            shape.</span>
+<span class="sd">        location : array-like</span>
+<span class="sd">            Dipole location (x, y, z), in µm.</span>
+<span class="sd">        moment : array-like</span>
+<span class="sd">            Dipole moment vector (mx, my, mz), in A.m².</span>
+<span class="sd">        jacobian : (n, 3) ndarray</span>
+<span class="sd">            Preallocated array to store the resulting Jacobian matrix,</span>
+<span class="sd">            where n is the number of observation points.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        jacobian : (n, 3) ndarray</span>
+<span class="sd">            The Jacobian matrix of Bz with respect to the dipole moment,</span>
+<span class="sd">            in nT/(A·m²). Each row corresponds to an observation point, and</span>
+<span class="sd">            each column to the partial derivative with respect to mx, my,</span>
+<span class="sd">            and mz, respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">coordinates</span>
+        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span> <span class="o">=</span> <span class="n">coordinates_micrometer_to_meter</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+        <span class="n">jacobian_nonlinear_jit</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">z</span><span class="p">,</span>
+            <span class="n">xc</span><span class="p">,</span>
+            <span class="n">yc</span><span class="p">,</span>
+            <span class="n">zc</span><span class="p">,</span>
+            <span class="n">moment</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">moment</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">moment</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">jacobian</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">jacobian</span></div>
+
+
+<div class="viewcode-block" id="NonlinearMagneticDipoleBz.fit">
+<a class="viewcode-back" href="../../api/generated/magali.NonlinearMagneticDipoleBz.html#magali.NonlinearMagneticDipoleBz.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the nonlinear magnetic dipole model to Bz data.</span>
+
+<span class="sd">        Performs nonlinear inversion using the Levenberg-Marquardt method to</span>
+<span class="sd">        estimate both the dipole location and its magnetic moment. The method</span>
+<span class="sd">        alternates between a nonlinear update of the dipole location (inner</span>
+<span class="sd">        loop) and a linear least-squares estimate of the dipole moment (outer</span>
+<span class="sd">        loop). The Jacobian matrix with respect to the location is computed</span>
+<span class="sd">        numerically using JIT-accelerated code.</span>
+
+<span class="sd">        The Jacobian matrix used in the nonlinear step contains partial</span>
+<span class="sd">        derivatives of the Bz field with respect to the dipole location:</span>
+<span class="sd">        :math:`\frac{\partial B_z}{\partial x_0}`,</span>
+<span class="sd">        :math:`\frac{\partial B_z}{\partial y_0}`, and</span>
+<span class="sd">        :math:`\frac{\partial B_z}{\partial z_0}`. These are computed assuming</span>
+<span class="sd">        a fixed moment vector.</span>
+
+<span class="sd">        At each inner iteration:</span>
+
+<span class="sd">        - The forward field is computed using the trial location and fixed</span>
+<span class="sd">        moment.</span>
+<span class="sd">        - A trial update is accepted if it reduces the data misfit.</span>
+<span class="sd">        - The damping parameter (alpha) is adapted based on success/failure.</span>
+
+<span class="sd">        At each outer iteration:</span>
+
+<span class="sd">        - A new linear estimate of the dipole moment is computed for the</span>
+<span class="sd">        current location.</span>
+<span class="sd">        - Convergence is assessed based on relative reduction in residual norm.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordinates : tuple of array-like</span>
+<span class="sd">            Arrays with the x, y, z coordinates of the observation points.</span>
+<span class="sd">            The arrays can have any shape as long as they all have the same</span>
+<span class="sd">            shape.</span>
+<span class="sd">        data : array-like</span>
+<span class="sd">            Observed Bz component of the magnetic field (in nT) at the</span>
+<span class="sd">            observation points. Must have the same shape as the coordinate</span>
+<span class="sd">            arrays.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : object</span>
+<span class="sd">            This instance with updated ``location_``,  ``dipole_moment_`` and</span>
+<span class="sd">            ``r2_``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Internally uses:</span>
+
+<span class="sd">        - :func:`jacobian_nonlinear_jit`: JIT-compiled function that fills the</span>
+<span class="sd">          Jacobian matrix :math:`\frac{\partial B_z}{\partial (x_0, y_0, z_0)}`</span>
+<span class="sd">          for a fixed moment.</span>
+<span class="sd">        - :func:`dipole_bz`: forward model for the Bz field of a dipole at</span>
+<span class="sd">          given coordinates.</span>
+<span class="sd">        - :class:`MagneticMomentBz`: linear inversion for estimating moment</span>
+<span class="sd">          given a fixed location.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">check_fit_input</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">coordinates_m</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coordinates_micrometer_to_meter</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_location</span><span class="p">)</span>
+        <span class="n">linear_model</span> <span class="o">=</span> <span class="n">MagneticMomentBz</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+        <span class="n">linear_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">moment</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">dipole_moment_</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">dipole_bz</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+        <span class="n">misfit</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">residual</span><span class="p">)]</span>
+        <span class="n">jacobian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
+            <span class="n">location_misfit</span> <span class="o">=</span> <span class="p">[</span><span class="n">misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
+                <span class="n">jacobian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="n">coordinates_m</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">moment</span><span class="p">,</span> <span class="n">jacobian</span><span class="p">)</span>
+                <span class="n">hessian</span> <span class="o">=</span> <span class="n">jacobian</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">jacobian</span>
+                <span class="c1"># Make alpha proportional to the curvature scale</span>
+                <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mf">1e-20</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="n">scaling_factor</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">hessian</span><span class="p">)),</span> <span class="mf">1e-30</span><span class="p">)</span>
+                <span class="n">gradient</span> <span class="o">=</span> <span class="n">jacobian</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">residual</span>
+                <span class="n">took_a_step</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+                    <span class="c1"># build damping matrix proportional to diag(H)</span>
+                    <span class="n">diagH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">hessian</span><span class="p">))</span>
+                    <span class="n">damping</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">diagH</span>
+                    <span class="c1"># small floor to avoid zero diagonal</span>
+                    <span class="n">damping</span> <span class="o">+=</span> <span class="mf">1e-20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">hessian</span> <span class="o">+</span> <span class="n">damping</span><span class="p">,</span> <span class="n">gradient</span><span class="p">)</span>
+                    <span class="n">max_step_m</span> <span class="o">=</span> <span class="mf">1e-6</span>  <span class="c1"># 10 µm</span>
+                    <span class="n">step_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">step_norm</span> <span class="o">&gt;</span> <span class="n">max_step_m</span><span class="p">:</span>
+                        <span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_step_m</span> <span class="o">/</span> <span class="n">step_norm</span><span class="p">)</span>
+
+                    <span class="n">trial_location</span> <span class="o">=</span> <span class="n">location</span> <span class="o">+</span> <span class="n">meter_to_micrometer</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+                    <span class="n">trial_predicted</span> <span class="o">=</span> <span class="n">dipole_bz</span><span class="p">(</span>
+                        <span class="n">coordinates</span><span class="p">,</span>
+                        <span class="n">trial_location</span><span class="p">,</span>
+                        <span class="n">moment</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">trial_residual</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">trial_predicted</span>
+                    <span class="n">trial_misfit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">trial_residual</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">trial_misfit</span> <span class="o">&lt;</span> <span class="n">location_misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">location</span> <span class="o">=</span> <span class="n">trial_location</span>
+                        <span class="n">residual</span> <span class="o">=</span> <span class="n">trial_residual</span>
+                        <span class="n">alpha</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_scale</span>
+                        <span class="n">location_misfit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial_misfit</span><span class="p">)</span>
+                        <span class="n">took_a_step</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                    <span class="n">alpha</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_scale</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">took_a_step</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">abs</span><span class="p">(</span><span class="n">location_misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">location_misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">location_misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span>
+                <span class="p">):</span>
+                    <span class="k">break</span>
+            <span class="n">linear_model</span> <span class="o">=</span> <span class="n">MagneticMomentBz</span><span class="p">(</span><span class="n">location</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">moment</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">dipole_moment_</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">dipole_bz</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+            <span class="n">misfit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">residual</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">misfit</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location_</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dipole_moment_</span> <span class="o">=</span> <span class="n">moment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">misfit_</span> <span class="o">=</span> <span class="n">misfit</span>
+
+        <span class="c1"># Calculate R²</span>
+        <span class="n">predicted_data</span> <span class="o">=</span> <span class="n">dipole_bz</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dipole_moment_</span><span class="p">)</span>
+        <span class="n">residual_sum_squares</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">data</span> <span class="o">-</span> <span class="n">predicted_data</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">total_sum_squares</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">data</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">r2_</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">residual_sum_squares</span> <span class="o">/</span> <span class="n">total_sum_squares</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+
+
+<span class="k">def</span> <span class="nf">_jacobian_nonlinear</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">zc</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">mz</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    JIT-compiled Jacobian for nonlinear inversion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">choclo</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">VACUUM_MAGNETIC_PERMEABILITY</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">xc</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">yc</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">zc</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dz</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c1"># prevent huge derivatives if (xc,yc,zc) gets very near an observation</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">r2</span><span class="p">,</span> <span class="mf">1e-18</span><span class="p">)</span>
+        <span class="n">r5</span> <span class="o">=</span> <span class="n">r2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">5</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">r7</span> <span class="o">=</span> <span class="n">r2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">7</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># ∂bz / ∂xc</span>
+        <span class="n">dBz_dxc</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">my</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span>
+            <span class="o">+</span> <span class="n">mz</span> <span class="o">*</span> <span class="p">((</span><span class="mi">15</span> <span class="o">*</span> <span class="n">dz</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span> <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">mx</span> <span class="o">*</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">mx</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span>
+        <span class="p">)</span>
+        <span class="c1"># ∂bz / ∂yc</span>
+        <span class="n">dBz_dyc</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">mx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span>
+            <span class="o">+</span> <span class="n">mz</span> <span class="o">*</span> <span class="p">((</span><span class="mi">15</span> <span class="o">*</span> <span class="n">dz</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span> <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">my</span> <span class="o">*</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">my</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span>
+        <span class="p">)</span>
+        <span class="c1"># ∂bz / ∂zc</span>
+        <span class="n">dBz_dzc</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">mz</span> <span class="o">*</span> <span class="p">((</span><span class="mi">15</span> <span class="o">*</span> <span class="n">dz</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span> <span class="o">-</span> <span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">my</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">my</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">mx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">dz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">r7</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">mx</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="n">r5</span>
+        <span class="p">)</span>
+        <span class="c1"># Convert to nT</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dBz_dxc</span> <span class="o">*</span> <span class="mf">1e9</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dBz_dyc</span> <span class="o">*</span> <span class="mf">1e9</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dBz_dzc</span> <span class="o">*</span> <span class="mf">1e9</span>
+
+
+<div class="viewcode-block" id="iterative_nonlinear_inversion">
+<a class="viewcode-back" href="../../api/generated/magali.iterative_nonlinear_inversion.html#magali.iterative_nonlinear_inversion">[docs]</a>
+<span class="k">def</span> <span class="nf">iterative_nonlinear_inversion</span><span class="p">(</span>
+    <span class="n">data_up</span><span class="p">,</span>
+    <span class="n">bounding_boxes</span><span class="p">,</span>
+    <span class="n">height_difference</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+    <span class="n">copy_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform iterative Euler and nonlinear dipole inversion over bounding boxes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_up : xarray.DataArray</span>
+<span class="sd">        Upward-continued magnetic data with coordinates &quot;x&quot;, &quot;y&quot;, and &quot;z&quot;.</span>
+<span class="sd">        This is typically obtained after upward continuation of observed</span>
+<span class="sd">        magnetic data.</span>
+
+<span class="sd">    bounding_boxes : list of lists or arrays</span>
+<span class="sd">        Bounding boxes of detected anomalies in data coordinates.</span>
+<span class="sd">        Each bounding box is defined as [x_min, x_max, y_min, y_max].</span>
+
+<span class="sd">    height_difference : float, optional</span>
+<span class="sd">        Height increment (in µm) used for upward continuation after each</span>
+<span class="sd">        iteration (default is 5.0). Increasing this value smooths the field</span>
+<span class="sd">        more rapidly between iterations.</span>
+
+<span class="sd">    copy_data : bool, optional</span>
+<span class="sd">        If True (default), operates on a deep copy of the input data to avoid</span>
+<span class="sd">        modifying the original array. If False, modifications will be applied</span>
+<span class="sd">        directly to the provided data array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data_updated : xarray.DataArray</span>
+<span class="sd">        Magnetic data after iterative dipole removal and upward continuation.</span>
+
+<span class="sd">    locations_ : list of tuples</span>
+<span class="sd">        Estimated (x, y, z) coordinates of the dipole sources identified during</span>
+<span class="sd">        the inversion.</span>
+
+<span class="sd">    dipole_moments_ : list of arrays</span>
+<span class="sd">        Estimated magnetic dipole moments (in A·m²) corresponding to each</span>
+<span class="sd">        bounding box.</span>
+
+<span class="sd">    r2_values : list of floats</span>
+<span class="sd">        Coefficient of determination (R²) for each nonlinear inversion fit,</span>
+<span class="sd">        indicating model quality.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">locations_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dipole_moments_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">r2_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">vd</span><span class="o">.</span><span class="n">grid_to_table</span><span class="p">(</span><span class="n">data_up</span><span class="p">)</span>
+    <span class="n">global_coordinates</span> <span class="o">=</span> <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="n">data_updated</span> <span class="o">=</span> <span class="n">data_up</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">copy_data</span> <span class="k">else</span> <span class="n">data_up</span>
+
+    <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="n">bounding_boxes</span><span class="p">:</span>
+        <span class="n">anomaly</span> <span class="o">=</span> <span class="n">data_updated</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="p">[:</span><span class="mi">2</span><span class="p">]),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))</span>
+
+        <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">tga</span> <span class="o">=</span> <span class="n">gradient</span><span class="p">(</span><span class="n">anomaly</span><span class="p">)</span>
+        <span class="n">anomaly</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">],</span> <span class="n">anomaly</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">],</span> <span class="n">anomaly</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">],</span> <span class="n">anomaly</span><span class="p">[</span><span class="s2">&quot;tga&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">tga</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="n">vd</span><span class="o">.</span><span class="n">grid_to_table</span><span class="p">(</span><span class="n">anomaly</span><span class="p">)</span>
+
+        <span class="n">euler</span> <span class="o">=</span> <span class="n">hm</span><span class="o">.</span><span class="n">EulerDeconvolution</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">euler</span><span class="o">.</span><span class="n">fit</span><span class="p">((</span><span class="n">table</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">z</span><span class="p">),</span> <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">bz</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">dz</span><span class="p">))</span>
+
+        <span class="n">bz_corrected</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">bz</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">euler</span><span class="o">.</span><span class="n">base_level_</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="n">model_nl</span> <span class="o">=</span> <span class="n">NonlinearMagneticDipoleBz</span><span class="p">(</span>
+            <span class="n">initial_location</span><span class="o">=</span><span class="n">euler</span><span class="o">.</span><span class="n">location_</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span>
+        <span class="p">)</span>
+        <span class="n">model_nl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">bz_corrected</span><span class="p">)</span>
+
+        <span class="n">locations_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_nl</span><span class="o">.</span><span class="n">location_</span><span class="p">)</span>
+        <span class="n">dipole_moments_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_nl</span><span class="o">.</span><span class="n">dipole_moment_</span><span class="p">)</span>
+        <span class="n">r2_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_nl</span><span class="o">.</span><span class="n">r2_</span><span class="p">)</span>
+
+        <span class="n">modeled_bz</span> <span class="o">=</span> <span class="n">dipole_bz</span><span class="p">(</span>
+            <span class="n">global_coordinates</span><span class="p">,</span> <span class="n">model_nl</span><span class="o">.</span><span class="n">location_</span><span class="p">,</span> <span class="n">model_nl</span><span class="o">.</span><span class="n">dipole_moment_</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">bz</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">modeled_bz</span><span class="p">):</span>
+            <span class="n">data_updated</span><span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">}]</span> <span class="o">-=</span> <span class="n">bz</span>
+
+        <span class="n">data_updated</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">hm</span><span class="o">.</span><span class="n">upward_continuation</span><span class="p">(</span><span class="n">data_updated</span><span class="p">,</span> <span class="n">height_difference</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">data_updated</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">data_updated</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">data_updated</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">data_updated</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">height_difference</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;bz&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">tga</span> <span class="o">=</span> <span class="n">gradient</span><span class="p">(</span><span class="n">data_updated</span><span class="p">)</span>
+        <span class="n">data_updated</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dx</span>
+        <span class="n">data_updated</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dy</span>
+        <span class="n">data_updated</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dz</span>
+        <span class="n">data_updated</span><span class="p">[</span><span class="s2">&quot;tga&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tga</span>
+
+    <span class="k">return</span> <span class="n">data_updated</span><span class="p">,</span> <span class="n">locations_</span><span class="p">,</span> <span class="n">dipole_moments_</span><span class="p">,</span> <span class="n">r2_values</span></div>
+
+
+
+<span class="c1"># Compile the Jacobian calculation. Doesn&#39;t use this as a decorator so that we</span>
+<span class="c1"># can test the pure Python function and get coverage information about it.</span>
+<span class="n">jacobian_linear_jit</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">_jacobian_linear</span><span class="p">,</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">jacobian_nonlinear_jit</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">_jacobian_nonlinear</span><span class="p">,</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, The magali Developers.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on Nov 11, 2025.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
