@@ -420,3 +420,34 @@ def test_nonlinear_max_step_normalization():
 
     assert model.misfit_[-1] < model.misfit_[0]
     assert not np.allclose(model.location_, initial_location)
+
+
+def test_nonlinear_outer_loop_tolerance_convergence():
+    """
+    Test outer loop convergence via tolerance condition.
+    This ensures the outer loop break condition is covered.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-10, 10, -10, 10],
+        spacing=2,
+        extra_coords=3,
+    )
+    true_location = (1.0, -1.0, -4.0)
+    true_moment = np.array([2e-12, -1e-12, 2e-12])
+    
+    data = dipole_bz(coordinates, true_location, true_moment)
+    
+    initial_location = np.array([1.1, -0.9, -3.9])
+    
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=100,
+        tol=0.1,  # Loose tolerance for quick outer loop convergence
+        alpha_init=1.0,
+        alpha_scale=10.0
+    )
+    
+    model.fit(coordinates, data)
+    
+    assert len(model.misfit_) >= 2
+    assert model.r2_ > 0.9
