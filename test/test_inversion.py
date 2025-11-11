@@ -338,25 +338,26 @@ def test_nonlinear_inner_loop_no_step_taken():
     )
     true_location = (0, 0, -5)
     true_moment = np.array([1e-12, 0, 1e-12])
-    
+
     data = dipole_bz(coordinates, true_location, true_moment)
-    
+
     initial_location = np.array([1000.0, 1000.0, 1000.0])  # Very far from solution
-    
+
     model = NonlinearMagneticDipoleBz(
         initial_location=initial_location,
         max_iter=3,  # Few outer iterations
-        tol=1e-10,   # Very tight tolerance
+        tol=1e-10,  # Very tight tolerance
         alpha_init=1e20,  # Extremely high damping
-        alpha_scale=1.001  # Very slow reduction
+        alpha_scale=1.001,  # Very slow reduction
     )
-    
+
     model.fit(coordinates, data)
-    
-    assert hasattr(model, 'location_')
-    assert hasattr(model, 'dipole_moment_')
-    assert hasattr(model, 'misfit_')
+
+    assert hasattr(model, "location_")
+    assert hasattr(model, "dipole_moment_")
+    assert hasattr(model, "misfit_")
     assert len(model.misfit_) >= 2
+
 
 def test_nonlinear_inner_loop_tolerance_convergence():
     """
@@ -370,21 +371,52 @@ def test_nonlinear_inner_loop_tolerance_convergence():
     )
     true_location = (0.0, 0.0, -3.0)
     true_moment = np.array([1e-12, 1e-12, 1e-12])
-    
+
     data = dipole_bz(coordinates, true_location, true_moment)
-    
+
     # Very close to true location
     initial_location = np.array([0.1, 0.1, -2.9])
-    
+
     model = NonlinearMagneticDipoleBz(
         initial_location=initial_location,
         max_iter=10,
         tol=0.5,  # Very loose tolerance
         alpha_init=1.0,
-        alpha_scale=10.0
+        alpha_scale=10.0,
     )
-    
+
     model.fit(coordinates, data)
-    
+
     assert model.misfit_[-1] < model.misfit_[0]
     assert len(model.misfit_) > 1
+
+
+def test_nonlinear_max_step_normalization():
+    """
+    Test that step normalization works when step norm exceeds max_step_m.
+    This covers the step_norm > max_step_m condition.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-20, 20, -20, 20],
+        spacing=5,
+        extra_coords=10,
+    )
+    true_location = (0.0, 0.0, -8.0)
+    true_moment = np.array([5e-11, 5e-11, 5e-11])  # Large moment for large gradients
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+
+    initial_location = np.array([50.0, 50.0, 50.0])
+
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=10,
+        tol=1e-2,
+        alpha_init=0.01,  # Low damping for larger steps
+        alpha_scale=5.0,
+    )
+
+    model.fit(coordinates, data)
+
+    assert model.misfit_[-1] < model.misfit_[0]
+    assert not np.allclose(model.location_, initial_location)
