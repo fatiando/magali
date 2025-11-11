@@ -288,6 +288,9 @@ def test_nonlinear_magnetic_moment_gz_jacobian():
 
 
 def test_iterative_nonlinear_inversion(synthetic_data):
+    """
+    Test the complete iterative nonlinear inversion workflow on synthetic data.
+    """
     height_difference = 5.0
     data_up = (
         hm.upward_continuation(synthetic_data, height_difference)
