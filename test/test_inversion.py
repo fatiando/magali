@@ -341,7 +341,7 @@ def test_nonlinear_inner_loop_no_step_taken():
 
     data = dipole_bz(coordinates, true_location, true_moment)
 
-    initial_location = np.array([1000.0, 1000.0, 1000.0])  # Very far from solution
+    initial_location = (1000.0, 1000.0, 1000.0)  # Very far from solution
 
     model = NonlinearMagneticDipoleBz(
         initial_location=initial_location,
@@ -375,7 +375,7 @@ def test_nonlinear_inner_loop_tolerance_convergence():
     data = dipole_bz(coordinates, true_location, true_moment)
 
     # Very close to true location
-    initial_location = np.array([0.1, 0.1, -2.9])
+    initial_location = (0.1, 0.1, -2.9)
 
     model = NonlinearMagneticDipoleBz(
         initial_location=initial_location,
@@ -406,7 +406,7 @@ def test_nonlinear_max_step_normalization():
 
     data = dipole_bz(coordinates, true_location, true_moment)
 
-    initial_location = np.array([50.0, 50.0, 50.0])
+    initial_location = (50.0, 50.0, 50.0)
 
     model = NonlinearMagneticDipoleBz(
         initial_location=initial_location,
@@ -437,7 +437,7 @@ def test_nonlinear_outer_loop_tolerance_convergence():
 
     data = dipole_bz(coordinates, true_location, true_moment)
 
-    initial_location = np.array([1.1, -0.9, -3.9])
+    initial_location = (1.1, -0.9, -3.9)
 
     model = NonlinearMagneticDipoleBz(
         initial_location=initial_location,
@@ -463,7 +463,7 @@ def test_nonlinear_single_iteration():
         spacing=1,
         extra_coords=2,
     )
-    true_location = np.array([0.0, 0.0, -2.0])
+    true_location = (0.0, 0.0, -2.0)
     true_moment = np.array([1e-12, 0, 1e-12])
 
     data = dipole_bz(coordinates, true_location, true_moment)
