@@ -357,3 +357,34 @@ def test_nonlinear_inner_loop_no_step_taken():
     assert hasattr(model, 'dipole_moment_')
     assert hasattr(model, 'misfit_')
     assert len(model.misfit_) >= 2
+
+def test_nonlinear_inner_loop_tolerance_convergence():
+    """
+    Test inner loop convergence via tolerance condition rather than step success.
+    Covers the inner loop tolerance break condition.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-5, 5, -5, 5],
+        spacing=1,
+        extra_coords=2,
+    )
+    true_location = (0.0, 0.0, -3.0)
+    true_moment = np.array([1e-12, 1e-12, 1e-12])
+    
+    data = dipole_bz(coordinates, true_location, true_moment)
+    
+    # Very close to true location
+    initial_location = np.array([0.1, 0.1, -2.9])
+    
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=10,
+        tol=0.5,  # Very loose tolerance
+        alpha_init=1.0,
+        alpha_scale=10.0
+    )
+    
+    model.fit(coordinates, data)
+    
+    assert model.misfit_[-1] < model.misfit_[0]
+    assert len(model.misfit_) > 1
