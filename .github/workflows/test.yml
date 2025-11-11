@@ -24,7 +24,7 @@ permissions: {}
 defaults:
   run:
     # -e makes sure builds fail if any command fails
-    shell: bash -e -o pipefail
+    shell: bash -o pipefail -e {0}
 
 jobs:
 
