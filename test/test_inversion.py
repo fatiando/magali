@@ -451,3 +451,36 @@ def test_nonlinear_outer_loop_tolerance_convergence():
     
     assert len(model.misfit_) >= 2
     assert model.r2_ > 0.9
+
+def test_nonlinear_single_iteration():
+    """
+    Test behavior with only one iteration.
+    This covers the case where outer loop runs only once.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-5, 5, -5, 5],
+        spacing=1,
+        extra_coords=2,
+    )
+    true_location = np.array([0.0, 0.0, -2.0])
+    true_moment = np.array([1e-12, 0, 1e-12])
+    
+    data = dipole_bz(coordinates, true_location, true_moment)
+    
+    # Use true location as initial guess (perfect scenario)
+    initial_location = true_location.copy()
+    
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=1,  # Only one iteration
+        tol=1e-10,
+        alpha_init=1.0,
+        alpha_scale=10.0
+    )
+    
+    model.fit(coordinates, data)
+    
+    assert hasattr(model, 'location_')
+    assert hasattr(model, 'dipole_moment_')
+    assert hasattr(model, 'misfit_')
+    assert len(model.misfit_) == 2
