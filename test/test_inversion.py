@@ -324,3 +324,47 @@ def test_iterative_nonlinear_inversion(synthetic_data):
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
     np.testing.assert_allclose(locations_[0][0], 1506.00100449, atol=1e-3)
     np.testing.assert_allclose(dipole_moments_[0][0], 5.22732937e-13, atol=1e-12)
+
+
+def test_nonlinear_magnetic_dipole_lm_damping_loop():
+    """
+    Force the Levenberg-Marquardt damping loop in NonlinearMagneticDipoleBz.fit()
+    to execute, covering alpha adjustment and trial-misfit conditions.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-20, 20, -20, 20], spacing=5, extra_coords=5
+    )
+    true_location = (0.0, 0.0, -5.0)
+    true_inclination = 45.0
+    true_declination = 30.0
+    true_intensity = 1e-12
+
+    true_moment = hm.magnetic_angles_to_vec(
+        inclination=true_inclination,
+        declination=true_declination,
+        intensity=true_intensity,
+    )
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+    rng = np.random.default_rng(42)
+    noise = rng.normal(scale=np.abs(data).max() * 0.5, size=data.shape)
+    data = data + noise
+    data = -data  # flip sign to make first step fail
+
+    # Very poor initial guess
+    bad_initial_guess = (100.0, -100.0, 100.0)
+
+    model = NonlinearMagneticDipoleBz(initial_location=bad_initial_guess, max_iter=5)
+    model.fit(coordinates, data)
+
+    assert len(model.misfit_) > 1, "Expected multiple LM iterations"
+    assert model.misfit_[-1] < model.misfit_[0], "Expected overall misfit reduction"
+
+    misfit_deltas = np.abs(np.diff(model.misfit_))
+    assert np.any(misfit_deltas < model.misfit_[0] * 1e-2), (
+        "Expected small intermediate misfit changes typical of LM damping loop."
+    )
+
+    assert not np.allclose(model.location_, bad_initial_guess), (
+        "Model parameters should have been updated after LM damping iterations"
+    )
