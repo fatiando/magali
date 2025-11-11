@@ -112,6 +112,8 @@ jobs:
 
       - name: Install requirements
         run: |
+          which python;
+          which python -m pip;
           python -m pip install --requirement requirements-full.txt
 
       - name: List installed packages
