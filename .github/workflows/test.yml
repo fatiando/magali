@@ -110,10 +110,12 @@ jobs:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements-full.txt') }}
 
+      - name: Check Python and pip version
+        run: |
+          python --version; python -m pip --version
+
       - name: Install requirements
         run: |
-          which python;
-          which python -m pip;
           python -m pip install --requirement requirements-full.txt
 
       - name: List installed packages
