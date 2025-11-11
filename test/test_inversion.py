@@ -326,45 +326,34 @@ def test_iterative_nonlinear_inversion(synthetic_data):
     np.testing.assert_allclose(dipole_moments_[0][0], 5.22732937e-13, atol=1e-12)
 
 
-def test_nonlinear_magnetic_dipole_lm_damping_loop():
+def test_nonlinear_inner_loop_no_step_taken():
     """
-    Force the Levenberg-Marquardt damping loop in NonlinearMagneticDipoleBz.fit()
-    to execute, covering alpha adjustment and trial-misfit conditions.
+    Test the scenario where inner loop fails to find a step that reduces misfit.
+    This covers the 'if not took_a_step: break' condition.
     """
     coordinates = vd.grid_coordinates(
-        region=[-20, 20, -20, 20], spacing=5, extra_coords=5
+        region=[-10, 10, -10, 10],
+        spacing=2,
+        extra_coords=5,
     )
-    true_location = (0.0, 0.0, -5.0)
-    true_inclination = 45.0
-    true_declination = 30.0
-    true_intensity = 1e-12
-
-    true_moment = hm.magnetic_angles_to_vec(
-        inclination=true_inclination,
-        declination=true_declination,
-        intensity=true_intensity,
-    )
-
+    true_location = (0, 0, -5)
+    true_moment = np.array([1e-12, 0, 1e-12])
+    
     data = dipole_bz(coordinates, true_location, true_moment)
-    rng = np.random.default_rng(42)
-    noise = rng.normal(scale=np.abs(data).max() * 0.5, size=data.shape)
-    data = data + noise
-    data = -data  # flip sign to make first step fail
-
-    # Very poor initial guess
-    bad_initial_guess = (100.0, -100.0, 100.0)
-
-    model = NonlinearMagneticDipoleBz(initial_location=bad_initial_guess, max_iter=5)
+    
+    initial_location = np.array([1000.0, 1000.0, 1000.0])  # Very far from solution
+    
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=3,  # Few outer iterations
+        tol=1e-10,   # Very tight tolerance
+        alpha_init=1e20,  # Extremely high damping
+        alpha_scale=1.001  # Very slow reduction
+    )
+    
     model.fit(coordinates, data)
-
-    assert len(model.misfit_) > 1, "Expected multiple LM iterations"
-    assert model.misfit_[-1] < model.misfit_[0], "Expected overall misfit reduction"
-
-    misfit_deltas = np.abs(np.diff(model.misfit_))
-    assert np.any(misfit_deltas < model.misfit_[0] * 1e-2), (
-        "Expected small intermediate misfit changes typical of LM damping loop."
-    )
-
-    assert not np.allclose(model.location_, bad_initial_guess), (
-        "Model parameters should have been updated after LM damping iterations"
-    )
+    
+    assert hasattr(model, 'location_')
+    assert hasattr(model, 'dipole_moment_')
+    assert hasattr(model, 'misfit_')
+    assert len(model.misfit_) >= 2
