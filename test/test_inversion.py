@@ -288,6 +288,9 @@ def test_nonlinear_magnetic_moment_gz_jacobian():
 
 
 def test_iterative_nonlinear_inversion(synthetic_data):
+    """
+    Test the complete iterative nonlinear inversion workflow on synthetic data.
+    """
     height_difference = 5.0
     data_up = (
         hm.upward_continuation(synthetic_data, height_difference)
@@ -324,3 +327,162 @@ def test_iterative_nonlinear_inversion(synthetic_data):
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
     np.testing.assert_allclose(locations_[0][0], 1506.00100449, atol=1e-3)
     np.testing.assert_allclose(dipole_moments_[0][0], 5.22732937e-13, atol=1e-12)
+
+
+def test_nonlinear_inner_loop_no_step_taken():
+    """
+    Test the scenario where inner loop fails to find a step that reduces misfit.
+    This covers the 'if not took_a_step: break' condition.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-10, 10, -10, 10],
+        spacing=2,
+        extra_coords=5,
+    )
+    true_location = (0, 0, -5)
+    true_moment = np.array([1e-12, 0, 1e-12])
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+
+    initial_location = (1000.0, 1000.0, 1000.0)  # Very far from solution
+
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=3,  # Few outer iterations
+        tol=1e-10,  # Very tight tolerance
+        alpha_init=1e20,  # Extremely high damping
+        alpha_scale=1.001,  # Very slow reduction
+    )
+
+    model.fit(coordinates, data)
+
+    assert hasattr(model, "location_")
+    assert hasattr(model, "dipole_moment_")
+    assert hasattr(model, "misfit_")
+    assert len(model.misfit_) >= 2
+
+
+def test_nonlinear_inner_loop_tolerance_convergence():
+    """
+    Test inner loop convergence via tolerance condition rather than step success.
+    Covers the inner loop tolerance break condition.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-5, 5, -5, 5],
+        spacing=1,
+        extra_coords=2,
+    )
+    true_location = (0.0, 0.0, -3.0)
+    true_moment = np.array([1e-12, 1e-12, 1e-12])
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+
+    # Very close to true location
+    initial_location = (0.1, 0.1, -2.9)
+
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=10,
+        tol=0.5,  # Very loose tolerance
+        alpha_init=1.0,
+        alpha_scale=10.0,
+    )
+
+    model.fit(coordinates, data)
+
+    assert model.misfit_[-1] < model.misfit_[0]
+    assert len(model.misfit_) > 1
+
+
+def test_nonlinear_max_step_normalization():
+    """
+    Test that step normalization works when step norm exceeds max_step_m.
+    This covers the step_norm > max_step_m condition.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-20, 20, -20, 20],
+        spacing=5,
+        extra_coords=10,
+    )
+    true_location = (0.0, 0.0, -8.0)
+    true_moment = np.array([5e-11, 5e-11, 5e-11])  # Large moment for large gradients
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+
+    initial_location = (50.0, 50.0, 50.0)
+
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=10,
+        tol=1e-2,
+        alpha_init=0.01,  # Low damping for larger steps
+        alpha_scale=5.0,
+    )
+
+    model.fit(coordinates, data)
+
+    assert model.misfit_[-1] < model.misfit_[0]
+    assert not np.allclose(model.location_, initial_location)
+
+
+def test_nonlinear_outer_loop_tolerance_convergence():
+    """
+    Test outer loop convergence via tolerance condition.
+    This ensures the outer loop break condition is covered.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-10, 10, -10, 10],
+        spacing=2,
+        extra_coords=3,
+    )
+    true_location = (1.0, -1.0, -4.0)
+    true_moment = np.array([2e-12, -1e-12, 2e-12])
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+
+    initial_location = (1.1, -0.9, -3.9)
+
+    model = NonlinearMagneticDipoleBz(
+        initial_location=initial_location,
+        max_iter=100,
+        tol=0.1,  # Loose tolerance for quick outer loop convergence
+        alpha_init=1.0,
+        alpha_scale=10.0,
+    )
+
+    model.fit(coordinates, data)
+
+    assert len(model.misfit_) >= 2
+    assert model.r2_ > 0.9
+
+
+def test_nonlinear_single_iteration():
+    """
+    Test behavior with only one iteration.
+    This covers the case where outer loop runs only once.
+    """
+    coordinates = vd.grid_coordinates(
+        region=[-5, 5, -5, 5],
+        spacing=1,
+        extra_coords=2,
+    )
+    true_location = (0.0, 0.0, -2.0)
+    true_moment = np.array([1e-12, 0, 1e-12])
+
+    data = dipole_bz(coordinates, true_location, true_moment)
+
+    # Use true location as initial guess (perfect scenario)
+    model = NonlinearMagneticDipoleBz(
+        initial_location=true_location,
+        max_iter=1,  # Only one iteration
+        tol=1e-10,
+        alpha_init=1.0,
+        alpha_scale=10.0,
+    )
+
+    model.fit(coordinates, data)
+
+    assert hasattr(model, "location_")
+    assert hasattr(model, "dipole_moment_")
+    assert hasattr(model, "misfit_")
+    assert len(model.misfit_) == 2
