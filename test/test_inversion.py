@@ -472,10 +472,8 @@ def test_nonlinear_single_iteration():
     data = dipole_bz(coordinates, true_location, true_moment)
 
     # Use true location as initial guess (perfect scenario)
-    initial_location = true_location.copy()
-
     model = NonlinearMagneticDipoleBz(
-        initial_location=initial_location,
+        initial_location=true_location,
         max_iter=1,  # Only one iteration
         tol=1e-10,
         alpha_init=1.0,
