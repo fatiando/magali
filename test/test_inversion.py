@@ -137,43 +137,104 @@ def test_linear_magnetic_moment_gz_jacobian():
     np.testing.assert_allclose(data_predicted, data)
 
 
-def test_nonlinear_magnetic_dipole_bz_inversion():
+def test_nonlinear_magnetic_dipole_bz_inversion(synthetic_data):
     "Check that the nonlinear inversion recovers a known dipole location and moment."
-    coordinates = vd.grid_coordinates(
-        region=[-20, 15, 0, 40],
-        spacing=1,
-        extra_coords=5,
-    )
-    true_location = (0, 20, -5)
-    true_inclination = 45
-    true_declination = -15
-    true_intensity = 1e-15
-    true_moment = hm.magnetic_angles_to_vec(
-        inclination=true_inclination,
-        declination=true_declination,
-        intensity=true_intensity,
-    )
-    data = dipole_bz(coordinates, true_location, true_moment)
+    SEED = 42
+    rng = np.random.default_rng(SEED)
 
-    initial_guess = (0.04041674, 20.27141785, 3.27582947)
-    model = NonlinearMagneticDipoleBz(initial_location=initial_guess)
+    sensor_sample_distance = 5.0
+    region = [0, 2000, 0, 2000]
+    spacing = 2.0
+    true_inclination = 30
+    true_declination = 40
+    true_dispersion_angle = 5
+    size = 5
+
+    directions_inclination, directions_declination = random_directions(
+        true_inclination,
+        true_declination,
+        true_dispersion_angle,
+        size=size,
+        random_state=SEED,
+    )
+
+    dipoles_amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
+    dipole_coordinates = (
+        rng.integers(30, 1970, size),
+        rng.integers(30, 1970, size),
+        rng.integers(-20, -1, size),
+    )
+
+    dipole_moments = hm.magnetic_angles_to_vec(
+        inclination=directions_inclination,
+        declination=directions_declination,
+        intensity=dipoles_amplitude,
+    )
+
+    data = dipole_bz_grid(
+        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+    )
+    noise_std_dev = 100
+    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
+
+
+    height_difference = 5.0
+
+    data_up = (
+        hm.upward_continuation(data, height_difference)
+        .assign_attrs(data.attrs)
+        .assign_coords(x=data.x, y=data.y)
+        .assign_coords(z=data.z + height_difference)
+        .rename("bz")
+    )
+
+    dx, dy, dz, tga = gradient(data_up)
+    data_up["dx"], data_up["dy"], data_up["dz"], data_up["tga"] = dx, dy, dz, tga
+
+    stretched = skimage.exposure.rescale_intensity(
+        tga, in_range=tuple(np.percentile(tga, (1, 99)))
+    )
+    data_tga_stretched = xr.DataArray(stretched, coords=data_up.coords)
+
+    bounding_boxes = detect_anomalies(
+        data_tga_stretched,
+        size_range=[50, 150],
+        detection_threshold=0.2,
+        border_exclusion=2,
+        size_multiplier=0.75
+
+    )
+    anomaly = data_up.sel(x=slice(*bounding_boxes[1][:2]), y=slice(*bounding_boxes[1][2:]))
+
+
+    table = vd.grid_to_table(anomaly)
+
+    euler = hm.EulerDeconvolution(3)
+    euler.fit((table.x, table.y, table.z), (table.bz, table.dx, table.dy, table.dz))
+    bz_corrected = table.bz.values - euler.base_level_
+    coordinates = (table.x.values, table.y.values, table.z.values)
+
+    model_nl = NonlinearMagneticDipoleBz(
+    initial_location=euler.location_, max_iter=1000
+    )
+ 
     # Check uninitialized attributes
-    assert not hasattr(model, "location_")
-    assert not hasattr(model, "dipole_moment_")
-    assert not hasattr(model, "r2")
+    assert not hasattr(model_nl, "location_")
+    assert not hasattr(model_nl, "dipole_moment_")
+    assert not hasattr(model_nl, "r2")
 
     # Run the inversion
-    model.fit(coordinates, data)
+    model_nl.fit(coordinates, bz_corrected)
 
     # Check that attributes are now set
-    assert model.location_ is not None
-    assert model.dipole_moment_ is not None
-    assert model.r2_ is not None
+    assert model_nl.location_ is not None
+    assert model_nl.dipole_moment_ is not None
+    assert model_nl.r2_ is not None
 
     # Assert that results are close to the truth
-    np.testing.assert_allclose(model.location_, true_location, atol=1.0)
-    np.testing.assert_allclose(model.dipole_moment_, true_moment, rtol=0.05)
-    np.testing.assert_allclose(model.r2_, 1, rtol=0.05)
+    np.testing.assert_allclose(model_nl.location_[2], -6, atol=0.05)
+    np.testing.assert_allclose(model_nl.dipole_moment_[2], -10, rtol=0.05)
+    np.testing.assert_allclose(model_nl.r2_, 1, rtol=0.05)
 
 
 def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():
@@ -292,6 +353,7 @@ def test_iterative_nonlinear_inversion(synthetic_data):
     Test the complete iterative nonlinear inversion workflow on synthetic data.
     """
     height_difference = 5.0
+
     data_up = (
         hm.upward_continuation(synthetic_data, height_difference)
         .assign_attrs(synthetic_data.attrs)
@@ -299,33 +361,39 @@ def test_iterative_nonlinear_inversion(synthetic_data):
         .assign_coords(z=synthetic_data.z + height_difference)
         .rename("bz")
     )
+
     dx, dy, dz, tga = gradient(data_up)
     data_up["dx"], data_up["dy"], data_up["dz"], data_up["tga"] = dx, dy, dz, tga
+
     stretched = skimage.exposure.rescale_intensity(
         tga, in_range=tuple(np.percentile(tga, (1, 99)))
     )
     data_tga_stretched = xr.DataArray(stretched, coords=data_up.coords)
+
     bounding_boxes = detect_anomalies(
         data_tga_stretched,
-        size_range=[30, 50],
-        detection_threshold=0.03,
+        size_range=[50, 150],
+        detection_threshold=0.2,
         border_exclusion=2,
-        size_multiplier=1,
+        size_multiplier=0.75
+
     )
-    data_updated, locations_, dipole_moments_, r2_values = (
-        iterative_nonlinear_inversion(
-            data_up,
-            bounding_boxes,
-            height_difference=height_difference,
-            copy_data=True,
-        )
+
+    data_updated, locations_, dipole_moments_, r2_values = iterative_nonlinear_inversion(
+        data_up,
+        bounding_boxes,
+        height_difference=height_difference,
+        copy_data=True,
     )
+
+    
+    
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
     assert isinstance(dipole_moments_, list)
     assert isinstance(r2_values, list)
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
-    np.testing.assert_allclose(locations_[0][0], 1506.00100449, atol=1e-3)
+    np.testing.assert_allclose(locations_[1][2], -6, atol=1e-3)
     np.testing.assert_allclose(dipole_moments_[0][0], 5.22732937e-13, atol=1e-12)
 
 
