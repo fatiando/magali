@@ -491,7 +491,7 @@ def iterative_nonlinear_inversion(
 
     table = vd.grid_to_table(data_up)
     global_coordinates = (table.x.values, table.y.values, table.z.values)
-
+    shape = data_up.shape
     data_updated = data_up.copy(deep=True) if copy_data else data_up
 
     for box in bounding_boxes:
@@ -520,17 +520,9 @@ def iterative_nonlinear_inversion(
         modeled_bz = dipole_bz(
             global_coordinates, model_nl.location_, model_nl.dipole_moment_
         )
-        # for x, y, bz in zip(table.x, table.y, modeled_bz):
-        #     data_updated.loc[{"x": x, "y": y}] -= bz
-        data_updated.values -= modeled_bz.ravel()
+        modeled_bz = np.reshape(modeled_bz, shape)
 
-        # data_updated = (
-        #     hm.upward_continuation(data_updated, 0)
-        #     .assign_attrs(data_updated.attrs)
-        #     .assign_coords(x=data_updated.x, y=data_updated.y)
-        #     .assign_coords(z=data_updated.z + 0)
-        #     .rename("bz")
-        # )
+        data_updated.values -= modeled_bz
         dx, dy, dz, tga = gradient(data_updated)
         data_updated["dx"] = dx
         data_updated["dy"] = dy
