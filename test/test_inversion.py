@@ -11,7 +11,7 @@ Test the _synthetic functions
 import harmonica as hm
 import numpy as np
 import pytest
-import scipy as sp
+import scipy.spatial as sps
 import skimage.exposure
 import verde as vd
 import xarray as xr
@@ -68,41 +68,6 @@ def synthetic_data():
         intensity=dipoles_amplitude,
     )
 
-    data = dipole_bz_grid(
-        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
-    )
-    noise_std_dev = 100
-    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
-
-    return data
-
-
-@pytest.fixture
-def complex_model():
-    SEED = 42
-    rng = np.random.default_rng(SEED)
-
-    sensor_sample_distance = 5.0
-    region = [0, 2000, 0, 2000]
-    spacing = 2
-
-    dipole_coordinates = (
-        np.concatenate([[1250, 1300, 500, 500, 1252, 1250, 1790, 1782, 1720]]),
-        np.concatenate([[500, 1750, 1000, 890, 380, 230, 1210, 1122, 1255]]),
-        np.concatenate([[-15, -15, -30, -30, -30, -15, -15, -15, -15]]),
-    )
-
-    true_inclination = np.concatenate([[10, -10, -5, 10, 10, 10, -10, -160, -10]])
-    true_declination = np.concatenate([[10, 170, 190, 170, 170, 10, -10, -10, -170]])
-    true_intensity = np.concatenate(
-        [[5e-11, 5e-11, 5e-11, 2e-12, 2e-12, 5e-11, 5e-13, 5e-12, 5e-13]]
-    )
-
-    dipole_moments = hm.magnetic_angles_to_vec(
-        inclination=true_inclination,
-        declination=true_declination,
-        intensity=true_intensity,
-    )
     data = dipole_bz_grid(
         region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
     )
@@ -383,16 +348,46 @@ def test_nonlinear_magnetic_moment_gz_jacobian():
     np.testing.assert_allclose(np.std(residual), 31.744971328845484, atol=1e-3)
 
 
-def test_iterative_nonlinear_inversion(complex_model):
+def test_iterative_nonlinear_inversion():
     """
     Test the complete iterative nonlinear inversion workflow on synthetic data.
     """
+    SEED = 42
+    rng = np.random.default_rng(SEED)
+
+    sensor_sample_distance = 5.0
+    region = [0, 2000, 0, 2000]
+    spacing = 2
+
+    dipole_coordinates = (
+        np.concatenate([[1250, 1300, 500, 500, 1252, 1250, 1790, 1782, 1720]]),
+        np.concatenate([[500, 1750, 1000, 890, 380, 230, 1210, 1122, 1255]]),
+        np.concatenate([[-15, -15, -30, -30, -30, -15, -15, -15, -15]]),
+    )
+
+    true_inclination = np.concatenate([[10, -10, -5, 10, 10, 10, -10, -160, -10]])
+    true_declination = np.concatenate([[10, 170, 190, 170, 170, 10, -10, -10, -170]])
+    true_intensity = np.concatenate(
+        [[5e-11, 5e-11, 5e-11, 2e-12, 2e-12, 5e-11, 5e-13, 5e-12, 5e-13]]
+    )
+
+    dipole_moments = hm.magnetic_angles_to_vec(
+        inclination=true_inclination,
+        declination=true_declination,
+        intensity=true_intensity,
+    )
+    data = dipole_bz_grid(
+        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+    )
+    noise_std_dev = 100
+    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
+
     height_difference = 5.0
     data_up = (
-        hm.upward_continuation(complex_model, height_difference)
-        .assign_attrs(complex_model.attrs)
-        .assign_coords(x=complex_model.x, y=complex_model.y)
-        .assign_coords(z=complex_model.z + height_difference)
+        hm.upward_continuation(data, height_difference)
+        .assign_attrs(data.attrs)
+        .assign_coords(x=data.x, y=data.y)
+        .assign_coords(z=data.z + height_difference)
         .rename("bz")
     )
 
@@ -462,11 +457,39 @@ def test_iterative_nonlinear_inversion(complex_model):
         )
     )
 
+    dipole_coords_arr = np.column_stack(dipole_coordinates)
+    locations_arr = np.asarray(locations_)
+
+    locations_arr = locations_arr.reshape(-1, 3)
+
+    tree = sps.KDTree(dipole_coords_arr)
+    distances, indices = tree.query(locations_arr)
+
+    closest_true_points = dipole_coords_arr[indices]
+
+    intensity_ = []
+    inc_ = []
+    dec_ = []
+    for i in range(len(dipole_moments_)):
+        intensity, inc, dec = hm.magnetic_vec_to_angles(
+            dipole_moments_[i][0] * 1e11,
+            dipole_moments_[i][1] * 1e11,
+            dipole_moments_[i][2] * 1e11,
+        )
+        intensity *= 1e-11
+        intensity_.append(intensity)
+        inc_.append(inc)
+        dec_.append(dec)
+
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
     assert isinstance(dipole_moments_, list)
     assert isinstance(r2_values, list)
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
+
+    np.testing.assert_array_less(distances, 3)
+
+    
 
 
 def test_nonlinear_inner_loop_no_step_taken():
