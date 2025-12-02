@@ -177,7 +177,6 @@ def test_nonlinear_magnetic_dipole_bz_inversion(synthetic_data):
     noise_std_dev = 100
     data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
 
-
     height_difference = 5.0
 
     data_up = (
@@ -201,11 +200,11 @@ def test_nonlinear_magnetic_dipole_bz_inversion(synthetic_data):
         size_range=[50, 150],
         detection_threshold=0.2,
         border_exclusion=2,
-        size_multiplier=0.75
-
+        size_multiplier=0.75,
     )
-    anomaly = data_up.sel(x=slice(*bounding_boxes[1][:2]), y=slice(*bounding_boxes[1][2:]))
-
+    anomaly = data_up.sel(
+        x=slice(*bounding_boxes[1][:2]), y=slice(*bounding_boxes[1][2:])
+    )
 
     table = vd.grid_to_table(anomaly)
 
@@ -215,9 +214,9 @@ def test_nonlinear_magnetic_dipole_bz_inversion(synthetic_data):
     coordinates = (table.x.values, table.y.values, table.z.values)
 
     model_nl = NonlinearMagneticDipoleBz(
-    initial_location=euler.location_, max_iter=1000
+        initial_location=euler.location_, max_iter=1000
     )
- 
+
     # Check uninitialized attributes
     assert not hasattr(model_nl, "location_")
     assert not hasattr(model_nl, "dipole_moment_")
@@ -375,19 +374,18 @@ def test_iterative_nonlinear_inversion(synthetic_data):
         size_range=[50, 150],
         detection_threshold=0.2,
         border_exclusion=2,
-        size_multiplier=0.75
-
+        size_multiplier=0.75,
     )
 
-    data_updated, locations_, dipole_moments_, r2_values = iterative_nonlinear_inversion(
-        data_up,
-        bounding_boxes,
-        height_difference=height_difference,
-        copy_data=True,
+    data_updated, locations_, dipole_moments_, r2_values = (
+        iterative_nonlinear_inversion(
+            data_up,
+            bounding_boxes,
+            height_difference=height_difference,
+            copy_data=True,
+        )
     )
 
-    
-    
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
     assert isinstance(dipole_moments_, list)
