@@ -489,8 +489,6 @@ def test_iterative_nonlinear_inversion():
 
     np.testing.assert_array_less(distances, 3)
 
-    
-
 
 def test_nonlinear_inner_loop_no_step_taken():
     """
