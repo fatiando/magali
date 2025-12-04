@@ -463,9 +463,9 @@ def test_iterative_nonlinear_inversion():
     locations_arr = locations_arr.reshape(-1, 3)
 
     tree = sps.KDTree(dipole_coords_arr)
-    distances, indices = tree.query(locations_arr)
+    distances, indexes = tree.query(locations_arr)
 
-    closest_true_points = dipole_coords_arr[indices]
+    closest_true_points = dipole_coords_arr[indexes]
 
     intensity_ = []
     inc_ = []
@@ -488,6 +488,8 @@ def test_iterative_nonlinear_inversion():
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
 
     np.testing.assert_array_less(distances, 3)
+
+
 
 
 def test_nonlinear_inner_loop_no_step_taken():
