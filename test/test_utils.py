@@ -13,6 +13,7 @@ import xarray as xr
 
 from magali._utils import (
     _estimate_grid_spacing,
+    angular_distance,
     gradient,
     total_gradient_amplitude_grid,
 )
@@ -69,3 +70,53 @@ def test_total_gradient_amplitude_grid(souza_junior_model):
     assert isinstance(data_tga.x, xr.DataArray)
     assert isinstance(data_tga.y, xr.DataArray)
     assert isinstance(data_tga, xr.DataArray)
+
+
+def test_parallel_vectors():
+    a = np.array([[1.0, 0.0, 0.0]])
+    b = np.array([[2.0, 0.0, 0.0]])
+    angle = angular_distance(a, b)
+    assert np.isclose(angle[0], 0.0)
+
+
+def test_antiparallel_vectors():
+    a = np.array([[1.0, 0.0, 0.0]])
+    b = np.array([[-1.0, 0.0, 0.0]])
+    angle = angular_distance(a, b)
+    assert np.isclose(angle[0], 180.0)
+
+
+def test_perpendicular_vectors():
+    a = np.array([[1.0, 0.0, 0.0]])
+    b = np.array([[0.0, 1.0, 0.0]])
+    angle = angular_distance(a, b)
+    assert np.isclose(angle[0], 90.0)
+
+
+def test_multiple_vector_pairs():
+    a = np.array(
+        [
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    b = np.array(
+        [
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 0.0, -1.0],
+        ]
+    )
+    angles = angular_distance(a, b)
+
+    assert np.isclose(angles[0], 0.0)
+    assert np.isclose(angles[1], 45.0)
+    assert np.isclose(angles[2], 180.0)
+
+
+def test_radians_output():
+    a = np.array([[1.0, 0.0, 0.0]])
+    b = np.array([[0.0, 1.0, 0.0]])
+    angle = angular_distance(a, b, degrees=False)
+    assert np.isclose(angle[0], np.pi / 2)
