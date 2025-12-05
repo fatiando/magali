@@ -34,49 +34,6 @@ from magali._utils import gradient
 from magali._validation import check_fit_input
 
 
-@pytest.fixture
-def synthetic_data():
-    SEED = 42
-    rng = np.random.default_rng(SEED)
-
-    sensor_sample_distance = 5.0
-    region = [0, 2000, 0, 2000]
-    spacing = 2.0
-    true_inclination = 30
-    true_declination = 40
-    true_dispersion_angle = 5
-    size = 5
-
-    directions_inclination, directions_declination = random_directions(
-        true_inclination,
-        true_declination,
-        true_dispersion_angle,
-        size=size,
-        random_state=SEED,
-    )
-
-    dipoles_amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
-    dipole_coordinates = (
-        rng.integers(30, 1970, size),
-        rng.integers(30, 1970, size),
-        rng.integers(-20, -1, size),
-    )
-
-    dipole_moments = hm.magnetic_angles_to_vec(
-        inclination=directions_inclination,
-        declination=directions_declination,
-        intensity=dipoles_amplitude,
-    )
-
-    data = dipole_bz_grid(
-        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
-    )
-    noise_std_dev = 100
-    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
-
-    return data
-
-
 def test_linear_magnetic_moment_bz_inversion():
     "Check that the inversion recovers a known direction."
     dipole_coordinates = (500, 500, -15)
@@ -138,7 +95,7 @@ def test_linear_magnetic_moment_gz_jacobian():
     np.testing.assert_allclose(data_predicted, data)
 
 
-def test_nonlinear_magnetic_dipole_bz_inversion(synthetic_data):
+def test_nonlinear_magnetic_dipole_bz_inversion():
     "Check that the nonlinear inversion recovers a known dipole location and moment."
     SEED = 42
     rng = np.random.default_rng(SEED)
@@ -465,21 +422,19 @@ def test_iterative_nonlinear_inversion():
     tree = sps.KDTree(dipole_coords_arr)
     distances, indexes = tree.query(locations_arr)
 
-    closest_true_points = dipole_coords_arr[indexes]
-
     intensity_ = []
-    inc_ = []
-    dec_ = []
     for i in range(len(dipole_moments_)):
-        intensity, inc, dec = hm.magnetic_vec_to_angles(
+        intensity, _, _ = hm.magnetic_vec_to_angles(
             dipole_moments_[i][0] * 1e11,
             dipole_moments_[i][1] * 1e11,
             dipole_moments_[i][2] * 1e11,
         )
         intensity *= 1e-11
         intensity_.append(intensity)
-        inc_.append(inc)
-        dec_.append(dec)
+
+    intensity_misfit = (
+        abs(intensity_ - true_intensity[indexes]) / true_intensity[indexes] * 100
+    )
 
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
@@ -487,9 +442,8 @@ def test_iterative_nonlinear_inversion():
     assert isinstance(r2_values, list)
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
 
-    np.testing.assert_array_less(distances, 3)
-
-
+    assert np.all(distances < 3)
+    assert np.all(intensity_misfit < 20)
 
 
 def test_nonlinear_inner_loop_no_step_taken():
