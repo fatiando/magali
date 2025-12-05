@@ -55,7 +55,7 @@ def test_gradient(souza_junior_model):
 
 def test_total_gradient_amplitude_grid(souza_junior_model):
     """
-    Test that `total_gradient_amplitude_grid` returns a DataArray with 
+    Test that `total_gradient_amplitude_grid` returns a DataArray with
     correct units, dimensions, size, name, and xarray types.
     """
     data_tga = total_gradient_amplitude_grid(souza_junior_model)
