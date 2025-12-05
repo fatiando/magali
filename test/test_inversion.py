@@ -30,7 +30,7 @@ from magali._units import (
     meter_to_micrometer,
     tesla_to_nanotesla,
 )
-from magali._utils import gradient
+from magali._utils import angular_distance, gradient
 from magali._validation import check_fit_input
 
 
@@ -436,14 +436,19 @@ def test_iterative_nonlinear_inversion():
         abs(intensity_ - true_intensity[indexes]) / true_intensity[indexes] * 100
     )
 
+    true_moments = np.column_stack(dipole_moments)
+    ang_dist = angular_distance(true_moments[indexes], dipole_moments_)
+
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
     assert isinstance(dipole_moments_, list)
     assert isinstance(r2_values, list)
+
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
 
     assert np.all(distances < 3)
     assert np.all(intensity_misfit < 20)
+    assert np.all(ang_dist < 5)
 
 
 def test_nonlinear_inner_loop_no_step_taken():
