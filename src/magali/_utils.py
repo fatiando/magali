@@ -94,8 +94,10 @@ def total_gradient_amplitude_grid(data):
 
 def angular_distance(vectors_a, vectors_b, degrees=True):
     """
-    Compute the angular distance between pairs of 3D vectors expressed in
-    Cartesian coordinates (x, y, z), using NumPy only.
+    Compute the angular distance between pairs of 3D vectors.
+
+    The vectors are expressed in Cartesian coordinates (x, y, z) and the
+    computation uses only NumPy operations.
 
     Parameters
     ----------

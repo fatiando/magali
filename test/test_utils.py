@@ -20,14 +20,20 @@ from magali._utils import (
 
 
 def test_estimate_grid_spacing(souza_junior_model):
-    # Use model fixture from _models.py
+    """
+    Test that `_estimate_grid_spacing` correctly returns the grid spacing
+    defined in the Souza-Junior model fixture.
+    """
     spacing = _estimate_grid_spacing(souza_junior_model)
-
     assert spacing == 2.0
 
 
 def test_gradient(souza_junior_model):
-    # Use model fixture from _models.py
+    """
+    Test that `gradient` computes dx, dy, dz, and total gradient amplitude
+    values consistent with precomputed reference statistics from the
+    Souza-Junior model fixture.
+    """
     dx, dy, dz, tga = gradient(souza_junior_model)
 
     np.testing.assert_allclose(dx.min().values, -92762.44269656, rtol=1e2)
@@ -48,31 +54,31 @@ def test_gradient(souza_junior_model):
 
 
 def test_total_gradient_amplitude_grid(souza_junior_model):
-    # Use model fixture from _models.py
-    data = souza_junior_model
+    """
+    Test that `total_gradient_amplitude_grid` returns a DataArray with 
+    correct units, dimensions, size, name, and xarray types.
+    """
+    data_tga = total_gradient_amplitude_grid(souza_junior_model)
 
-    data_tga = total_gradient_amplitude_grid(data)
-
-    # Test units
     assert data_tga.x.units == "µm"
     assert data_tga.y.units == "µm"
     assert data_tga.units == "nT/µm"
 
-    # Test array sizes
     assert data_tga.x.size == 1001
     assert data_tga.y.size == 1001
     assert data_tga.size == 1002001
 
-    # Test data name
     assert data_tga.long_name == "Total Gradient Amplitude"
 
-    # Test if data is a DataArray
     assert isinstance(data_tga.x, xr.DataArray)
     assert isinstance(data_tga.y, xr.DataArray)
     assert isinstance(data_tga, xr.DataArray)
 
 
 def test_parallel_vectors():
+    """
+    Test that `angular_distance` returns 0° for parallel vectors.
+    """
     a = np.array([[1.0, 0.0, 0.0]])
     b = np.array([[2.0, 0.0, 0.0]])
     angle = angular_distance(a, b)
@@ -80,6 +86,9 @@ def test_parallel_vectors():
 
 
 def test_antiparallel_vectors():
+    """
+    Test that `angular_distance` returns 180° for antiparallel vectors.
+    """
     a = np.array([[1.0, 0.0, 0.0]])
     b = np.array([[-1.0, 0.0, 0.0]])
     angle = angular_distance(a, b)
@@ -87,6 +96,9 @@ def test_antiparallel_vectors():
 
 
 def test_perpendicular_vectors():
+    """
+    Test that `angular_distance` returns 90° for perpendicular vectors.
+    """
     a = np.array([[1.0, 0.0, 0.0]])
     b = np.array([[0.0, 1.0, 0.0]])
     angle = angular_distance(a, b)
@@ -94,6 +106,10 @@ def test_perpendicular_vectors():
 
 
 def test_multiple_vector_pairs():
+    """
+    Test that `angular_distance` correctly computes angles for multiple
+    vector pairs in a single call.
+    """
     a = np.array(
         [
             [1.0, 0.0, 0.0],
@@ -116,6 +132,10 @@ def test_multiple_vector_pairs():
 
 
 def test_radians_output():
+    """
+    Test that `angular_distance` returns the angle in radians when
+    `degrees=False` is passed.
+    """
     a = np.array([[1.0, 0.0, 0.0]])
     b = np.array([[0.0, 1.0, 0.0]])
     angle = angular_distance(a, b, degrees=False)

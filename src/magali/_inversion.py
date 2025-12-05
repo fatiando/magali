@@ -441,7 +441,6 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
 def iterative_nonlinear_inversion(
     data_up,
     bounding_boxes,
-    height_difference=5.0,
     copy_data=True,
 ):
     """
@@ -457,11 +456,6 @@ def iterative_nonlinear_inversion(
     bounding_boxes : list of lists or arrays
         Bounding boxes of detected anomalies in data coordinates.
         Each bounding box is defined as [x_min, x_max, y_min, y_max].
-
-    height_difference : float, optional
-        Height increment (in µm) used for upward continuation after each
-        iteration (default is 5.0). Increasing this value smooths the field
-        more rapidly between iterations.
 
     copy_data : bool, optional
         If True (default), operates on a deep copy of the input data to avoid
