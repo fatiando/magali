@@ -350,9 +350,8 @@ class NonlinearMagneticDipoleBz:
                     damping += 1e-20 * np.eye(3)
                     delta = np.linalg.solve(hessian + damping, gradient)
                     max_step_m = 1e-6  # 10 µm
-                    step_norm = np.linalg.norm(delta)
-                    if step_norm > max_step_m:
-                        delta = delta * (max_step_m / step_norm)
+
+                    delta = _clip_step(delta, max_step_m)
 
                     trial_location = location + meter_to_micrometer(delta)
                     trial_predicted = dipole_bz(
@@ -441,7 +440,6 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
 def iterative_nonlinear_inversion(
     data_up,
     bounding_boxes,
-    height_difference=5.0,
     copy_data=True,
 ):
     """
@@ -525,6 +523,41 @@ def iterative_nonlinear_inversion(
         data_updated["tga"] = tga
 
     return data_updated, locations_, dipole_moments_, r2_values
+
+
+def _clip_step(delta, max_step_m):
+    """
+    Limit the magnitude of a nonlinear inversion step.
+
+    Ensures that the update vector used in the Levenberg-Marquardt
+    nonlinear location inversion does not exceed a maximum step size.
+    If the proposed step ``delta`` is larger than ``max_step_m`` (in meters),
+    it is rescaled to have exactly that norm while preserving direction.
+
+    Parameters
+    ----------
+    delta : array-like, shape (3,)
+        Proposed update step for the dipole location, in meters.
+    max_step_m : float
+        Maximum allowed step norm, in meters.
+
+    Returns
+    -------
+    delta_clipped : ndarray, shape (3,)
+        Step vector after applying the norm constraint. If the input
+        step already satisfies ``||delta|| <= max_step_m``, it is returned
+        unchanged. Otherwise, it is rescaled to have norm ``max_step_m``.
+
+    Notes
+    -----
+    Used inside the nonlinear location update of
+    :class:`NonlinearMagneticDipoleBz` to prevent instability when the
+    curvature of the objective function produces large Gauss-Newton steps.
+    """
+    step_norm = np.linalg.norm(delta)
+    if step_norm > max_step_m:
+        delta = delta * (max_step_m / step_norm)
+    return delta
 
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we

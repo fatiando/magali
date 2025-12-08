@@ -12,19 +12,18 @@ import harmonica as hm
 import numpy as np
 import pytest
 import scipy.spatial as sps
-import skimage.exposure
 import verde as vd
 import xarray as xr
 
-from magali._detection import detect_anomalies
 from magali._inversion import (
     MagneticMomentBz,
     NonlinearMagneticDipoleBz,
+    _clip_step,
     _jacobian_linear,
     _jacobian_nonlinear,
     iterative_nonlinear_inversion,
 )
-from magali._synthetic import dipole_bz, dipole_bz_grid, random_directions
+from magali._synthetic import dipole_bz, dipole_bz_grid
 from magali._units import (
     coordinates_micrometer_to_meter,
     meter_to_micrometer,
@@ -139,19 +138,13 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     dx, dy, dz, tga = gradient(data_up)
     data_up["dx"], data_up["dy"], data_up["dz"], data_up["tga"] = dx, dy, dz, tga
 
-    stretched = skimage.exposure.rescale_intensity(
-        tga, in_range=tuple(np.percentile(tga, (1, 99)))
-    )
-    data_tga_stretched = xr.DataArray(stretched, coords=data_up.coords)
     bounding_box = [
         np.float64(1206.6619048833757),
         np.float64(1393.3380951166243),
         np.float64(1656.6619048833757),
         np.float64(1843.3380951166243),
     ]
-    anomaly = data_up.sel(
-        x=slice(*bounding_box[:2]), y=slice(*bounding_box[2:])
-    )
+    anomaly = data_up.sel(x=slice(*bounding_box[:2]), y=slice(*bounding_box[2:]))
 
     table = vd.grid_to_table(anomaly)
 
@@ -164,7 +157,6 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
         initial_location=euler.location_, max_iter=1000
     )
 
-    
     # Check uninitialized attributes
     assert not hasattr(model_nl, "location_")
     assert not hasattr(model_nl, "dipole_moment_")
@@ -173,21 +165,21 @@ def test_nonlinear_magnetic_dipole_bz_inversion():
     # Run the inversion
     model_nl.fit(coordinates, bz_corrected)
 
-    true_moment = np.array([ 8.55050358e-12, -4.84923155e-11,  8.68240888e-12])
+    true_moment = np.array([8.55050358e-12, -4.84923155e-11, 8.68240888e-12])
 
     # Check that attributes are now set
     assert model_nl.location_ is not None
     assert model_nl.dipole_moment_ is not None
     assert model_nl.r2_ is not None
-    
+
     ang_dist = angular_distance(true_moment, np.array(model_nl.dipole_moment_))
 
     # Assert that results are close to the truth
     np.testing.assert_allclose(model_nl.location_[0], 1300, rtol=0.05)
     np.testing.assert_allclose(model_nl.location_[1], 1750, rtol=0.05)
     np.testing.assert_allclose(model_nl.location_[2], -15, rtol=0.05)
-    np.testing.assert_allclose(ang_dist, 0.5, rtol=0.05)
-    np.testing.assert_allclose(model_nl.r2_, 1, rtol=0.05)
+    np.testing.assert_allclose(ang_dist, 0.004, atol=0.005)
+    np.testing.assert_allclose(model_nl.r2_, 1, atol=0.0005)
 
 
 def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():
@@ -301,7 +293,6 @@ def test_nonlinear_magnetic_moment_gz_jacobian():
     np.testing.assert_allclose(np.std(residual), 31.744971328845484, atol=1e-3)
 
 
-
 def test_iterative_nonlinear_inversion():
     """
     Test the complete iterative nonlinear inversion workflow on synthetic data.
@@ -406,7 +397,6 @@ def test_iterative_nonlinear_inversion():
         iterative_nonlinear_inversion(
             data_up,
             bounding_boxes,
-            height_difference=height_difference,
             copy_data=True,
         )
     )
@@ -446,6 +436,7 @@ def test_iterative_nonlinear_inversion():
     assert np.all(distances < 3)
     assert np.all(intensity_misfit < 20)
     assert np.all(ang_dist < 5)
+
 
 def test_nonlinear_inner_loop_no_step_taken():
     """
@@ -604,3 +595,23 @@ def test_nonlinear_single_iteration():
     assert hasattr(model, "dipole_moment_")
     assert hasattr(model, "misfit_")
     assert len(model.misfit_) == 2
+
+
+def test_clip_step_limits_step_norm():
+    """_clip_step must reduce the step norm to the maximum allowed value."""
+    max_step = 1e-6
+    delta = np.array([10.0, 0.0, 0.0])  # way too large
+
+    clipped = _clip_step(delta, max_step)
+
+    assert np.isclose(np.linalg.norm(clipped), max_step)
+
+
+def test_clip_step_no_change_when_small():
+    """_clip_step must return the original step when its norm is within limits."""
+    max_step = 1e-6
+    delta = np.array([5e-7, 0, 0])
+
+    clipped = _clip_step(delta, max_step)
+
+    assert np.allclose(clipped, delta)
