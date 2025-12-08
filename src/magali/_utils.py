@@ -90,3 +90,39 @@ def total_gradient_amplitude_grid(data):
     tga.attrs = {"long_name": "Total Gradient Amplitude", "units": "nT/µm"}
 
     return tga
+
+
+def angular_distance(vectors_a, vectors_b, degrees=True):
+    """
+    Compute the angular distance between pairs of 3D vectors.
+
+    The vectors are expressed in Cartesian coordinates (x, y, z) and the
+    computation uses only NumPy operations.
+
+    Parameters
+    ----------
+    vectors_a : array-like, shape (N, 3)
+        First array of 3D vectors.
+    vectors_b : array-like, shape (N, 3)
+        Second array of 3D vectors.
+    degrees : bool, optional
+        If True, return the angular distance in degrees.
+        Default is True.
+
+    Returns
+    -------
+    ndarray of shape (N,)
+        Angular distance between the corresponding vector pairs.
+    """
+    vectors_a = np.atleast_2d(vectors_a)
+    vectors_b = np.atleast_2d(vectors_b)
+
+    dot_products = np.sum(vectors_a * vectors_b, axis=1)
+    norms_a = np.linalg.norm(vectors_a, axis=1)
+    norms_b = np.linalg.norm(vectors_b, axis=1)
+
+    cos_angles = dot_products / (norms_a * norms_b)
+    cos_angles = np.clip(cos_angles, -1.0, 1.0)
+
+    angles = np.arccos(cos_angles)
+    return np.degrees(angles) if degrees else angles

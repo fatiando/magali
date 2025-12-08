@@ -21,3 +21,4 @@ List of functions and classes (API)
    gradient
    total_gradient_amplitude_grid
    detect_anomalies
+   angular_distance

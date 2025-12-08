@@ -350,9 +350,8 @@ class NonlinearMagneticDipoleBz:
                     damping += 1e-20 * np.eye(3)
                     delta = np.linalg.solve(hessian + damping, gradient)
                     max_step_m = 1e-6  # 10 µm
-                    step_norm = np.linalg.norm(delta)
-                    if step_norm > max_step_m:
-                        delta = delta * (max_step_m / step_norm)
+
+                    delta = _clip_step(delta, max_step_m)
 
                     trial_location = location + meter_to_micrometer(delta)
                     trial_predicted = dipole_bz(
@@ -441,7 +440,6 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
 def iterative_nonlinear_inversion(
     data_up,
     bounding_boxes,
-    height_difference=5.0,
     copy_data=True,
 ):
     """
@@ -457,11 +455,6 @@ def iterative_nonlinear_inversion(
     bounding_boxes : list of lists or arrays
         Bounding boxes of detected anomalies in data coordinates.
         Each bounding box is defined as [x_min, x_max, y_min, y_max].
-
-    height_difference : float, optional
-        Height increment (in µm) used for upward continuation after each
-        iteration (default is 5.0). Increasing this value smooths the field
-        more rapidly between iterations.
 
     copy_data : bool, optional
         If True (default), operates on a deep copy of the input data to avoid
@@ -491,7 +484,7 @@ def iterative_nonlinear_inversion(
 
     table = vd.grid_to_table(data_up)
     global_coordinates = (table.x.values, table.y.values, table.z.values)
-
+    shape = data_up.shape
     data_updated = data_up.copy(deep=True) if copy_data else data_up
 
     for box in bounding_boxes:
@@ -520,16 +513,9 @@ def iterative_nonlinear_inversion(
         modeled_bz = dipole_bz(
             global_coordinates, model_nl.location_, model_nl.dipole_moment_
         )
-        for x, y, bz in zip(table.x, table.y, modeled_bz):
-            data_updated.loc[{"x": x, "y": y}] -= bz
+        modeled_bz = np.reshape(modeled_bz, shape)
 
-        data_updated = (
-            hm.upward_continuation(data_updated, height_difference)
-            .assign_attrs(data_updated.attrs)
-            .assign_coords(x=data_updated.x, y=data_updated.y)
-            .assign_coords(z=data_updated.z + height_difference)
-            .rename("bz")
-        )
+        data_updated.values -= modeled_bz
         dx, dy, dz, tga = gradient(data_updated)
         data_updated["dx"] = dx
         data_updated["dy"] = dy
@@ -537,6 +523,41 @@ def iterative_nonlinear_inversion(
         data_updated["tga"] = tga
 
     return data_updated, locations_, dipole_moments_, r2_values
+
+
+def _clip_step(delta, max_step_m):
+    """
+    Limit the magnitude of a nonlinear inversion step.
+
+    Ensures that the update vector used in the Levenberg-Marquardt
+    nonlinear location inversion does not exceed a maximum step size.
+    If the proposed step ``delta`` is larger than ``max_step_m`` (in meters),
+    it is rescaled to have exactly that norm while preserving direction.
+
+    Parameters
+    ----------
+    delta : array-like, shape (3,)
+        Proposed update step for the dipole location, in meters.
+    max_step_m : float
+        Maximum allowed step norm, in meters.
+
+    Returns
+    -------
+    delta_clipped : ndarray, shape (3,)
+        Step vector after applying the norm constraint. If the input
+        step already satisfies ``||delta|| <= max_step_m``, it is returned
+        unchanged. Otherwise, it is rescaled to have norm ``max_step_m``.
+
+    Notes
+    -----
+    Used inside the nonlinear location update of
+    :class:`NonlinearMagneticDipoleBz` to prevent instability when the
+    curvature of the objective function produces large Gauss-Newton steps.
+    """
+    step_norm = np.linalg.norm(delta)
+    if step_norm > max_step_m:
+        delta = delta * (max_step_m / step_norm)
+    return delta
 
 
 # Compile the Jacobian calculation. Doesn't use this as a decorator so that we

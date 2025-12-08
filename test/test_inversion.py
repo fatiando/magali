@@ -11,69 +11,26 @@ Test the _synthetic functions
 import harmonica as hm
 import numpy as np
 import pytest
-import skimage.exposure
+import scipy.spatial as sps
 import verde as vd
 import xarray as xr
 
-from magali._detection import detect_anomalies
 from magali._inversion import (
     MagneticMomentBz,
     NonlinearMagneticDipoleBz,
+    _clip_step,
     _jacobian_linear,
     _jacobian_nonlinear,
     iterative_nonlinear_inversion,
 )
-from magali._synthetic import dipole_bz, dipole_bz_grid, random_directions
+from magali._synthetic import dipole_bz, dipole_bz_grid
 from magali._units import (
     coordinates_micrometer_to_meter,
     meter_to_micrometer,
     tesla_to_nanotesla,
 )
-from magali._utils import gradient
+from magali._utils import angular_distance, gradient
 from magali._validation import check_fit_input
-
-
-@pytest.fixture
-def synthetic_data():
-    SEED = 42
-    rng = np.random.default_rng(SEED)
-
-    sensor_sample_distance = 5.0
-    region = [0, 2000, 0, 2000]
-    spacing = 2.0
-    true_inclination = 30
-    true_declination = 40
-    true_dispersion_angle = 5
-    size = 5
-
-    directions_inclination, directions_declination = random_directions(
-        true_inclination,
-        true_declination,
-        true_dispersion_angle,
-        size=size,
-        random_state=SEED,
-    )
-
-    dipoles_amplitude = abs(rng.normal(0, 100, size)) * 1.0e-14
-    dipole_coordinates = (
-        rng.integers(30, 1970, size),
-        rng.integers(30, 1970, size),
-        rng.integers(-20, -1, size),
-    )
-
-    dipole_moments = hm.magnetic_angles_to_vec(
-        inclination=directions_inclination,
-        declination=directions_declination,
-        intensity=dipoles_amplitude,
-    )
-
-    data = dipole_bz_grid(
-        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
-    )
-    noise_std_dev = 100
-    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
-
-    return data
 
 
 def test_linear_magnetic_moment_bz_inversion():
@@ -139,41 +96,90 @@ def test_linear_magnetic_moment_gz_jacobian():
 
 def test_nonlinear_magnetic_dipole_bz_inversion():
     "Check that the nonlinear inversion recovers a known dipole location and moment."
-    coordinates = vd.grid_coordinates(
-        region=[-20, 15, 0, 40],
-        spacing=1,
-        extra_coords=5,
+    SEED = 42
+    rng = np.random.default_rng(SEED)
+
+    sensor_sample_distance = 5.0
+    region = [0, 2000, 0, 2000]
+    spacing = 2
+
+    dipole_coordinates = (
+        np.concatenate([[1250, 1300, 500, 500, 1252, 1250, 1790, 1782, 1720]]),
+        np.concatenate([[500, 1750, 1000, 890, 380, 230, 1210, 1122, 1255]]),
+        np.concatenate([[-15, -15, -30, -30, -30, -15, -15, -15, -15]]),
     )
-    true_location = (0, 20, -5)
-    true_inclination = 45
-    true_declination = -15
-    true_intensity = 1e-15
-    true_moment = hm.magnetic_angles_to_vec(
+
+    true_inclination = np.concatenate([[10, -10, -5, 10, 10, 10, -10, -160, -10]])
+    true_declination = np.concatenate([[10, 170, 190, 170, 170, 10, -10, -10, -170]])
+    true_intensity = np.concatenate(
+        [[5e-11, 5e-11, 5e-11, 2e-12, 2e-12, 5e-11, 5e-13, 5e-12, 5e-13]]
+    )
+
+    dipole_moments = hm.magnetic_angles_to_vec(
         inclination=true_inclination,
         declination=true_declination,
         intensity=true_intensity,
     )
-    data = dipole_bz(coordinates, true_location, true_moment)
+    data = dipole_bz_grid(
+        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+    )
+    noise_std_dev = 100
+    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
 
-    initial_guess = (0.04041674, 20.27141785, 3.27582947)
-    model = NonlinearMagneticDipoleBz(initial_location=initial_guess)
+    height_difference = 5.0
+    data_up = (
+        hm.upward_continuation(data, height_difference)
+        .assign_attrs(data.attrs)
+        .assign_coords(x=data.x, y=data.y)
+        .assign_coords(z=data.z + height_difference)
+        .rename("bz")
+    )
+
+    dx, dy, dz, tga = gradient(data_up)
+    data_up["dx"], data_up["dy"], data_up["dz"], data_up["tga"] = dx, dy, dz, tga
+
+    bounding_box = [
+        np.float64(1206.6619048833757),
+        np.float64(1393.3380951166243),
+        np.float64(1656.6619048833757),
+        np.float64(1843.3380951166243),
+    ]
+    anomaly = data_up.sel(x=slice(*bounding_box[:2]), y=slice(*bounding_box[2:]))
+
+    table = vd.grid_to_table(anomaly)
+
+    euler = hm.EulerDeconvolution(3)
+    euler.fit((table.x, table.y, table.z), (table.bz, table.dx, table.dy, table.dz))
+    bz_corrected = table.bz.values - euler.base_level_
+    coordinates = (table.x.values, table.y.values, table.z.values)
+
+    model_nl = NonlinearMagneticDipoleBz(
+        initial_location=euler.location_, max_iter=1000
+    )
+
     # Check uninitialized attributes
-    assert not hasattr(model, "location_")
-    assert not hasattr(model, "dipole_moment_")
-    assert not hasattr(model, "r2")
+    assert not hasattr(model_nl, "location_")
+    assert not hasattr(model_nl, "dipole_moment_")
+    assert not hasattr(model_nl, "r2")
 
     # Run the inversion
-    model.fit(coordinates, data)
+    model_nl.fit(coordinates, bz_corrected)
+
+    true_moment = np.array([8.55050358e-12, -4.84923155e-11, 8.68240888e-12])
 
     # Check that attributes are now set
-    assert model.location_ is not None
-    assert model.dipole_moment_ is not None
-    assert model.r2_ is not None
+    assert model_nl.location_ is not None
+    assert model_nl.dipole_moment_ is not None
+    assert model_nl.r2_ is not None
+
+    ang_dist = angular_distance(true_moment, np.array(model_nl.dipole_moment_))
 
     # Assert that results are close to the truth
-    np.testing.assert_allclose(model.location_, true_location, atol=1.0)
-    np.testing.assert_allclose(model.dipole_moment_, true_moment, rtol=0.05)
-    np.testing.assert_allclose(model.r2_, 1, rtol=0.05)
+    np.testing.assert_allclose(model_nl.location_[0], 1300, rtol=0.05)
+    np.testing.assert_allclose(model_nl.location_[1], 1750, rtol=0.05)
+    np.testing.assert_allclose(model_nl.location_[2], -15, rtol=0.05)
+    np.testing.assert_allclose(ang_dist, 0.004, atol=0.005)
+    np.testing.assert_allclose(model_nl.r2_, 1, atol=0.0005)
 
 
 def test_nonlinear_magnetic_dipole_jacobian_step_decreases_misfit():
@@ -287,46 +293,149 @@ def test_nonlinear_magnetic_moment_gz_jacobian():
     np.testing.assert_allclose(np.std(residual), 31.744971328845484, atol=1e-3)
 
 
-def test_iterative_nonlinear_inversion(synthetic_data):
+def test_iterative_nonlinear_inversion():
     """
     Test the complete iterative nonlinear inversion workflow on synthetic data.
     """
+    SEED = 42
+    rng = np.random.default_rng(SEED)
+
+    sensor_sample_distance = 5.0
+    region = [0, 2000, 0, 2000]
+    spacing = 2
+
+    dipole_coordinates = (
+        np.concatenate([[1250, 1300, 500, 500, 1252, 1250, 1790, 1782, 1720]]),
+        np.concatenate([[500, 1750, 1000, 890, 380, 230, 1210, 1122, 1255]]),
+        np.concatenate([[-15, -15, -30, -30, -30, -15, -15, -15, -15]]),
+    )
+
+    true_inclination = np.concatenate([[10, -10, -5, 10, 10, 10, -10, -160, -10]])
+    true_declination = np.concatenate([[10, 170, 190, 170, 170, 10, -10, -10, -170]])
+    true_intensity = np.concatenate(
+        [[5e-11, 5e-11, 5e-11, 2e-12, 2e-12, 5e-11, 5e-13, 5e-12, 5e-13]]
+    )
+
+    dipole_moments = hm.magnetic_angles_to_vec(
+        inclination=true_inclination,
+        declination=true_declination,
+        intensity=true_intensity,
+    )
+    data = dipole_bz_grid(
+        region, spacing, sensor_sample_distance, dipole_coordinates, dipole_moments
+    )
+    noise_std_dev = 100
+    data.values += rng.normal(loc=0, scale=noise_std_dev, size=data.shape)
+
     height_difference = 5.0
     data_up = (
-        hm.upward_continuation(synthetic_data, height_difference)
-        .assign_attrs(synthetic_data.attrs)
-        .assign_coords(x=synthetic_data.x, y=synthetic_data.y)
-        .assign_coords(z=synthetic_data.z + height_difference)
+        hm.upward_continuation(data, height_difference)
+        .assign_attrs(data.attrs)
+        .assign_coords(x=data.x, y=data.y)
+        .assign_coords(z=data.z + height_difference)
         .rename("bz")
     )
-    dx, dy, dz, tga = gradient(data_up)
-    data_up["dx"], data_up["dy"], data_up["dz"], data_up["tga"] = dx, dy, dz, tga
-    stretched = skimage.exposure.rescale_intensity(
-        tga, in_range=tuple(np.percentile(tga, (1, 99)))
-    )
-    data_tga_stretched = xr.DataArray(stretched, coords=data_up.coords)
-    bounding_boxes = detect_anomalies(
-        data_tga_stretched,
-        size_range=[30, 50],
-        detection_threshold=0.03,
-        border_exclusion=2,
-        size_multiplier=1,
-    )
+
+    bounding_boxes = [
+        [
+            np.float64(1206.6619048833757),
+            np.float64(1393.3380951166243),
+            np.float64(1656.6619048833757),
+            np.float64(1843.3380951166243),
+        ],
+        [
+            np.float64(1156.6619048833757),
+            np.float64(1343.3380951166243),
+            np.float64(134.6619048833757),
+            np.float64(321.3380951166243),
+        ],
+        [
+            np.float64(1156.6619048833757),
+            np.float64(1343.3380951166243),
+            np.float64(408.6619048833757),
+            np.float64(595.3380951166243),
+        ],
+        [
+            np.float64(406.6619048833757),
+            np.float64(593.3380951166243),
+            np.float64(906.6619048833757),
+            np.float64(1093.3380951166243),
+        ],
+        [
+            np.float64(1750.8873016277919),
+            np.float64(1813.1126983722081),
+            np.float64(1088.8873016277919),
+            np.float64(1151.1126983722081),
+        ],
+        [
+            np.float64(1688.8873016277919),
+            np.float64(1751.1126983722081),
+            np.float64(1222.8873016277919),
+            np.float64(1285.1126983722081),
+        ],
+        [
+            np.float64(1758.8873016277919),
+            np.float64(1821.1126983722081),
+            np.float64(1184.8873016277919),
+            np.float64(1247.1126983722081),
+        ],
+        [
+            np.float64(1220.8873016277919),
+            np.float64(1283.1126983722081),
+            np.float64(342.8873016277919),
+            np.float64(405.1126983722081),
+        ],
+        [
+            np.float64(472.8873016277919),
+            np.float64(535.1126983722081),
+            np.float64(826.8873016277919),
+            np.float64(889.1126983722081),
+        ],
+    ]
+
     data_updated, locations_, dipole_moments_, r2_values = (
         iterative_nonlinear_inversion(
             data_up,
             bounding_boxes,
-            height_difference=height_difference,
             copy_data=True,
         )
     )
+
+    dipole_coords_arr = np.column_stack(dipole_coordinates)
+    locations_arr = np.asarray(locations_)
+
+    locations_arr = locations_arr.reshape(-1, 3)
+
+    tree = sps.KDTree(dipole_coords_arr)
+    distances, indexes = tree.query(locations_arr)
+
+    intensity_ = []
+    for i in range(len(dipole_moments_)):
+        intensity, _, _ = hm.magnetic_vec_to_angles(
+            dipole_moments_[i][0] * 1e11,
+            dipole_moments_[i][1] * 1e11,
+            dipole_moments_[i][2] * 1e11,
+        )
+        intensity *= 1e-11
+        intensity_.append(intensity)
+
+    intensity_misfit = (
+        abs(intensity_ - true_intensity[indexes]) / true_intensity[indexes] * 100
+    )
+
+    true_moments = np.column_stack(dipole_moments)
+    ang_dist = angular_distance(true_moments[indexes], dipole_moments_)
+
     assert isinstance(data_updated, xr.DataArray)
     assert isinstance(locations_, list)
     assert isinstance(dipole_moments_, list)
     assert isinstance(r2_values, list)
+
     assert len(locations_) == len(dipole_moments_) == len(r2_values)
-    np.testing.assert_allclose(locations_[0][0], 1506.00100449, atol=1e-3)
-    np.testing.assert_allclose(dipole_moments_[0][0], 5.22732937e-13, atol=1e-12)
+
+    assert np.all(distances < 3)
+    assert np.all(intensity_misfit < 20)
+    assert np.all(ang_dist < 5)
 
 
 def test_nonlinear_inner_loop_no_step_taken():
@@ -486,3 +595,23 @@ def test_nonlinear_single_iteration():
     assert hasattr(model, "dipole_moment_")
     assert hasattr(model, "misfit_")
     assert len(model.misfit_) == 2
+
+
+def test_clip_step_limits_step_norm():
+    """_clip_step must reduce the step norm to the maximum allowed value."""
+    max_step = 1e-6
+    delta = np.array([10.0, 0.0, 0.0])  # way too large
+
+    clipped = _clip_step(delta, max_step)
+
+    assert np.isclose(np.linalg.norm(clipped), max_step)
+
+
+def test_clip_step_no_change_when_small():
+    """_clip_step must return the original step when its norm is within limits."""
+    max_step = 1e-6
+    delta = np.array([5e-7, 0, 0])
+
+    clipped = _clip_step(delta, max_step)
+
+    assert np.allclose(clipped, delta)

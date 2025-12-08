@@ -23,6 +23,7 @@ from ._units import (
     tesla_to_nanotesla,
 )
 from ._utils import (
+    angular_distance,
     gradient,
     total_gradient_amplitude_grid,
 )
