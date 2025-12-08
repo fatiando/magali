@@ -114,8 +114,8 @@ def angular_distance(vectors_a, vectors_b, degrees=True):
     ndarray of shape (N,)
         Angular distance between the corresponding vector pairs.
     """
-    vectors_a = np.asarray(vectors_a)
-    vectors_b = np.asarray(vectors_b)
+    vectors_a = np.atleast_2d(vectors_a)
+    vectors_b = np.atleast_2d(vectors_b)
 
     dot_products = np.sum(vectors_a * vectors_b, axis=1)
     norms_a = np.linalg.norm(vectors_a, axis=1)

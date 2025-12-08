@@ -441,6 +441,7 @@ def _jacobian_nonlinear(x, y, z, xc, yc, zc, mx, my, mz, result):
 def iterative_nonlinear_inversion(
     data_up,
     bounding_boxes,
+    height_difference=5.0,
     copy_data=True,
 ):
     """
