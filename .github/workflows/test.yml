@@ -102,7 +102,7 @@ jobs:
           echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
       - name: Setup caching for pip packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements-full.txt') }}
@@ -127,7 +127,7 @@ jobs:
         run: echo "v=$(grep ensaio env/requirements-docs.txt)" >> $GITHUB_OUTPUT
 
       - name: Setup caching of Ensaio datasets
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/cache/ensaio
           key: ensaio-data-${{ steps.ensaio-version.outputs.v }}
@@ -144,7 +144,7 @@ jobs:
         run: mv .coverage .coverage.${{ matrix.os }}_${{ matrix.python }}_${{ matrix.dependencies }}
 
       - name: Upload coverage as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           path: .coverage.*
           name: coverage_${{ matrix.os }}_${{ matrix.python }}_${{ matrix.dependencies }}
@@ -178,12 +178,12 @@ jobs:
         run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
       - name: Setup caching for pip packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-coverage
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           pattern: coverage_*
           # If true, the downloaded artifacts will be in the same directory
@@ -206,7 +206,7 @@ jobs:
         run: python -m coverage report --fail-under=100
 
       - name: Upload HTML report if check failed
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: html-report
           path: htmlcov
