@@ -1,13 +1,14 @@
 <h1 align="center"><img src="https://github.com/fatiando/magali/raw/main/doc/_static/readme-banner.png" alt="Magali"></h1>
 
-<h2 align="center">Modeling and inversion of magnetic microscopy data</h2>
+<p align="center"><strong>Modeling and inversion of magnetic microscopy data</strong></p>
 
 <p align="center">
 <a href="https://www.fatiando.org/magali"><strong>Documentation</strong> (latest)</a> •
-<a href="https://www.fatiando.org/magali/dev"><strong>Documentation</strong> (main branch)</a> •
-<a href="https://github.com/fatiando/magali/blob/main/CONTRIBUTING.md"><strong>Contributing</strong></a> •
+<a href="https://www.fatiando.org/magali/dev"><strong>Documentation</strong> (development)</a> •
+<a href="https://github.com/fatiando/magali/blob/main/CONTRIBUTING.md"><strong>Contribute</strong></a> •
 <a href="https://www.fatiando.org/contact/"><strong>Contact</strong></a> •
-<a href="https://github.com/orgs/fatiando/discussions"><strong>Ask a question</strong></a>
+<a href="https://github.com/orgs/fatiando/discussions"><strong>Ask a question</strong></a> •
+<a href="https://www.fatiando.org/magali/latest/citing.html"><strong>Cite</strong></a>
 </p>
 
 <p align="center">
