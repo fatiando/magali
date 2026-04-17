@@ -151,4 +151,5 @@ particles in imagery, and perform inversions for magnetic dipole moments.
     How to contribute <https://github.com/fatiando/magali/blob/master/CONTRIBUTING.md>
     Code of Conduct <https://github.com/fatiando/magali/blob/master/CODE_OF_CONDUCT.md>
     Source code on GitHub <https://github.com/fatiando/magali>
+    Authors <https://github.com/fatiando/magali/blob/main/AUTHORS.md>
     The Fatiando a Terra project <https://www.fatiando.org>
