@@ -55,6 +55,10 @@ how we can improve the project.
 [Join the conversation](https://www.fatiando.org/contact) or submit
 [issues on GitHub](https://github.com/fatiando/magali/issues).
 
+## Policy on AI usage:
+Please read our
+[AI Usage Policy](https://github.com/fatiando/community/blob/main/AI.md).
+
 ## License
 
 This is free software: you can redistribute it and/or modify it under the terms
